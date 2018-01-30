@@ -1,0 +1,140 @@
+Title,Body
+"How to build an image classification dataset in Azure?","<p>I've a set of images that have a single classification of OPEN (they show something that is open).  I couldn't find a way to directly add a status of open to the image reader dataset so I have FULL OUTER JOIN-ed a single ENTER DATA to an IMAGE READER as per the following.  This seems like a hack, does anyone know the ""right"" way to do this?
+<img src=""https://i.stack.imgur.com/Kt1Rv.png"" alt=""enter image description here""></p>
+"
+"Access Azure blog storage from within an Azure ML experiment","<p>Azure ML Experiments provide ways to read and write CSV files to Azure blob storage through the <code>Reader</code> and <code>Writer</code> modules. However, I need to write a JSON file to blob storage. Since there is no module to do so, I'm trying to do so from within an <code>Execute Python Script</code> module.</p>
+
+<pre><code># Import the necessary items
+from azure.storage.blob import BlobService
+
+def azureml_main(dataframe1 = None, dataframe2 = None):
+    account_name = 'mystorageaccount'
+    account_key='mykeyhere=='
+    json_string='{jsonstring here}'
+
+    blob_service = BlobService(account_name, account_key)
+
+    blob_service.put_block_blob_from_text(""upload"",""out.json"",json_string)
+
+    # Return value must be of a sequence of pandas.DataFrame
+    return dataframe1,
+</code></pre>
+
+<p>However, this results in an error: <code>ImportError: No module named azure.storage.blob</code></p>
+
+<p>This implies that the <code>azure-storage</code> Python package is not installed on Azure ML. </p>
+
+<p><em>How can I write to Azure blob storage from inside an Azure ML Experiment?</em></p>
+
+<p>Here's the fill error message:</p>
+
+<pre><code>Error 0085: The following error occurred during script evaluation, please view the output log for more information:
+---------- Start of error message from Python interpreter ----------
+data:text/plain,Caught exception while executing function: Traceback (most recent call last):
+  File ""C:\server\invokepy.py"", line 162, in batch
+    mod = import_module(moduleName)
+  File ""C:\pyhome\lib\importlib\__init__.py"", line 37, in import_module
+    __import__(name)
+  File ""C:\temp\azuremod.py"", line 19, in &lt;module&gt;
+    from azure.storage.blob import BlobService
+ImportError: No module named azure.storage.blob
+
+---------- End of error message from Python  interpreter  ----------
+Start time: UTC 02/06/2016 17:59:47
+End time: UTC 02/06/2016 18:00:00`
+</code></pre>
+
+<p>Thanks, everyone!</p>
+
+<p>UPDATE: Thanks to Dan and Peter for the ideas below. This is the progress I've made using those recommendations.  I created a clean Python 2.7 virtual environment (in VS 2005), and did a <code>pip install azure-storage</code> to get the dependencies into my site-packages directory.  I then zipped the site-packages folder and uploaded as the Zip file, as per Dan's note below.  I then included the reference to the site-packages directory and successfully imported the required items.  This resulted in a time out error when writing to blog storage.</p>
+
+<p><a href=""https://i.stack.imgur.com/wsrLn.png"" rel=""noreferrer""><img src=""https://i.stack.imgur.com/wsrLn.png"" alt=""Failure to write to Blob storage""></a></p>
+
+<p>Here is my code:</p>
+
+<pre><code># Get access to the uploaded Python packages    
+import sys
+packages = "".\Script Bundle\site-packages""
+sys.path.append(packages)
+
+# Import the necessary items from packages referenced above
+from azure.storage.blob import BlobService
+from azure.storage.queue import QueueService
+
+def azureml_main(dataframe1 = None, dataframe2 = None):
+    account_name = 'mystorageaccount'
+    account_key='p8kSy3F...elided...3plQ=='
+
+    blob_service = BlobService(account_name, account_key)
+    blob_service.put_block_blob_from_text(""upload"",""out.txt"",""Test to write"")
+
+    # All of the following also fail
+    #blob_service.create_container('images')
+    #blob_service.put_blob(""upload"",""testme.txt"",""foo"",""BlockBlob"")
+
+    #queue_service = QueueService(account_name, account_key)
+    #queue_service.create_queue('taskqueue')
+
+    # Return value must be of a sequence of pandas.DataFrame
+    return dataframe1,
+</code></pre>
+
+<p>And here is the new error log:</p>
+
+<pre><code>Error 0085: The following error occurred during script evaluation, please view the output log for more information:
+---------- Start of error message from Python interpreter ----------
+data:text/plain,C:\pyhome\lib\site-packages\requests\packages\urllib3\util\ssl_.py:79: InsecurePlatformWarning: A true SSLContext object is not available. This prevents urllib3 from configuring SSL appropriately and may cause certain SSL connections to fail. For more information, see https://urllib3.readthedocs.org/en/latest/security.html#insecureplatformwarning.
+  InsecurePlatformWarning
+Caught exception while executing function: Traceback (most recent call last):   
+  File ""C:\server\invokepy.py"", line 169, in batch
+    odfs = mod.azureml_main(*idfs)
+  File ""C:\temp\azuremod.py"", line 44, in azureml_main
+    blob_service.put_blob(""upload"",""testme.txt"",""foo"",""BlockBlob"")
+  File "".\Script Bundle\site-packages\azure\storage\blob\blobservice.py"", line 883, in put_blob
+    self._perform_request(request)
+  File "".\Script Bundle\site-packages\azure\storage\storageclient.py"", line 171, in _perform_request
+    resp = self._filter(request)
+  File "".\Script Bundle\site-packages\azure\storage\storageclient.py"", line 160, in _perform_request_worker
+    return self._httpclient.perform_request(request)
+  File "".\Script Bundle\site-packages\azure\storage\_http\httpclient.py"", line 181, in perform_request
+    self.send_request_body(connection, request.body)
+  File "".\Script Bundle\site-packages\azure\storage\_http\httpclient.py"", line 143, in send_request_body
+    connection.send(request_body)
+  File "".\Script Bundle\site-packages\azure\storage\_http\requestsclient.py"", line 81, in send
+    self.response = self.session.request(self.method, self.uri, data=request_body, headers=self.headers, timeout=self.timeout)
+  File ""C:\pyhome\lib\site-packages\requests\sessions.py"", line 464, in request
+    resp = self.send(prep, **send_kwargs)
+  File ""C:\pyhome\lib\site-packages\requests\sessions.py"", line 576, in send
+    r = adapter.send(request, **kwargs)
+  File ""C:\pyhome\lib\site-packages\requests\adapters.py"", line 431, in send
+    raise SSLError(e, request=request)
+SSLError: The write operation timed out
+
+---------- End of error message from Python  interpreter  ----------
+Start time: UTC 02/10/2016 15:33:00
+End time: UTC 02/10/2016 15:34:18
+</code></pre>
+
+<p>Where my current exploration is leading is that there is a dependency on the <code>requests</code> Python package in <code>azure-storage</code>. <code>requests</code> has a known bug in Python 2.7 for calling newer SSL protocols. Not sure, but I'm digging around in that area now.  </p>
+
+<p>UPDATE 2: This code runs perfectly fine inside of a Python 3 Jupyter notebook.  Additionally, if I make the Blob Container open to public access, I can directly READ from the Container through a URL.  For instance: <code>df = pd.read_csv(""https://mystorageaccount.blob.core.windows.net/upload/test.csv"")</code> easily loads the file from blob storage.  However, I cannot use the <code>azure.storage.blob.BlobService</code> to read from the same file.</p>
+
+<p><a href=""https://i.stack.imgur.com/X4vpX.png"" rel=""noreferrer""><img src=""https://i.stack.imgur.com/X4vpX.png"" alt=""enter image description here""></a></p>
+
+<p>UPDATE 3: Dan, in a comment below, suggested I try from the Jupyter notebooks <em>hosted on Azure ML</em>.  I had been running it from a local Jupyter notebook (see update 2 above).  <strong>However</strong>, it fails when run from an Azure ML Notebook, and the errors point to the <code>requires</code> package again. I'll need to find the known issues with that package, but from my reading, the known issue is with urllib3 and only impacts Python 2.7 and NOT any Python 3.x versions.  And this was run in a Python 3.x notebook.  Grrr.</p>
+
+<p><a href=""https://i.stack.imgur.com/jjbp2.png"" rel=""noreferrer""><img src=""https://i.stack.imgur.com/jjbp2.png"" alt=""enter image description here""></a></p>
+
+<p>UPDATE 4: As Dan notes below, this may be an issue with Azure ML networking, as <code>Execute Python Script</code> is relatively new and just got networking support.  However, I have also tested this on an Azure App Service webjob, which is on an entirely different Azure platform. (It is also on an entirely different Python distribution and supports both Python 2.7 and 3.4/5, but only at 32 bit - even on 64 bit machines.)  The code there also fails, with an <code>InsecurePlatformWarning</code> message.</p>
+
+<pre><code>[02/08/2016 15:53:54 &gt; b40783: SYS INFO] Run script 'ListenToQueue.py' with script host - 'PythonScriptHost'
+[02/08/2016 15:53:54 &gt; b40783: SYS INFO] Status changed to Running
+[02/08/2016 15:54:09 &gt; b40783: INFO] test.csv
+[02/08/2016 15:54:09 &gt; b40783: ERR ] D:\home\site\wwwroot\env\Lib\site-packages\requests\packages\urllib3\util\ssl_.py:315: SNIMissingWarning: An HTTPS request has been made, but the SNI (Subject Name Indication) extension to TLS is not available on this platform. This may cause the server to present an incorrect TLS certificate, which can cause validation failures. For more information, see https://urllib3.readthedocs.org/en/latest/security.html#snimissingwarning.
+[02/08/2016 15:54:09 &gt; b40783: ERR ]   SNIMissingWarning
+[02/08/2016 15:54:09 &gt; b40783: ERR ] D:\home\site\wwwroot\env\Lib\site-packages\requests\packages\urllib3\util\ssl_.py:120: InsecurePlatformWarning: A true SSLContext object is not available. This prevents urllib3 from configuring SSL appropriately and may cause certain SSL connections to fail. For more information, see https://urllib3.readthedocs.org/en/latest/security.html#insecureplatformwarning.
+[02/08/2016 15:54:09 &gt; b40783: ERR ]   InsecurePlatformWarning
+[02/08/2016 15:54:09 &gt; b40783: ERR ] D:\home\site\wwwroot\env\Lib\site-packages\requests\packages\urllib3\util\ssl_.py:120: InsecurePlatformWarning: A true SSLContext object is not available. This prevents urllib3 from configuring SSL appropriately and may cause certain SSL connections to fail. For more information, see https://urllib3.readthedocs.org/en/latest/security.html#insecureplatformwarning.
+[02/08/2016 15:54:09 &gt; b40783: ERR ]   InsecurePlatformWarning
+</code></pre>
+"

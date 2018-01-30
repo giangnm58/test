@@ -1,0 +1,31 @@
+Title,Body
+"Amazon AWS Machine Learning HTTP request","<p>I have created AWS Machine Learning model with working real-time endpoint. I want to consume created service via HTTP request. For testing purpose I'm using Postman, I've created request according to Amazon's API documentation but every time I get the same exception: <code>UnknownOperationException</code>. While I'm using Python SDK the service is working fine. Below example that gets model info. </p>
+
+<p>That's my request (fake credentials):</p>
+
+<pre><code>POST  HTTP/1.1
+Host: realtime.machinelearning.us-east-1.amazonaws.com
+Content-Type: application/json
+X-Amz-Target: AmazonML_20141212.GetMLModel
+X-Amz-Date: 20170714T124250Z
+Authorization: AWS4-HMAC-SHA256 Credential=JNALSFNLANFAFS/20170714/us-east-1/AmazonML/aws4_request, SignedHeaders=content-length;content-type;host;x-amz-date;x-amz-target, Signature=fiudsf9sdfh9sdhfsd9hfsdkfdsiufhdsfoidshfodsh
+Cache-Control: no-cache
+Postman-Token: hd9sfh9s-idsfuuf-a32c-31ca-dsufhdso
+
+{
+   ""MLModelId"": ""ml-Hfdlfjdof0807"",
+   ""Verbose"": true
+}
+</code></pre>
+
+<p>Exception I get:</p>
+
+<pre><code>{
+    ""Output"": {
+        ""__type"": ""com.amazon.coral.service#UnknownOperationException"",
+        ""message"": null
+    },
+    ""Version"": ""1.0""
+}
+</code></pre>
+"

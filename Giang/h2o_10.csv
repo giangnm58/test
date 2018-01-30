@@ -1,0 +1,91 @@
+Title,Body
+"How to get different Variable Importance for each class in a binary h2o GBM in R?","<p>I'm trying to explore the use of a GBM with <code>h2o</code> for a classification issue to replace a logistic regression (GLM). The non-linearity and interactions in my data make me think a GBM is more suitable.</p>
+
+<p>I've ran a baseline GBM (see below) and compared the AUC against the AUC of the logistic regression. THe GBM performs much better.</p>
+
+<p>In a classic linear logistic regression, one would be able to see the direction and effect of each of the predictors (x) on the outcome variable (y). </p>
+
+<p>Now, I would like to evaluate the variable importance of the estimate GBM in the same way. </p>
+
+<p><strong>How does one obtain the variable importance for each of the (two) classes?</strong></p>
+
+<p>I know that the variable importance is not the same as the estimated coefficient in a logistic regression, but it would help me to understand which predictor impacts what class.  </p>
+
+<p>Others have asked <a href=""https://stackoverflow.com/questions/29637145/gbm-r-function-get-variable-importance-separately-for-each-class"">similar questions</a>, but the answers provided won't work for the H2O object.</p>
+
+<p>Any help is much appreciated.</p>
+
+<pre><code>example.gbm &lt;- h2o.gbm(
+  x = c(""list of predictors""), 
+  y = ""binary response variable"", 
+  training_frame = data, 
+  max_runtime_secs = 1800, 
+  nfolds=5,
+  stopping_metric = ""AUC"")
+</code></pre>
+"
+"What's the difference between passport and oauth?","<p>I'm trying to build an authentication service with express.js, but I didn't catch the idea of authentication modules yet. </p>
+
+<p>What's difference between passport and oauth middleware? Are they dependent of each other? Is useless to have the BearerStrategy without an oauth server to generate tokens to the BearerStrategy validate? Am I on the right way?</p>
+
+<p>I've read about oAuth2 and Its authentication flow, but I'm still lost with this uncoupled code.</p>
+
+<p>I'm trying to build the Resourse Owner Password authentication with refresh token for my AngularJS frontend communicating with the backend API, and I'm facing with many combinations of password.js strategies (Basic, Bearer, ClientPassword) with oauth2orize on the other side.</p>
+
+<p>So, I'd like to know a very simple explanation of how authentication works on NodeJS. At really I know that Express is not inventing a new way of how authentication works, but the modules are too unobtrusive that I need to understand the base of how It works to achieve them working together.</p>
+"
+"How to convert r data frame to h2o object","<p>Im new to R and H2O and I have tried to find a way to convert r data frame to a h2o object. I have spent some time research on how to do this with no luck. Other way around is possible and well documented as follows.</p>
+
+<pre><code>prosPath = system.file(""extdata"", ""prostate.csv"", package=""h2o"")
+prostate.hex = h2o.importFile(localH2O, path = prosPath)
+prostate.data.frame &lt;- as.data.frame(prostate.hex)
+</code></pre>
+
+<p>But what i want is complete opposite of this. I wants to convert r ""prostate.data.frame"" data object converted to h2o object named ""prostate.hex"".
+Thanks in advance.</p>
+"
+"Fastest way to read in 100,000 .dat.gz files","<p>I have a few hundred thousand very small <code>.dat.gz</code> files that I want to read into R in the most efficient way possible. I read in the file and then immediately aggregate and discard the data, so I am not worried about managing memory as I get near the end of the process. I just really want to speed up the bottleneck, which happens to be unzipping and reading in the data.</p>
+
+<p>Each dataset consists of 366 rows and 17 columns. Here is a reproducible example of what I am doing so far:</p>
+
+<p>Building reproducible data:</p>
+
+<pre><code>require(data.table)
+
+# Make dir
+system(""mkdir practice"")
+
+# Function to create data
+create_write_data &lt;- function(file.nm) {
+  dt &lt;- data.table(Day=0:365)
+  dt[, (paste0(""V"", 1:17)) := lapply(1:17, function(x) rnorm(n=366))]
+  write.table(dt, paste0(""./practice/"",file.nm), row.names=FALSE, sep=""\t"", quote=FALSE)
+  system(paste0(""gzip ./practice/"", file.nm))    
+}
+</code></pre>
+
+<p>And here is code applying:</p>
+
+<pre><code># Apply function to create 10 fake zipped data.frames (550 kb on disk)
+tmp &lt;- lapply(paste0(""dt"", 1:10,"".dat""), function(x) create_write_data(x))
+</code></pre>
+
+<p>And here is my most efficient code so far to read in the data:</p>
+
+<pre><code># Function to read in files as fast as possible
+read_Fast &lt;- function(path.gz) {
+  system(paste0(""gzip -d "", path.gz)) # Unzip file
+  path.dat &lt;- gsub("".gz"", """", path.gz)
+  dat_run &lt;- fread(path.dat)
+}
+
+# Apply above function
+dat.files &lt;- list.files(path=""./practice"", full.names = TRUE)
+system.time(dat.list &lt;- rbindlist(lapply(dat.files, read_Fast), fill=TRUE))
+dat.list
+</code></pre>
+
+<p>I have bottled this up in a function and applied it in parallel, but it is still much much too slow for what I need this for.</p>
+
+<p>I have already tried the <code>h2o.importFolder</code> from the wonderful <code>h2o</code> package, but it is actually much much slower compared to using plain <code>R</code> with <code>data.table</code>. Maybe there is a way to speed up the unzipping of files, but I am unsure. From the few times that I have run this, I have noticed that the unzipping of the files usually takes about 2/3rd of the function time.</p>
+"

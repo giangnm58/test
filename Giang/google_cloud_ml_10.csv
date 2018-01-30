@@ -1,0 +1,33 @@
+Title,Body
+"Google Dataflow vs Apache Spark","<p>I am surveying <strong>Google Dataflow</strong> and <strong>Apache Spark</strong> to decide which one is more suitable solution for our bigdata analysis business needs.</p>
+
+<p>I found there are <code>Spark SQL</code> and <code>MLlib</code> in the spark platform to do structured data query and machine learning. </p>
+
+<p>I wonder is there any corresponding solution in the Google Dataflow platform?</p>
+"
+"Which Google Cloud Platform service is the easiest for running Tensorflow?","<p>While working on Udacity Deep Learning assignments, I encountered memory problem. I need to switch to a cloud platform. I worked with AWS EC2 before but now I would like to try Google Cloud Platform (GCP). I will need at least 8GB memory. I know how to use docker locally but never tried it on the cloud.</p>
+
+<ol>
+<li>Is there any ready-made solution for running Tensorflow on GCP?</li>
+<li>If not, which service (Compute Engine or Container Engine) would make it easier to get started?</li>
+<li>Any other tip is also appreciated!</li>
+</ol>
+"
+"How do I set up TensorFlow in the Google cloud?","<p>How do I set up a TensorFlow in the Google cloud? I understand how to create a Google Compute Engine instance, and how to run TensorFlow locally; and a <a href=""http://googleresearch.blogspot.com/2016/03/machine-learning-in-cloud-with.html"" rel=""noreferrer"">recent Google blog post</a> suggests that there ought to be a way to create a Google Compute Engine instance and run TensorFlow applications in the cloud: </p>
+
+<blockquote>
+  <p>Machine Learning projects can come in many sizes, and as we’ve seen
+  with our open source offering TensorFlow, projects often need to scale
+  up. Some small tasks are best handled with a local solution running on
+  one’s desktop, while large scale applications require both the scale
+  and dependability of a hosted solution. Google Cloud Machine Learning
+  aims to support the full range and provide a seamless transition from
+  local to cloud environment.</p>
+</blockquote>
+
+<p>Even if I'm reading a bit much into this, it has to be the case, given what competing platforms such as Microsoft's Azure offer, that there's a way to set up TensorFlow applications (developed locally and ""seamlessly"" scaled up into the cloud, presumably using GPUs) in the Google cloud.</p>
+
+<p>For example, I'd like to work locally in my IDE tuning the features and code for my project, running limited training and validation there, and push the code periodically to the cloud to run train there with (arbitrarily) greater resources, and then save and download the trained model. Or perhaps even better, just run the graphs (or parts of graphs) in the cloud using tunable resources. </p>
+
+<p>Is there a way to do this; is one planned? How do I set up TensorFlow in the Google cloud?</p>
+"

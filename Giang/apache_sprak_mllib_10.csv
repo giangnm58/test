@@ -1,0 +1,1111 @@
+Title,Body
+"Dealing with unbalanced datasets in Spark MLlib","<p>I'm working on a particular binary classification problem with a highly unbalanced dataset, and I was wondering if anyone has tried to implement specific techniques for dealing with unbalanced datasets (such as <a href=""https://www.jair.org/media/953/live-953-2037-jair.pdf"" rel=""noreferrer"">SMOTE</a>) in classification problems using Spark's MLlib.</p>
+
+<p>I'm using MLLib's Random Forest implementation and already tried the simplest approach of randomly undersampling the larger class but it didn't work as well as I expected.</p>
+
+<p>I would appreciate any feedback regarding your experience with similar issues.</p>
+
+<p>Thanks,</p>
+"
+"Matrix Multiplication in Apache Spark","<p>I am trying to perform matrix multiplication using Apache Spark and Java.</p>
+
+<p>I have 2 main questions:</p>
+
+<ol>
+<li>How to create RDD that can represent matrix in Apache Spark?  </li>
+<li>How to multiply two such RDDs?</li>
+</ol>
+"
+"Spark MLlib LDA, how to infer the topics distribution of a new unseen document?","<p>i am interested in applying LDA topic modelling using Spark MLlib. I have checked the code and the explanations in <a href=""http://spark.apache.org/docs/latest/mllib-clustering.html#latent-dirichlet-allocation-lda"" rel=""noreferrer"">here</a> but I couldn't find how to use the model then to find the topic distribution in a new unseen document.</p>
+"
+"How to save models from ML Pipeline to S3 or HDFS?","<p>I am trying to save thousands of models produced by ML Pipeline. As indicated in the answer <a href=""https://stackoverflow.com/questions/32121046/run-3000-random-forest-models-by-group-using-spark-mllib-scala-api"">here</a>, the models can be saved as follows:</p>
+
+<pre><code>import java.io._
+
+def saveModel(name: String, model: PipelineModel) = {
+  val oos = new ObjectOutputStream(new FileOutputStream(s""/some/path/$name""))
+  oos.writeObject(model)
+  oos.close
+}
+
+schools.zip(bySchoolArrayModels).foreach{
+  case (name, model) =&gt; saveModel(name, Model)
+}
+</code></pre>
+
+<p>I have tried using <code>s3://some/path/$name</code> and <code>/user/hadoop/some/path/$name</code> as I would like the models to be saved to amazon s3 eventually but they both fail with messages indicating the path cannot be found.</p>
+
+<p>How to save models to Amazon S3?</p>
+"
+"Save ML model for future usage","<p>I was applying some Machine Learning algorithms like Linear Regression, Logistic Regression, and Naive Bayes to some data, but I was trying to avoid using RDDs and start using DataFrames because the <a href=""https://ogirardot.wordpress.com/2015/05/29/rdds-are-the-new-bytecode-of-apache-spark/"">RDDs are slower</a> than Dataframes under pyspark  (see pic 1).</p>
+
+<p><img src=""https://ogirardot.files.wordpress.com/2015/05/unified-physical-execution.png""></p>
+
+<p>The other reason why I am using DataFrames is because the ml library has a class very useful to tune models which is <a href=""http://spark.apache.org/docs/latest/api/python/pyspark.ml.html?highlight=crossvalidator#pyspark.ml.tuning.CrossValidator"">CrossValidator</a> this class returns a model after fitting it, obviously this method has to test several scenarios, and after that returns a <a href=""http://spark.apache.org/docs/latest/api/python/pyspark.ml.html?highlight=model#pyspark.ml.Model"">fitted model</a> (with the best combinations of parameters).</p>
+
+<p>The cluster I use isn't so large and the data is pretty big and some fitting take hours so I want to save this models to reuse them later, but I haven't realized how, is there something I am ignoring?</p>
+
+<p>Notes:</p>
+
+<ul>
+<li>The mllib's model classes have a save method (i.e. <a href=""http://spark.apache.org/docs/latest/api/python/pyspark.mllib.html?highlight=mllib#pyspark.mllib.classification.NaiveBayesModel.save"">NaiveBayes</a>), but mllib does not have CrossValidator and use RDDs so I am avoiding it premeditatedly.</li>
+<li>The current version is spark 1.5.1. </li>
+</ul>
+"
+"How to serve a Spark MLlib model?","<p>I'm evaluating tools for production ML based applications and one of our options is Spark MLlib , but I have some questions about how to serve a model once its trained? </p>
+
+<p>For example in Azure ML, once trained, the model is exposed as a web service which can be consumed from any application, and it's a similar case with Amazon ML.</p>
+
+<p>How do you serve/deploy ML models in Apache Spark ?</p>
+"
+"How to prepare data into a LibSVM format from DataFrame?","<p>I want to make libsvm format, so I made dataframe to the desired format, but I do not know how to convert to libsvm format. The format is as shown in the figure. I hope that the desired libsvm type is <strong>user item:rating</strong> . If you know what to do in the current situation :</p>
+
+<pre><code>val ratings = sc.textFile(new File(""/user/ubuntu/kang/0829/rawRatings.csv"").toString).map { line =&gt;
+     val fields = line.split("","")
+      (fields(0).toInt,fields(1).toInt,fields(2).toDouble)
+}
+val user = ratings.map{ case (user,product,rate) =&gt; (user,(product.toInt,rate.toDouble))}
+val usergroup = user.groupByKey 
+
+val data =usergroup.map{ case(x,iter) =&gt; (x,iter.map(_._1).toArray,iter.map(_._2).toArray)}
+
+val data_DF = data.toDF(""user"",""item"",""rating"")
+</code></pre>
+
+<p><img src=""https://i.stack.imgur.com/RsZaJ.jpg"" alt=""DATAFRAME FIGURE""></p>
+"
+"How to cross validate RandomForest model?","<p>I want to evaluate a random forest being trained on some data. Is there any utility in Apache Spark to do the same or do I have to perform cross validation manually?</p>
+"
+"How to handle categorical features with spark-ml?","<p><em>How do I handle categorical data with</em> <code>spark-ml</code> <em>and not</em> <code>spark-mllib</code> ?</p>
+
+<p>Thought the documentation is not very clear, it seems that classifiers e.g. <code>RandomForestClassifier</code>, <code>LogisticRegression</code>, have a <code>featuresCol</code> argument, which specifies the name of the column of features in the <code>DataFrame</code>, and a <code>labelCol</code> argument, which specifies the name of the column of labeled classes in the <code>DataFrame</code>.</p>
+
+<p>Obviously I want to use more than one feature in my prediction, so I tried using the <code>VectorAssembler</code> to put all my features in a single vector under <code>featuresCol</code>. </p>
+
+<p>However, the <code>VectorAssembler</code> only accepts numeric types, boolean type, and vector type (according to the Spark website), so I can't put strings in my features vector.</p>
+
+<p>How should I proceed? </p>
+"
+"Out-of-core processing of sparse CSR arrays","<p>How can one apply some function in parallel on chunks of a sparse CSR array saved on disk using Python? Sequentially this could be done e.g. by saving the CSR array with <code>joblib.dump</code> opening it with <code>joblib.load(.., mmap_mode=""r"")</code> and processing the chunks of rows one by one.  Could this be done more efficiently with <a href=""https://dask.pydata.org/en/latest/"" rel=""noreferrer"">dask</a>? </p>
+
+<p>In particular, assuming one doesn't need all the possible out of core operations on sparse arrays, but just the ability to load row chunks in parallel (each chunk is a CSR array) and apply some function to them (in my case it would be e.g. <code>estimator.predict(X)</code> from scikit-learn). </p>
+
+<p>Besides, is there a file format on disk that would be suitable for this task?  joblib works but I'm not sure about the (parallel) performance of CSR arrays loaded as  memory maps; spark.mllib appears to use either some custom sparse storage format (that doesn't seem to have a pure Python parser) or LIBSVM format (the parser in scikit-learn is, in my experience, much slower than <code>joblib.dump</code>)...</p>
+
+<p>Note: I have read <a href=""http://dask.pydata.org/en/latest/array-sparse.html"" rel=""noreferrer"">http://dask.pydata.org/en/latest/array-sparse.html</a> , <a href=""https://github.com/dask/dask/search?q=sparse&amp;type=Issues&amp;utf8=%E2%9C%93"" rel=""noreferrer"">various issues about it on https://github.com/dask/dask/</a> but  I'm still not sure how to best approach this problem.</p>
+
+<p><strong>Edit:</strong> to give a more practical example, below is the code that works in dask for dense arrays but fails when using sparse arrays with <a href=""https://pastebin.com/5dy36fQd"" rel=""noreferrer"">this error</a>,</p>
+
+<pre><code>import numpy as np
+import scipy.sparse
+
+import joblib
+import dask.array as da
+from sklearn.utils import gen_batches
+
+np.random.seed(42)
+joblib.dump(np.random.rand(100000, 1000), 'X_dense.pkl')
+joblib.dump(scipy.sparse.random(10000, 1000000, format='csr'), 'X_csr.pkl')
+
+fh = joblib.load('X_dense.pkl', mmap_mode='r')
+
+# computing the results without dask
+results = np.vstack((fh[sl, :].sum(axis=1)) for sl in gen_batches(fh.shape[0], batch_size))
+
+# computing the results with dask
+x = da.from_array(fh, chunks=(2000))
+results = x.sum(axis=1).compute()
+</code></pre>
+
+<p><strong>Edit2:</strong> following the discussion below, the example below overcomes the previous error but gets ones about <code>IndexError: tuple index out of range</code> in <code>dask/array/core.py:L3413</code>,</p>
+
+<pre><code>import dask
+# +imports from the example above
+dask.set_options(get=dask.get)  # disable multiprocessing
+
+fh = joblib.load('X_csr.pkl', mmap_mode='r')
+
+def func(x):
+    if x.ndim == 0:
+        # dask does some heuristics with dummy data, if the x is a 0d array
+        # the sum command would fail
+        return x
+    res = np.asarray(x.sum(axis=1, keepdims=True))
+    return res
+
+Xd = da.from_array(fh, chunks=(2000))
+results_new = Xd.map_blocks(func).compute()
+</code></pre>
+"
+"How to assign unique contiguous numbers to elements in a Spark RDD","<p>I have a dataset of <code>(user, product, review)</code>, and want to feed it into mllib's ALS algorithm.</p>
+
+<p>The algorithm needs users and products to be numbers, while mine are String usernames and String SKUs.</p>
+
+<p>Right now, I get the distinct users and SKUs, then assign numeric IDs to them outside of Spark.</p>
+
+<p>I was wondering whether there was a better way of doing this. The one approach I've thought of is to write a custom RDD that essentially enumerates 1 through <code>n</code>, then call zip on the two RDDs.</p>
+"
+"How are number of iterations and number of partitions releated in Apache spark Word2Vec?","<p>According to <a href=""https://spark.apache.org/docs/1.3.1/api/scala/index.html#org.apache.spark.mllib.feature.Word2Vec"" rel=""noreferrer"">mllib.feature.Word2Vec - spark 1.3.1</a> documentation [1]:</p>
+
+<pre><code>def setNumIterations(numIterations: Int): Word2Vec.this.type
+</code></pre>
+
+<blockquote>
+  <p>Sets number of iterations (default: 1), which should be smaller than or equal to number of partitions.</p>
+</blockquote>
+
+<pre><code>def setNumPartitions(numPartitions: Int): Word2Vec.this.type
+</code></pre>
+
+<blockquote>
+  <p>Sets number of partitions (default: 1). Use a small number for accuracy.</p>
+</blockquote>
+
+<p>But in this <a href=""https://github.com/apache/spark/pull/1719"" rel=""noreferrer"">Pull Request</a> [2]:</p>
+
+<blockquote>
+  <p>To make our implementation more scalable, we train each partition
+  separately and merge the model of each partition after each iteration.
+  To make the model more accurate, multiple iterations may be needed.</p>
+</blockquote>
+
+<p><strong>Questions:</strong> </p>
+
+<ul>
+<li><p>How do the parameters numIterations &amp; numPartitions effect the internal working of the algorithm?</p></li>
+<li><p>Is there a trade-off between setting the number of partitions and number of iterations considering the following rules ? </p>
+
+<ul>
+<li><p>more accuracy -> more iteration a/c to [2]</p></li>
+<li><p>more iteration -> more partition a/c to [1]</p></li>
+<li><p>more partition -> less accuracy  </p></li>
+</ul></li>
+</ul>
+"
+"Proper save/load of MatrixFactorizationModel","<p>I have MatrixFactorizationModel object. If I'm trying to recommend products to single user right after constructing model through ALS.train(...) then it takes 300ms (for my data and hardware). But if I save model to disk and load it back then recommendation takes almost 2000ms. Also Spark warns:</p>
+
+<pre><code>15/07/17 11:05:47 WARN MatrixFactorizationModel: User factor does not have a partitioner. Prediction on individual records could be slow.
+15/07/17 11:05:47 WARN MatrixFactorizationModel: User factor is not cached. Prediction could be slow.
+15/07/17 11:05:47 WARN MatrixFactorizationModel: Product factor does not have a partitioner. Prediction on individual records could be slow.
+15/07/17 11:05:47 WARN MatrixFactorizationModel: Product factor is not cached. Prediction could be slow.
+</code></pre>
+
+<p>How can I create/set partitioner and cache user and product factors after loading model? Following approach didn't help:</p>
+
+<pre><code>model.userFeatures().cache();
+model.productFeatures().cache();
+</code></pre>
+
+<p>Also I was trying to repartition those rdds and create new model from repartitioned versions but that also didn't help.</p>
+"
+"What is rank in ALS machine Learning Algorithm in Apache Spark Mllib","<p>I Wanted to try an example of ALS machine learning algorithm. And my code works fine, However I do not understand  parameter <code>rank</code> used in algorithm.</p>
+
+<p>I have following code in java</p>
+
+<pre><code>    // Build the recommendation model using ALS
+    int rank = 10;
+    int numIterations = 10;
+    MatrixFactorizationModel model = ALS.train(JavaRDD.toRDD(ratings),
+            rank, numIterations, 0.01);
+</code></pre>
+
+<p>I have read some where that it is the number of latent factors in the model.</p>
+
+<p>Suppose I have a dataset of (user,product,rating) that has 100 rows. What value should be of <code>rank</code> (latent factors).</p>
+"
+"Apache Spark: StackOverflowError when trying to indexing string columns","<p>I have csv file with about 5000 rows and 950 columns. First I load it to DataFrame:</p>
+
+<pre><code>val data = sqlContext.read
+  .format(csvFormat)
+  .option(""header"", ""true"")
+  .option(""inferSchema"", ""true"")
+  .load(file)
+  .cache()
+</code></pre>
+
+<p>After that I search all string columns</p>
+
+<pre><code>val featuresToIndex = data.schema
+  .filter(_.dataType == StringType)
+  .map(field =&gt; field.name)
+</code></pre>
+
+<p>and want to index them. For that I create indexers for each string column</p>
+
+<pre><code>val stringIndexers = featuresToIndex.map(colName =&gt;
+  new StringIndexer()
+    .setInputCol(colName)
+    .setOutputCol(colName + ""Indexed""))
+</code></pre>
+
+<p>and create pipeline</p>
+
+<pre><code>val pipeline = new Pipeline().setStages(stringIndexers.toArray)
+</code></pre>
+
+<p>But when I try to transform my initial dataframe with this pipeline</p>
+
+<pre><code>val indexedDf = pipeline.fit(data).transform(data)
+</code></pre>
+
+<p>I get StackOverflowError</p>
+
+<pre><code>16/07/05 16:55:12 INFO DAGScheduler: Job 4 finished: countByValue at StringIndexer.scala:86, took 7.882774 s
+Exception in thread ""main"" java.lang.StackOverflowError
+at scala.collection.immutable.Set$Set1.contains(Set.scala:84)
+at scala.collection.immutable.Set$Set1.$plus(Set.scala:86)
+at scala.collection.immutable.Set$Set1.$plus(Set.scala:81)
+at scala.collection.mutable.SetBuilder.$plus$eq(SetBuilder.scala:22)
+at scala.collection.mutable.SetBuilder.$plus$eq(SetBuilder.scala:20)
+at scala.collection.generic.Growable$class.loop$1(Growable.scala:53)
+at scala.collection.generic.Growable$class.$plus$plus$eq(Growable.scala:57)
+at scala.collection.mutable.SetBuilder.$plus$plus$eq(SetBuilder.scala:20)
+at scala.collection.TraversableLike$class.to(TraversableLike.scala:590)
+at scala.collection.AbstractTraversable.to(Traversable.scala:104)
+at scala.collection.TraversableOnce$class.toSet(TraversableOnce.scala:304)
+at scala.collection.AbstractTraversable.toSet(Traversable.scala:104)
+at org.apache.spark.sql.catalyst.trees.TreeNode.containsChild$lzycompute(TreeNode.scala:86)
+at org.apache.spark.sql.catalyst.trees.TreeNode.containsChild(TreeNode.scala:86)
+at org.apache.spark.sql.catalyst.trees.TreeNode$$anonfun$4.apply(TreeNode.scala:280)
+at scala.collection.Iterator$$anon$11.next(Iterator.scala:409)
+...
+</code></pre>
+
+<p>What am I doing wrong?
+Thanks.</p>
+"
+"Addition of two RDD[mllib.linalg.Vector]'s","<p>I need addition of two matrices that are stored in two files.</p>
+
+<p>The content of <code>latest1.txt</code> and <code>latest2.txt</code> has the next str:</p>
+
+<pre>
+1 2 3
+4 5 6
+7 8 9
+</pre>
+
+<p>I am reading those files as follows:</p>
+
+<pre><code>scala&gt; val rows = sc.textFile(“latest1.txt”).map { line =&gt; val values = line.split(‘ ‘).map(_.toDouble)
+    Vectors.sparse(values.length,values.zipWithIndex.map(e =&gt; (e._2, e._1)).filter(_._2 != 0.0))
+}
+
+scala&gt; val r1 = rows
+r1: org.apache.spark.rdd.RDD[org.apache.spark.mllib.linalg.Vector] = MappedRDD[2] at map at :14
+
+scala&gt; val rows = sc.textFile(“latest2.txt”).map { line =&gt; val values = line.split(‘ ‘).map(_.toDouble)
+    Vectors.sparse(values.length,values.zipWithIndex.map(e =&gt; (e._2, e._1)).filter(_._2 != 0.0))
+}
+
+scala&gt; val r2 = rows
+r2: org.apache.spark.rdd.RDD[org.apache.spark.mllib.linalg.Vector] = MappedRDD[2] at map at :14
+</code></pre>
+
+<p>I want to add r1, r2. So, Is there any way to add this two <code>RDD[mllib.linalg.Vector]</code>s in Apache-Spark.</p>
+"
+"AttributeError: 'DataFrame' object has no attribute 'map'","<p>I wanted to convert the spark data frame to add using the code below:</p>
+
+<pre><code>from pyspark.mllib.clustering import KMeans
+spark_df = sqlContext.createDataFrame(pandas_df)
+rdd = spark_df.map(lambda data: Vectors.dense([float(c) for c in data]))
+model = KMeans.train(rdd, 2, maxIterations=10, runs=30, initializationMode=""random"")
+</code></pre>
+
+<p>The detailed error message is:</p>
+
+<pre><code>---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+&lt;ipython-input-11-a19a1763d3ac&gt; in &lt;module&gt;()
+      1 from pyspark.mllib.clustering import KMeans
+      2 spark_df = sqlContext.createDataFrame(pandas_df)
+----&gt; 3 rdd = spark_df.map(lambda data: Vectors.dense([float(c) for c in data]))
+      4 model = KMeans.train(rdd, 2, maxIterations=10, runs=30, initializationMode=""random"")
+
+/home/edamame/spark/spark-2.0.0-bin-hadoop2.6/python/pyspark/sql/dataframe.pyc in __getattr__(self, name)
+    842         if name not in self.columns:
+    843             raise AttributeError(
+--&gt; 844                 ""'%s' object has no attribute '%s'"" % (self.__class__.__name__, name))
+    845         jc = self._jdf.apply(name)
+    846         return Column(jc)
+
+AttributeError: 'DataFrame' object has no attribute 'map'
+</code></pre>
+
+<p>Does anyone know what I did wrong here? Thanks!</p>
+"
+"Spark Word2vec vector mathematics","<p>I was looking at the <a href=""http://spark.apache.org/docs/latest/mllib-feature-extraction.html#example"">example</a> of Spark site for Word2Vec:</p>
+
+
+
+<pre class=""lang-scala prettyprint-override""><code>val input = sc.textFile(""text8"").map(line =&gt; line.split("" "").toSeq)
+
+val word2vec = new Word2Vec()
+
+val model = word2vec.fit(input)
+
+val synonyms = model.findSynonyms(""country name here"", 40)
+</code></pre>
+
+<p>How do I do the interesting vector such as king - man + woman = queen. I can use model.getVectors, but not sure how to proceed further. </p>
+"
+"Why spark.ml don't implement any of spark.mllib algorithms?","<p>Following the <a href=""http://spark.apache.org/docs/latest/mllib-guide.html"" rel=""nofollow noreferrer"">Spark MLlib Guide</a>  we can read that Spark has two machine learning libraries:</p>
+
+<ul>
+<li><code>spark.mllib</code>, built on top of RDDs.</li>
+<li><code>spark.ml</code>, built on top of Dataframes.</li>
+</ul>
+
+<p>According to <a href=""https://stackoverflow.com/questions/31453324/which-is-efficient-dataframe-or-rdd-or-hiveql"">this</a> and <a href=""https://stackoverflow.com/questions/31508083/difference-between-dataframe-and-rdd-in-spark"">this</a> question on StackOverflow, Dataframes are better (and newer) than RDDs and should be used whenever possible.</p>
+
+<p>The problem is that I want to use common machine learning algorithms (e.g: <a href=""http://spark.apache.org/docs/latest/mllib-frequent-pattern-mining.html"" rel=""nofollow noreferrer"">Frequent Pattern Mining</a>,<a href=""http://spark.apache.org/docs/latest/mllib-naive-bayes.html"" rel=""nofollow noreferrer"">Naive Bayes</a>, etc.) and <code>spark.ml</code> (for dataframes) don't provide such methods, only <code>spark.mllib</code>(for RDDs) provides this algorithms. </p>
+
+<p>If Dataframes are better than RDDs and the referred guide recommends the use of <code>spark.ml</code>, why aren't common machine learning methods implemented in that lib?  </p>
+
+<h3>What's the missing point here?</h3>
+"
+"apache spark MLLib: how to build labeled points for string features?","<p>I am trying to build a NaiveBayes classifier with Spark's MLLib which takes as input a set of documents. </p>
+
+<p>I'd like to put some things as features (i.e. authors, explicit tags, implicit keywords, category), but looking at <a href=""https://spark.apache.org/docs/1.1.0/mllib-naive-bayes.html"" rel=""nofollow noreferrer"">the documentation</a> it seems that a <code>LabeledPoint</code> contains only doubles, i.e it looks like <code>LabeledPoint[Double, List[Pair[Double,Double]]</code>.</p>
+
+<p>Instead what I have as output from the rest of my code would be something like <code>LabeledPoint[Double, List[Pair[String,Double]]</code>.</p>
+
+<p>I could make up my own conversion, but it seems odd. How am I supposed to handle this using MLLib? </p>
+
+<p>I believe the answer is in the <code>HashingTF</code> class (i.e. hashing features) but I don't understand how that works, it appears that it takes some sort of capacity value, but my list of keywords and topics is effectively unbounded (or better, unknown at the beginning).</p>
+"
+"What is the difference between HashingTF and CountVectorizer in Spark?","<p>Trying to do doc classification in Spark. I am not sure what the hashing does in HashingTF; does it sacrifice any accuracy? I doubt it, but I don't know. The spark doc says it uses the ""hashing trick""... just another example of really bad/confusing naming used by engineers (I'm guilty as well). CountVectorizer also requires setting the vocabulary size, but it has another parameter, a threshold param that can be used to exclude words or tokens that appear below some threshold in the text corpus. I do not understand the difference between these two Transformers. What makes this important is the subsequent steps in the algorithm. For example, if I wanted to perform SVD on the resulting tfidf matrix, then vocabulary size will determine the size of the matrix for SVD, which impacts the running time of the code, and the model performance etc. I am having a difficulty in general finding any source about Spark Mllib beyond API documentation and really trivial examples with no depth.</p>
+"
+"Optimal way to create a ml pipeline in Apache Spark for dataset with high number of columns","<p>I am working with Spark 2.1.1 on a dataset with ~2000 features and trying to create a basic ML Pipeline, consisting of some Transformers and a Classifier. </p>
+
+<p>Let's assume for the sake of simplicity that the Pipeline I am working with consists of a VectorAssembler, StringIndexer and a Classifier, which would be a fairly common usecase.  </p>
+
+<pre><code>// Pipeline elements
+val assmbleFeatures: VectorAssembler = new VectorAssembler()
+  .setInputCols(featureColumns)
+  .setOutputCol(""featuresRaw"")
+
+val labelIndexer: StringIndexer = new StringIndexer()
+  .setInputCol(""TARGET"")
+  .setOutputCol(""indexedLabel"")
+
+// Train a RandomForest model.
+val rf: RandomForestClassifier = new RandomForestClassifier()
+  .setLabelCol(""indexedLabel"")
+  .setFeaturesCol(""featuresRaw"")
+  .setMaxBins(30)
+
+// add the params, unique to this classifier
+val paramGrid = new ParamGridBuilder()
+  .addGrid(rf.numTrees, Array(5))
+  .addGrid(rf.maxDepth, Array(5))
+  .build()
+
+// Treat the Pipeline as an Estimator, to jointly choose parameters for all Pipeline stages.
+val evaluator = new BinaryClassificationEvaluator()
+  .setMetricName(""areaUnderROC"")
+  .setLabelCol(""indexedLabel"")
+</code></pre>
+
+<p>If the pipeline steps are separated into a transformer pipeline (VectorAssembler + StringIndexer) and a second classifier pipeline, and if the unnecessary columns are dropped in between both pipelines, training succeeds. 
+This means for reusing the models, two PipelineModels have to be saved after training and an intermediary preprocessing step has to be introduced. </p>
+
+<pre><code>// Split indexers and forest in two Pipelines.
+val prePipeline = new Pipeline().setStages(Array(labelIndexer, assmbleFeatures)).fit(dfTrain)
+// Transform data and drop all columns, except those needed for training 
+val dfTrainT = prePipeline.transform(dfTrain)
+val columnsToDrop = dfTrainT.columns.filter(col =&gt; !Array(""featuresRaw"", ""indexedLabel"").contains(col))
+val dfTrainRdy = dfTrainT.drop(columnsToDrop:_*)
+
+val mainPipeline = new Pipeline().setStages(Array(rf))
+
+val cv = new CrossValidator()
+  .setEstimator(mainPipeline)
+  .setEvaluator(evaluator)
+  .setEstimatorParamMaps(paramGrid)
+  .setNumFolds(2)
+
+val bestModel = cv.fit(dfTrainRdy).bestModel.asInstanceOf[PipelineModel]
+</code></pre>
+
+<p>The (imho) much cleaner solution would be to merge all pipeline stages into one pipeline. </p>
+
+<pre><code>val pipeline = new Pipeline()
+  .setStages(Array(labelIndexer, assmbleFeatures, rf))
+
+val cv = new CrossValidator()
+  .setEstimator(pipeline)
+  .setEvaluator(evaluator)
+  .setEstimatorParamMaps(paramGrid)
+  .setNumFolds(2)
+
+// This will fail! 
+val bestModel = cv.fit(dfTrain).bestModel.asInstanceOf[PipelineModel]
+</code></pre>
+
+<p>However, putting all PipelineStages into one Pipeline leads to the following exception, probably due to the issue <a href=""https://github.com/apache/spark/pull/16648"" rel=""noreferrer"">this</a> PR will eventually solve: </p>
+
+<blockquote>
+  <p>ERROR CodeGenerator: failed to compile: org.codehaus.janino.JaninoRuntimeException: Constant pool for class org.apache.spark.sql.catalyst.expressions.GeneratedClass$SpecificUnsafeProjection has grown past JVM limit of 0xFFFF</p>
+</blockquote>
+
+<p>The reason for this is that the VectorAssembler effectively doubles (in this example) the amount  of data in the DataFrame, as there is no transformer that could drop the unnecessary columns. (See <a href=""https://stackoverflow.com/questions/40536335/spark-pipeline-vector-assembler-drop-other-columns"">spark pipeline vector assembler drop other columns</a>)</p>
+
+<p>To the example works on the <a href=""https://github.com/MarcKaminski/stackoverflow/blob/master/golub/golub_merged.csv"" rel=""noreferrer"">golub dataset</a> and the following preprocessing steps are necessary:  </p>
+
+<pre><code>import org.apache.spark.sql.types.DoubleType
+import org.apache.spark.ml.classification.RandomForestClassifier
+import org.apache.spark.ml.{Pipeline, PipelineModel, PipelineStage}
+import org.apache.spark.ml.evaluation.BinaryClassificationEvaluator
+import org.apache.spark.ml.feature._
+import org.apache.spark.sql._
+import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder}
+
+val df = spark.read.option(""header"", true).option(""inferSchema"", true).csv(""/path/to/dataset/golub_merged.csv"").drop(""_c0"").repartition(100)
+
+// Those steps are necessary, otherwise training would fail either way
+val colsToDrop = df.columns.take(5000)
+val dfValid = df.withColumn(""TARGET"", df(""TARGET_REAL"").cast(DoubleType)).drop(""TARGET_REAL"").drop(colsToDrop:_*)
+
+// Split df in train and test sets
+val Array(dfTrain, dfTest) = dfValid.randomSplit(Array(0.7, 0.3))
+
+// Feature columns are columns except ""TARGET""
+val featureColumns = dfTrain.columns.filter(col =&gt; col != ""TARGET"")
+</code></pre>
+
+<p>As I am new to Spark, I am not sure what would be the best way to solve this issue. Would you suggest... </p>
+
+<ol>
+<li><s>to create a new transformer, which drops columns and that can be incorporated into the pipeline? </s></li>
+<li>split both Pipelines and introduce the intermediary step</li>
+<li>anything else? :) </li>
+</ol>
+
+<p>Or am I missing anything important (pipeline steps, PR, etc.) that would solve this issue? </p>
+
+<hr>
+
+<h3>Edit:</h3>
+
+<p>I implemented a new Transformer <code>DroppingVectorAssembler</code>, which drops unnecessary columns, however, the same exception is thrown. </p>
+
+<p>Besides that, setting <code>spark.sql.codegen.wholeStage</code> to <code>false</code> does not solve the issue. </p>
+"
+"Spark ML indexer cannot resolve DataFrame column name with dots?","<p>I have a DataFrame with a column named <strong>a.b</strong>.  When I specify <strong>a.b</strong> as the input column name to a <a href=""http://spark.apache.org/docs/latest/ml-features.html#stringindexer"" rel=""nofollow noreferrer"">StringIndexer</a>, AnalysisException with the message <em>""cannot resolve 'a.b' given input columns a.b""</em>.  I'm using Spark 1.6.0.</p>
+
+<p>I'm aware that older versions of Spark may have had issues with dots in column names, but that in more recent version, backquotes can be used around column names in the Spark shell and with SQL queries.  For instance, that's the resolution to another question, <a href=""https://stackoverflow.com/questions/30889630/how-to-escape-column-names-with-hyphen-in-spark-sql"">How to escape column names with hyphen in Spark SQL</a>.  Some of these issues were reported  <a href=""https://issues.apache.org/jira/browse/SPARK-6898"" rel=""nofollow noreferrer"">SPARK-6898, Special chars in column names is broken</a>, but that was resolved back in 1.4.0.</p>
+
+<p>Here's a minimal example and stacktrace:</p>
+
+<pre class=""lang-java prettyprint-override""><code>public class SparkMLDotColumn {
+    public static void main(String[] args) {
+        // Get the contexts
+        SparkConf conf = new SparkConf()
+                .setMaster(""local[*]"")
+                .setAppName(""test"")
+                .set(""spark.ui.enabled"", ""false""); // http://permalink.gmane.org/gmane.comp.lang.scala.spark.user/21385
+        JavaSparkContext sparkContext = new JavaSparkContext(conf);
+        SQLContext sqlContext = new SQLContext(sparkContext);
+
+        // Create a schema with a single string column named ""a.b""
+        StructType schema = new StructType(new StructField[] {
+                DataTypes.createStructField(""a.b"", DataTypes.StringType, false)
+        });
+
+        // Create an empty RDD and DataFrame
+        JavaRDD&lt;Row&gt; rdd = sparkContext.parallelize(Collections.emptyList());
+        DataFrame df = sqlContext.createDataFrame(rdd, schema);
+
+        StringIndexer indexer = new StringIndexer()
+            .setInputCol(""a.b"")
+            .setOutputCol(""a.b_index"");
+        df = indexer.fit(df).transform(df);
+    }
+}
+</code></pre>
+
+<p>Now, it's worth trying the same kind of example using backquoted column names, because we get some weird results.  Here's an example with the same schema, but we've got data in the frame this time.  Before attempting any indexing, we'll copy the column named <code>a.b</code> to a column named <code>a_b</code>. That requires the use of backticks, and it works without a problem.  Then, we'll try indexing the <code>a_b</code> column, which works without a problem.  Then something really weird happens when we try to indexing the <code>a.b</code> column, using backticks.  We get no error, but get no result, either:</p>
+
+<pre><code>public class SparkMLDotColumn {
+    public static void main(String[] args) {
+        // Get the contexts
+        SparkConf conf = new SparkConf()
+                .setMaster(""local[*]"")
+                .setAppName(""test"")
+                .set(""spark.ui.enabled"", ""false"");
+        JavaSparkContext sparkContext = new JavaSparkContext(conf);
+        SQLContext sqlContext = new SQLContext(sparkContext);
+
+        // Create a schema with a single string column named ""a.b""
+        StructType schema = new StructType(new StructField[] {
+                DataTypes.createStructField(""a.b"", DataTypes.StringType, false)
+        });
+
+        // Create an empty RDD and DataFrame
+        List&lt;Row&gt; rows = Arrays.asList(RowFactory.create(""foo""), RowFactory.create(""bar"")); 
+        JavaRDD&lt;Row&gt; rdd = sparkContext.parallelize(rows);
+        DataFrame df = sqlContext.createDataFrame(rdd, schema);
+
+        df = df.withColumn(""a_b"", df.col(""`a.b`""));
+
+        StringIndexer indexer0 = new StringIndexer();
+        indexer0.setInputCol(""a_b"");
+        indexer0.setOutputCol(""a_bIndex"");
+        df = indexer0.fit(df).transform(df);
+
+        StringIndexer indexer1 = new StringIndexer();
+        indexer1.setInputCol(""`a.b`"");
+        indexer1.setOutputCol(""abIndex"");
+        df = indexer1.fit(df).transform(df);
+
+        df.show();
+    }
+}
+</code></pre>
+
+<pre class=""lang-none prettyprint-override""><code>+---+---+--------+
+|a.b|a_b|a_bIndex|  // where's the abIndex column?
++---+---+--------+
+|foo|foo|     0.0|
+|bar|bar|     1.0|
++---+---+--------+
+</code></pre>
+
+<h2>Stacktrace from first example</h2>
+
+<pre class=""lang-none prettyprint-override""><code>Exception in thread ""main"" org.apache.spark.sql.AnalysisException: cannot resolve 'a.b' given input columns a.b;
+    at org.apache.spark.sql.catalyst.analysis.package$AnalysisErrorAt.failAnalysis(package.scala:42)
+    at org.apache.spark.sql.catalyst.analysis.CheckAnalysis$$anonfun$checkAnalysis$1$$anonfun$apply$2.applyOrElse(CheckAnalysis.scala:60)
+    at org.apache.spark.sql.catalyst.analysis.CheckAnalysis$$anonfun$checkAnalysis$1$$anonfun$apply$2.applyOrElse(CheckAnalysis.scala:57)
+    at org.apache.spark.sql.catalyst.trees.TreeNode$$anonfun$transformUp$1.apply(TreeNode.scala:319)
+    at org.apache.spark.sql.catalyst.trees.TreeNode$$anonfun$transformUp$1.apply(TreeNode.scala:319)
+    at org.apache.spark.sql.catalyst.trees.CurrentOrigin$.withOrigin(TreeNode.scala:53)
+    at org.apache.spark.sql.catalyst.trees.TreeNode.transformUp(TreeNode.scala:318)
+    at org.apache.spark.sql.catalyst.trees.TreeNode$$anonfun$5.apply(TreeNode.scala:316)
+    at org.apache.spark.sql.catalyst.trees.TreeNode$$anonfun$5.apply(TreeNode.scala:316)
+    at org.apache.spark.sql.catalyst.trees.TreeNode$$anonfun$4.apply(TreeNode.scala:265)
+    at scala.collection.Iterator$$anon$11.next(Iterator.scala:328)
+    at scala.collection.Iterator$class.foreach(Iterator.scala:727)
+    at scala.collection.AbstractIterator.foreach(Iterator.scala:1157)
+    at scala.collection.generic.Growable$class.$plus$plus$eq(Growable.scala:48)
+    at scala.collection.mutable.ArrayBuffer.$plus$plus$eq(ArrayBuffer.scala:103)
+    at scala.collection.mutable.ArrayBuffer.$plus$plus$eq(ArrayBuffer.scala:47)
+    at scala.collection.TraversableOnce$class.to(TraversableOnce.scala:273)
+    at scala.collection.AbstractIterator.to(Iterator.scala:1157)
+    at scala.collection.TraversableOnce$class.toBuffer(TraversableOnce.scala:265)
+    at scala.collection.AbstractIterator.toBuffer(Iterator.scala:1157)
+    at scala.collection.TraversableOnce$class.toArray(TraversableOnce.scala:252)
+    at scala.collection.AbstractIterator.toArray(Iterator.scala:1157)
+    at org.apache.spark.sql.catalyst.trees.TreeNode.transformChildren(TreeNode.scala:305)
+    at org.apache.spark.sql.catalyst.trees.TreeNode.transformUp(TreeNode.scala:316)
+    at org.apache.spark.sql.catalyst.trees.TreeNode$$anonfun$5.apply(TreeNode.scala:316)
+    at org.apache.spark.sql.catalyst.trees.TreeNode$$anonfun$5.apply(TreeNode.scala:316)
+    at org.apache.spark.sql.catalyst.trees.TreeNode$$anonfun$4.apply(TreeNode.scala:265)
+    at scala.collection.Iterator$$anon$11.next(Iterator.scala:328)
+    at scala.collection.Iterator$class.foreach(Iterator.scala:727)
+    at scala.collection.AbstractIterator.foreach(Iterator.scala:1157)
+    at scala.collection.generic.Growable$class.$plus$plus$eq(Growable.scala:48)
+    at scala.collection.mutable.ArrayBuffer.$plus$plus$eq(ArrayBuffer.scala:103)
+    at scala.collection.mutable.ArrayBuffer.$plus$plus$eq(ArrayBuffer.scala:47)
+    at scala.collection.TraversableOnce$class.to(TraversableOnce.scala:273)
+    at scala.collection.AbstractIterator.to(Iterator.scala:1157)
+    at scala.collection.TraversableOnce$class.toBuffer(TraversableOnce.scala:265)
+    at scala.collection.AbstractIterator.toBuffer(Iterator.scala:1157)
+    at scala.collection.TraversableOnce$class.toArray(TraversableOnce.scala:252)
+    at scala.collection.AbstractIterator.toArray(Iterator.scala:1157)
+    at org.apache.spark.sql.catalyst.trees.TreeNode.transformChildren(TreeNode.scala:305)
+    at org.apache.spark.sql.catalyst.trees.TreeNode.transformUp(TreeNode.scala:316)
+    at org.apache.spark.sql.catalyst.plans.QueryPlan.transformExpressionUp$1(QueryPlan.scala:107)
+    at org.apache.spark.sql.catalyst.plans.QueryPlan.org$apache$spark$sql$catalyst$plans$QueryPlan$$recursiveTransform$2(QueryPlan.scala:117)
+    at org.apache.spark.sql.catalyst.plans.QueryPlan$$anonfun$org$apache$spark$sql$catalyst$plans$QueryPlan$$recursiveTransform$2$1.apply(QueryPlan.scala:121)
+    at scala.collection.TraversableLike$$anonfun$map$1.apply(TraversableLike.scala:244)
+    at scala.collection.TraversableLike$$anonfun$map$1.apply(TraversableLike.scala:244)
+    at scala.collection.mutable.ResizableArray$class.foreach(ResizableArray.scala:59)
+    at scala.collection.mutable.ArrayBuffer.foreach(ArrayBuffer.scala:47)
+    at scala.collection.TraversableLike$class.map(TraversableLike.scala:244)
+    at scala.collection.AbstractTraversable.map(Traversable.scala:105)
+    at org.apache.spark.sql.catalyst.plans.QueryPlan.org$apache$spark$sql$catalyst$plans$QueryPlan$$recursiveTransform$2(QueryPlan.scala:121)
+    at org.apache.spark.sql.catalyst.plans.QueryPlan$$anonfun$2.apply(QueryPlan.scala:125)
+    at scala.collection.Iterator$$anon$11.next(Iterator.scala:328)
+    at scala.collection.Iterator$class.foreach(Iterator.scala:727)
+    at scala.collection.AbstractIterator.foreach(Iterator.scala:1157)
+    at scala.collection.generic.Growable$class.$plus$plus$eq(Growable.scala:48)
+    at scala.collection.mutable.ArrayBuffer.$plus$plus$eq(ArrayBuffer.scala:103)
+    at scala.collection.mutable.ArrayBuffer.$plus$plus$eq(ArrayBuffer.scala:47)
+    at scala.collection.TraversableOnce$class.to(TraversableOnce.scala:273)
+    at scala.collection.AbstractIterator.to(Iterator.scala:1157)
+    at scala.collection.TraversableOnce$class.toBuffer(TraversableOnce.scala:265)
+    at scala.collection.AbstractIterator.toBuffer(Iterator.scala:1157)
+    at scala.collection.TraversableOnce$class.toArray(TraversableOnce.scala:252)
+    at scala.collection.AbstractIterator.toArray(Iterator.scala:1157)
+    at org.apache.spark.sql.catalyst.plans.QueryPlan.transformExpressionsUp(QueryPlan.scala:125)
+    at org.apache.spark.sql.catalyst.analysis.CheckAnalysis$$anonfun$checkAnalysis$1.apply(CheckAnalysis.scala:57)
+    at org.apache.spark.sql.catalyst.analysis.CheckAnalysis$$anonfun$checkAnalysis$1.apply(CheckAnalysis.scala:50)
+    at org.apache.spark.sql.catalyst.trees.TreeNode.foreachUp(TreeNode.scala:105)
+    at org.apache.spark.sql.catalyst.analysis.CheckAnalysis$class.checkAnalysis(CheckAnalysis.scala:50)
+    at org.apache.spark.sql.catalyst.analysis.Analyzer.checkAnalysis(Analyzer.scala:44)
+    at org.apache.spark.sql.execution.QueryExecution.assertAnalyzed(QueryExecution.scala:34)
+    at org.apache.spark.sql.DataFrame.&lt;init&gt;(DataFrame.scala:133)
+    at org.apache.spark.sql.DataFrame.org$apache$spark$sql$DataFrame$$withPlan(DataFrame.scala:2165)
+    at org.apache.spark.sql.DataFrame.select(DataFrame.scala:751)
+    at org.apache.spark.ml.feature.StringIndexer.fit(StringIndexer.scala:84)
+    at SparkMLDotColumn.main(SparkMLDotColumn.java:38)
+</code></pre>
+"
+"Incremental training of ALS model","<p>I'm trying to find out if it is possible to have ""incremental training"" on data using MLlib in Apache Spark.</p>
+
+<p>My platform is Prediction IO, and it's basically a wrapper for Spark (MLlib), HBase, ElasticSearch and some other Restful parts.</p>
+
+<p>In my app data ""events"" are inserted in real-time, but to get updated prediction results I need to ""pio train"" and ""pio deploy"". This takes some time and the server goes offline during the redeploy.</p>
+
+<p>I'm trying to figure out if I can do incremental training during the ""predict"" phase, but cannot find an answer.</p>
+"
+"How to use mllib.recommendation if the user ids are string instead of contiguous integers?","<p>I want to use Spark's <code>mllib.recommendation</code> library to build a prototype recommender system. However, the format of the user data I have is something of the following format:</p>
+
+<pre><code>AB123XY45678
+CD234WZ12345
+EF345OOO1234
+GH456XY98765
+....
+</code></pre>
+
+<p>If I want to use the <code>mllib.recommendation</code> library, according to the API of the <code>Rating</code> class, the user ids have to be integers (also have to be contiguous?)</p>
+
+<p>It looks like some kind of conversion between the real user ids and the numeric ones used by Spark must be done. But how should I do this?</p>
+"
+"How to convert org.apache.spark.rdd.RDD[Array[Double]] to Array[Double] which is required by Spark MLlib","<p>I am trying to implement <code>KMeans using Apache Spark</code>.</p>
+
+<pre><code>val data = sc.textFile(irisDatasetString)
+val parsedData = data.map(_.split(',').map(_.toDouble)).cache()
+
+val clusters = KMeans.train(parsedData,3,numIterations = 20)
+</code></pre>
+
+<p>on which I get the following error :</p>
+
+<pre><code>error: overloaded method value train with alternatives:
+  (data: org.apache.spark.rdd.RDD[org.apache.spark.mllib.linalg.Vector],k: Int,maxIterations: Int,runs: Int)org.apache.spark.mllib.clustering.KMeansModel &lt;and&gt;
+  (data: org.apache.spark.rdd.RDD[org.apache.spark.mllib.linalg.Vector],k: Int,maxIterations: Int)org.apache.spark.mllib.clustering.KMeansModel &lt;and&gt;
+  (data: org.apache.spark.rdd.RDD[org.apache.spark.mllib.linalg.Vector],k: Int,maxIterations: Int,runs: Int,initializationMode: String)org.apache.spark.mllib.clustering.KMeansModel
+ cannot be applied to (org.apache.spark.rdd.RDD[Array[Double]], Int, numIterations: Int)
+       val clusters = KMeans.train(parsedData,3,numIterations = 20)
+</code></pre>
+
+<p>so I tried converting Array[Double] to Vector as shown <a href=""http://spark.apache.org/docs/1.1.1/mllib-guide.html"" rel=""nofollow noreferrer"">here</a></p>
+
+<pre><code>scala&gt; val vectorData: Vector = Vectors.dense(parsedData)
+</code></pre>
+
+<p>on which I got the following error :</p>
+
+<pre><code>error: type Vector takes type parameters
+   val vectorData: Vector = Vectors.dense(parsedData)
+                   ^
+error: overloaded method value dense with alternatives:
+  (values: Array[Double])org.apache.spark.mllib.linalg.Vector &lt;and&gt;
+  (firstValue: Double,otherValues: Double*)org.apache.spark.mllib.linalg.Vector
+ cannot be applied to (org.apache.spark.rdd.RDD[Array[Double]])
+       val vectorData: Vector = Vectors.dense(parsedData)
+</code></pre>
+
+<p>So I am inferring that <strong><code>org.apache.spark.rdd.RDD[Array[Double]]</code></strong> is not the same as Array[Double]</p>
+
+<p>How can I proceed with my data as <strong><code>org.apache.spark.rdd.RDD[Array[Double]]</code></strong> ? or how can I convert <strong><code>org.apache.spark.rdd.RDD[Array[Double]] to Array[Double]</code></strong> ?</p>
+"
+"What is the right way to save\load models in Spark\PySpark","<p>I'm working with Spark 1.3.0 using PySpark and MLlib and I need to save and load my models. I use code like this (taken from the official <a href=""http://spark.apache.org/docs/latest/mllib-collaborative-filtering.html"" rel=""nofollow noreferrer"">documentation</a> )</p>
+
+<pre><code>from pyspark.mllib.recommendation import ALS, MatrixFactorizationModel, Rating
+
+data = sc.textFile(""data/mllib/als/test.data"")
+ratings = data.map(lambda l: l.split(',')).map(lambda l: Rating(int(l[0]), int(l[1]), float(l[2])))
+rank = 10
+numIterations = 20
+model = ALS.train(ratings, rank, numIterations)
+testdata = ratings.map(lambda p: (p[0], p[1]))
+predictions = model.predictAll(testdata).map(lambda r: ((r[0], r[1]), r[2]))
+predictions.collect() # shows me some predictions
+model.save(sc, ""model0"")
+
+# Trying to load saved model and work with it
+model0 = MatrixFactorizationModel.load(sc, ""model0"")
+predictions0 = model0.predictAll(testdata).map(lambda r: ((r[0], r[1]), r[2]))
+</code></pre>
+
+<p>After I try to use model0 I get a long traceback, which ends with this:</p>
+
+<pre><code>Py4JError: An error occurred while calling o70.predict. Trace:
+py4j.Py4JException: Method predict([class org.apache.spark.api.java.JavaRDD]) does not exist
+    at py4j.reflection.ReflectionEngine.getMethod(ReflectionEngine.java:333)
+    at py4j.reflection.ReflectionEngine.getMethod(ReflectionEngine.java:342)
+    at py4j.Gateway.invoke(Gateway.java:252)
+    at py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:133)
+    at py4j.commands.CallCommand.execute(CallCommand.java:79)
+    at py4j.GatewayConnection.run(GatewayConnection.java:207)
+    at java.lang.Thread.run(Thread.java:745)
+</code></pre>
+
+<p>So my question is - am I doing something wrong? As far as I debugged my models are stored (locally and on HDFS) and they contain many files with some data. I have a feeling that models are saved correctly but probably they aren't loaded correctly. I also googled around but found nothing related. </p>
+
+<p>Looks like this save\load feature has been added recently in Spark 1.3.0 and because of this I have another question - what was the recommended way to save\load models before the release 1.3.0? I haven't found any nice ways to do this, at least for Python. I also tried Pickle, but faced with the same issues as described here <a href=""https://stackoverflow.com/questions/28427797/save-apache-spark-mllib-model-in-python"">Save Apache Spark mllib model in python</a></p>
+"
+"Mllib dependency error","<p>I'm trying to build a very simple scala standalone app using the Mllib, but I get the following error when trying to bulid the program:</p>
+
+<pre><code>Object Mllib is not a member of package org.apache.spark
+</code></pre>
+
+<p>Then, I realized that I have to add Mllib as dependency as follow :</p>
+
+<pre><code>version := ""1""
+scalaVersion :=""2.10.4""
+
+libraryDependencies ++= Seq(
+""org.apache.spark""  %% ""spark-core""              % ""1.1.0"",
+""org.apache.spark""  %% ""spark-mllib""             % ""1.1.0""
+)
+</code></pre>
+
+<p>But, here I got an error that says : </p>
+
+<p><code>unresolved dependency spark-core_2.10.4;1.1.1</code> : <code>not found</code> </p>
+
+<p>so I had to modify it to  </p>
+
+<p><code>""org.apache.spark""  % ""spark-core_2.10""  % ""1.1.1"",</code></p>
+
+<p>But there is still an error that says : </p>
+
+<p><code>unresolved dependency spark-mllib;1.1.1 : not found</code></p>
+
+<p>Anyone knows how to add dependency of Mllib in <code>.sbt</code> file? </p>
+"
+"Using DataFrame with MLlib","<p>Let's say I have a DataFrame (that I read in from a csv on HDFS) and I want to train some algorithms on it via MLlib. How do I convert the rows into LabeledPoints or otherwise utilize MLlib on this dataset?</p>
+"
+"How to update Spark MatrixFactorizationModel for ALS","<p>I build a simple recommendation system for the MovieLens DB inspired by <a href=""https://databricks-training.s3.amazonaws.com/movie-recommendation-with-mllib.html"" rel=""nofollow noreferrer"">https://databricks-training.s3.amazonaws.com/movie-recommendation-with-mllib.html</a>.</p>
+
+<p>I also have problems with explicit training like here: <a href=""https://stackoverflow.com/questions/26213573/apache-spark-als-collaborative-filtering-results-they-dont-make-sense"">Apache Spark ALS collaborative filtering results. They don&#39;t make sense</a> 
+Using implicit training (on both explicit and implicit data) gives me reasonable results, but explicit training doesn't.</p>
+
+<p>While this is ok for me by now, im curious on how to update a model. While my current solution works like </p>
+
+<ol>
+<li>having all user ratings </li>
+<li>generate model </li>
+<li>get recommendations for user</li>
+</ol>
+
+<p>I want to have a flow like this:</p>
+
+<ol>
+<li>having a base of ratings </li>
+<li>generate model once (optional save &amp; load it) </li>
+<li>get some ratings by one user on 10 random movies (not in the model!) </li>
+<li>get recommendations using the model and the new user ratings</li>
+</ol>
+
+<p>Therefore I must update my model, without completely recompute it. Is there any chance to do so?</p>
+
+<p>While the first way is good for batch processing (like generating recommendations in nightly batches) the second way would be good for nearly-live generating of recommendations.</p>
+"
+"Difference between org.apache.spark.ml.classification and org.apache.spark.mllib.classification","<p>I'm writing a spark application and would like to use algorithms in MLlib. In the API doc I found two different classes for the same algorithm. </p>
+
+<p>For example, there is one LogisticRegression in org.apache.spark.ml.classification also a LogisticRegressionwithSGD in org.apache.spark.mllib.classification.</p>
+
+<p>The only difference I can find is that the one in org.apache.spark.ml is inherited from Estimator and was able to be used in cross validation. I was quite confused that they are placed in different packages. Is there anyone know the reason for it? Thanks!</p>
+"
+"How to integrate Apache Spark with Spring MVC web application for interactive user sessions","<p>I am trying to build a Movie Recommender System Using Apache Spark MLlib.
+I have written a code for recommender in java  and its working fine when run using <code>spark-submit</code> command.</p>
+
+<p>My run command looks like this</p>
+
+<p><code>bin/spark-submit --jars /opt/poc/spark-1.3.1-bin-hadoop2.6/mllib/spark-mllib_2.10-1.0.0.jar --class ""com.recommender.MovieLensALSExtended"" --master local[4] /home/sarvesh/Desktop/spark-test/recommender.jar /home/sarvesh/Desktop/spark-test/ml-latest-small/ratings.csv /home/sarvesh/Desktop/spark-test/ml-latest-small/movies.csv</code></p>
+
+<p>Now I want to use my recommender in real world scenario, as a web application in which I can query recommender to give some result.</p>
+
+<p>I want to build a Spring MVC web application which can interact with Apache Spark Context and give me results when asked.</p>
+
+<p>My question is that how I can build an application which interacts with Apache Spark which is running on a cluster. So that when a request comes to controller it should take user query and fetch the same result as the <code>spark-submit</code> command outputs on console.</p>
+
+<p>As far as I have searched, I found that we can use Spark SQL, integrate with JDBC. But I did not find any good example.</p>
+
+<p>Thanks in advance.</p>
+"
+"Spark MLlib - trainImplicit warning","<p>I keep seeing these warnings when using <code>trainImplicit</code>:</p>
+
+
+
+<pre class=""lang-none prettyprint-override""><code>WARN TaskSetManager: Stage 246 contains a task of very large size (208 KB).
+The maximum recommended task size is 100 KB.
+</code></pre>
+
+<p>And then the task size starts to increase. I tried to call <code>repartition</code> on the input RDD but the warnings are the same.</p>
+
+<p>All these warnings come from ALS iterations, from flatMap and also from aggregate, for instance the origin of the stage where the flatMap is showing these warnings (w/ Spark 1.3.0, but they are also shown in Spark 1.3.1):</p>
+
+<pre class=""lang-none prettyprint-override""><code>org.apache.spark.rdd.RDD.flatMap(RDD.scala:296)
+org.apache.spark.ml.recommendation.ALS$.org$apache$spark$ml$recommendation$ALS$$computeFactors(ALS.scala:1065)
+org.apache.spark.ml.recommendation.ALS$$anonfun$train$3.apply(ALS.scala:530)
+org.apache.spark.ml.recommendation.ALS$$anonfun$train$3.apply(ALS.scala:527)
+scala.collection.immutable.Range.foreach(Range.scala:141)
+org.apache.spark.ml.recommendation.ALS$.train(ALS.scala:527)
+org.apache.spark.mllib.recommendation.ALS.run(ALS.scala:203)
+</code></pre>
+
+<p>and from aggregate:</p>
+
+<pre class=""lang-none prettyprint-override""><code>org.apache.spark.rdd.RDD.aggregate(RDD.scala:968)
+org.apache.spark.ml.recommendation.ALS$.computeYtY(ALS.scala:1112)
+org.apache.spark.ml.recommendation.ALS$.org$apache$spark$ml$recommendation$ALS$$computeFactors(ALS.scala:1064)
+org.apache.spark.ml.recommendation.ALS$$anonfun$train$3.apply(ALS.scala:538)
+org.apache.spark.ml.recommendation.ALS$$anonfun$train$3.apply(ALS.scala:527)
+scala.collection.immutable.Range.foreach(Range.scala:141)
+org.apache.spark.ml.recommendation.ALS$.train(ALS.scala:527)
+org.apache.spark.mllib.recommendation.ALS.run(ALS.scala:203)
+</code></pre>
+"
+"From DataFrame to RDD[LabeledPoint]","<p>I am trying to implement a document classifier using Apache Spark MLlib and I am having some problems representing the data. My code is the following:</p>
+
+<pre><code>import org.apache.spark.sql.{Row, SQLContext}
+import org.apache.spark.sql.types.{StringType, StructField, StructType}
+import org.apache.spark.ml.feature.Tokenizer
+import org.apache.spark.ml.feature.HashingTF
+import org.apache.spark.ml.feature.IDF
+
+val sql = new SQLContext(sc)
+
+// Load raw data from a TSV file
+val raw = sc.textFile(""data.tsv"").map(_.split(""\t"").toSeq)
+
+// Convert the RDD to a dataframe
+val schema = StructType(List(StructField(""class"", StringType), StructField(""content"", StringType)))
+val dataframe = sql.createDataFrame(raw.map(row =&gt; Row(row(0), row(1))), schema)
+
+// Tokenize
+val tokenizer = new Tokenizer().setInputCol(""content"").setOutputCol(""tokens"")
+val tokenized = tokenizer.transform(dataframe)
+
+// TF-IDF
+val htf = new HashingTF().setInputCol(""tokens"").setOutputCol(""rawFeatures"").setNumFeatures(500)
+val tf = htf.transform(tokenized)
+tf.cache
+val idf = new IDF().setInputCol(""rawFeatures"").setOutputCol(""features"")
+val idfModel = idf.fit(tf)
+val tfidf = idfModel.transform(tf)
+
+// Create labeled points
+val labeled = tfidf.map(row =&gt; LabeledPoint(row.getDouble(0), row.get(4)))
+</code></pre>
+
+<p>I need to use dataframes to generate the tokens and create the TF-IDF features. The problem appears when I try to convert this dataframe to a RDD[LabeledPoint]. I map the dataframe rows, but the get method of Row return an Any type, not the type defined on the dataframe schema (Vector). Therefore, I cannot construct the RDD I need to train a ML model.</p>
+
+<p>What is the best option to get a RDD[LabeledPoint] after calculating a TF-IDF?</p>
+"
+"What is the difference between Apache Mahout and Apache Spark's MLlib?","<p>Considering a MySQL <code>products</code> database with 10 millions products for an e-commerce website. </p>
+
+<p>I'm trying to set up a classification module to categorize products. I'm using Apache Sqoop to import data from MySQL to Hadoop.</p>
+
+<p>I wanted to use Mahout over it as a Machine Learning framework to use one of it's <a href=""https://mahout.apache.org/users/basics/algorithms.html"">Classification algorithms</a>, and then I ran into Spark which is provided with <a href=""http://spark.apache.org/mllib/"">MLlib</a></p>
+
+<ul>
+<li>So what is the difference between the two frameworks?</li>
+<li>Mainly, what are the advantages,down-points and limitations of each?</li>
+</ul>
+"
+"How to create correct data frame for classification in Spark ML","<p>I am trying to run random forest classification by using <a href=""https://spark.apache.org/docs/latest/ml-guide.html"" rel=""noreferrer"">Spark ML api</a> but I am having issues with creating right data frame input into pipeline. </p>
+
+<p>Here is sample data:</p>
+
+<pre><code>age,hours_per_week,education,sex,salaryRange
+38,40,""hs-grad"",""male"",""A""
+28,40,""bachelors"",""female"",""A""
+52,45,""hs-grad"",""male"",""B""
+31,50,""masters"",""female"",""B""
+42,40,""bachelors"",""male"",""B""
+</code></pre>
+
+<p><strong>age</strong> and <strong>hours_per_week</strong> are integers while other features including label <strong>salaryRange</strong> are categorical (String)</p>
+
+<p>Loading this csv file (lets call it sample.csv) can be done by <a href=""https://github.com/databricks/spark-csv"" rel=""noreferrer"">Spark csv library</a> like this:</p>
+
+<pre><code>val data = sqlContext.csvFile(""/home/dusan/sample.csv"")
+</code></pre>
+
+<p>By default all columns are imported as string so we need to change ""age"" and  ""hours_per_week"" to Int:</p>
+
+<pre><code>val toInt    = udf[Int, String]( _.toInt)
+val dataFixed = data.withColumn(""age"", toInt(data(""age""))).withColumn(""hours_per_week"",toInt(data(""hours_per_week"")))
+</code></pre>
+
+<p>Just to check how schema looks now:</p>
+
+<pre><code>scala&gt; dataFixed.printSchema
+root
+ |-- age: integer (nullable = true)
+ |-- hours_per_week: integer (nullable = true)
+ |-- education: string (nullable = true)
+ |-- sex: string (nullable = true)
+ |-- salaryRange: string (nullable = true)
+</code></pre>
+
+<p>Then lets set the cross validator and pipeline:</p>
+
+<pre><code>val rf = new RandomForestClassifier()
+val pipeline = new Pipeline().setStages(Array(rf)) 
+val cv = new CrossValidator().setNumFolds(10).setEstimator(pipeline).setEvaluator(new BinaryClassificationEvaluator)
+</code></pre>
+
+<p>Error shows up when running this line:</p>
+
+<pre><code>val cmModel = cv.fit(dataFixed)
+</code></pre>
+
+<p><strong>java.lang.IllegalArgumentException: Field ""features"" does not exist.</strong></p>
+
+<p>It is possible to set label column and feature column in RandomForestClassifier ,however I have 4 columns as predictors (features) not only one. </p>
+
+<p><strong>How I should organize my data frame so it has label and features columns organized correctly?</strong></p>
+
+<p>For your convenience here is full code :</p>
+
+<pre><code>import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
+import org.apache.spark.ml.classification.RandomForestClassifier
+import org.apache.spark.ml.evaluation.BinaryClassificationEvaluator
+import org.apache.spark.ml.tuning.CrossValidator
+import org.apache.spark.ml.Pipeline
+import org.apache.spark.sql.DataFrame
+
+import org.apache.spark.sql.functions._
+import org.apache.spark.mllib.linalg.{Vector, Vectors}
+
+
+object SampleClassification {
+
+  def main(args: Array[String]): Unit = {
+
+    //set spark context
+    val conf = new SparkConf().setAppName(""Simple Application"").setMaster(""local"");
+    val sc = new SparkContext(conf)
+    val sqlContext = new org.apache.spark.sql.SQLContext(sc)
+
+    import sqlContext.implicits._
+    import com.databricks.spark.csv._
+
+    //load data by using databricks ""Spark CSV Library"" 
+    val data = sqlContext.csvFile(""/home/dusan/sample.csv"")
+
+    //by default all columns are imported as string so we need to change ""age"" and  ""hours_per_week"" to Int
+    val toInt    = udf[Int, String]( _.toInt)
+    val dataFixed = data.withColumn(""age"", toInt(data(""age""))).withColumn(""hours_per_week"",toInt(data(""hours_per_week"")))
+
+
+    val rf = new RandomForestClassifier()
+
+    val pipeline = new Pipeline().setStages(Array(rf))
+
+    val cv = new CrossValidator().setNumFolds(10).setEstimator(pipeline).setEvaluator(new BinaryClassificationEvaluator)
+
+    // this fails with error
+    //java.lang.IllegalArgumentException: Field ""features"" does not exist.
+    val cmModel = cv.fit(dataFixed) 
+  }
+
+}
+</code></pre>
+
+<p>Thanks for help!</p>
+"
+"Calling Java/Scala function from a task","<h3>Background</h3>
+
+<p>My original question here was <em>Why using <code>DecisionTreeModel.predict</code> inside map function raises an exception?</em> and is related to <a href=""https://stackoverflow.com/q/31680704/1560062"">How to generate tuples of (original lable, predicted label) on Spark with MLlib?</a></p>
+
+<p>When we use Scala API <a href=""https://spark.apache.org/docs/1.4.1/mllib-decision-tree.html#classification"" rel=""nofollow noreferrer"">a recommended way</a> of getting predictions for <code>RDD[LabeledPoint]</code> using <code>DecisionTreeModel</code> is to simply map over <code>RDD</code>:</p>
+
+<pre><code>val labelAndPreds = testData.map { point =&gt;
+  val prediction = model.predict(point.features)
+  (point.label, prediction)
+}
+</code></pre>
+
+<p>Unfortunately similar approach in PySpark doesn't work so well:</p>
+
+<pre><code>labelsAndPredictions = testData.map(
+    lambda lp: (lp.label, model.predict(lp.features))
+labelsAndPredictions.first()
+</code></pre>
+
+<blockquote>
+  <p>Exception: It appears that you are attempting to reference SparkContext from a broadcast variable, action, or transforamtion. SparkContext can only be used on the driver, not in code that it run on workers. For more information, see <a href=""https://issues.apache.org/jira/browse/SPARK-5063"" rel=""nofollow noreferrer"">SPARK-5063</a>.</p>
+</blockquote>
+
+<p>Instead of that <a href=""https://spark.apache.org/docs/1.4.1/mllib-decision-tree.html#classification"" rel=""nofollow noreferrer"">official documentation</a> recommends something like this:</p>
+
+<pre><code>predictions = model.predict(testData.map(lambda x: x.features))
+labelsAndPredictions = testData.map(lambda lp: lp.label).zip(predictions)
+</code></pre>
+
+<p>So what is going on here? There is no broadcast variable here and <a href=""https://github.com/apache/spark/blob/3697232b7d438979cc119b2a364296b0eec4a16a/mllib/src/main/scala/org/apache/spark/mllib/tree/model/DecisionTreeModel.scala#L45"" rel=""nofollow noreferrer"">Scala API</a> defines <code>predict</code> as follows:</p>
+
+<pre><code>/**
+ * Predict values for a single data point using the model trained.
+ *
+ * @param features array representing a single data point
+ * @return Double prediction from the trained model
+ */
+def predict(features: Vector): Double = {
+  topNode.predict(features)
+}
+
+/**
+ * Predict values for the given data set using the model trained.
+ *
+ * @param features RDD representing data points to be predicted
+ * @return RDD of predictions for each of the given data points
+ */
+def predict(features: RDD[Vector]): RDD[Double] = {
+  features.map(x =&gt; predict(x))
+}
+</code></pre>
+
+<p>so at least at the first glance calling from action or transformation is not a problem since prediction seems to be a local operation. </p>
+
+<h3>Explanation</h3>
+
+<p>After some digging I figured out that the source of the problem is a <a href=""https://github.com/apache/spark/blob/3c0156899dc1ec1f7dfe6d7c8af47fa6dc7d00bf/python/pyspark/mllib/common.py#L142"" rel=""nofollow noreferrer""><code>JavaModelWrapper.call</code></a> method invoked from <a href=""https://github.com/apache/spark/blob/164fe2aa44993da6c77af6de5efdae47a8b3958c/python/pyspark/mllib/tree.py#L76"" rel=""nofollow noreferrer"">DecisionTreeModel.predict</a>. It <a href=""https://github.com/apache/spark/blob/3c0156899dc1ec1f7dfe6d7c8af47fa6dc7d00bf/python/pyspark/mllib/common.py#L144"" rel=""nofollow noreferrer"">access</a>  <code>SparkContext</code> which is required to call Java function:</p>
+
+<pre><code>callJavaFunc(self._sc, getattr(self._java_model, name), *a)
+</code></pre>
+
+<h3>Question</h3>
+
+<p>In case of <code>DecisionTreeModel.predict</code> there is a recommended workaround and all the required code is already a part of the Scala API but is there any elegant way to handle problem like this in general? </p>
+
+<p>Only solutions I can think of right now are rather heavyweight:</p>
+
+<ul>
+<li>pushing everything down to JVM either by extending Spark classes through Implicit Conversions or adding some kind of wrappers</li>
+<li>using Py4j gateway directly</li>
+</ul>
+"
+"How to extract best parameters from a CrossValidatorModel","<p>I want to find the parameters of <code>ParamGridBuilder</code> that make the best model in CrossValidator in Spark 1.4.x,</p>
+
+<p>In <a href=""http://spark.apache.org/docs/latest/ml-guide.html#example-model-selection-via-cross-validation"" rel=""noreferrer"">Pipeline Example</a> in Spark documentation, they add different parameters (<code>numFeatures</code>, <code>regParam</code>) by using <code>ParamGridBuilder</code> in the Pipeline. Then by the following line of code they make the best model:</p>
+
+<pre><code>val cvModel = crossval.fit(training.toDF)
+</code></pre>
+
+<p>Now, I want to know what are the parameters (<code>numFeatures</code>, <code>regParam</code>) from <code>ParamGridBuilder</code> that produces the best model.</p>
+
+<p>I already used the following commands without success:</p>
+
+<pre><code>cvModel.bestModel.extractParamMap().toString()
+cvModel.params.toList.mkString(""("", "","", "")"")
+cvModel.estimatorParamMaps.toString()
+cvModel.explainParams()
+cvModel.getEstimatorParamMaps.mkString(""("", "","", "")"")
+cvModel.toString()
+</code></pre>
+
+<p>Any help?</p>
+
+<p>Thanks in advance,</p>
+"

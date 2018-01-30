@@ -1,0 +1,1878 @@
+Title,Body
+"theano - print value of TensorVariable","<p><strong>How can I print the numerical value of a theano TensorVariable?</strong>
+I'm new to theano, so please be patient :)</p>
+
+<p>I have a function where I get <code>y</code> as a parameter.
+Now I want to debug-print the shape of this <code>y</code> to the console.
+Using</p>
+
+<pre><code>print y.shape
+</code></pre>
+
+<p>results in the console output (i was expecting numbers, i.e. <code>(2,4,4)</code>):</p>
+
+<pre><code>Shape.0
+</code></pre>
+
+<p>Or how can I print the numerical result of for example the following code (this counts how many values in <code>y</code> are bigger than half the maximum):</p>
+
+<pre><code>errorCount = T.sum(T.gt(T.abs_(y),T.max(y)/2.0))
+</code></pre>
+
+<p><code>errorCount</code> should be a single number because <code>T.sum</code> sums up all the values.
+But using</p>
+
+<pre><code>print errCount
+</code></pre>
+
+<p>gives me (expected something like <code>134</code>):</p>
+
+<pre><code>Sum.0
+</code></pre>
+"
+"Numpy installation error. (Mingw32CCompiler instance has no attribute 'compile_options')","<p>I use python with windows8 / anaconda spyder (2.7)
+I'm trying to update Theano up-to-date. When I installing the theano by </p>
+
+<pre><code>""pip install --upgrade theano""
+</code></pre>
+
+<p>The error happens at numpy installation part. </p>
+
+<p>Though numpy is available to use in anaconda GUI, But is not shown in anaconda terminal. (pip show numpy outputs nothing)</p>
+
+<p>The error is like below (when I try to install numpy, same error happens)</p>
+
+<pre><code>  File ""c:\users\user\appdata\local\temp\pip_build_user\numpy\numpy\distutils\command\build_src.py"", line 329, in build_extension_sources
+
+    sources = self.generate_sources(sources, ext)
+
+  File ""c:\users\user\appdata\local\temp\pip_build_user\numpy\numpy\distutils\command\build_src.py"", line 386, in generate_sources
+
+    source = func(extension, build_dir)
+
+  File ""numpy\core\setup.py"", line 455, in generate_config_h
+
+    rep = check_long_double_representation(config_cmd)
+
+  File ""numpy\core\setup_common.py"", line 191, in check_long_double_representation
+
+    cmd.compiler.compile_options.remove(""/GL"")
+
+AttributeError: Mingw32CCompiler instance has no attribute 'compile_options'
+
+----------------------------------------
+Cleaning up...
+  Removing temporary dir c:\users\user\appdata\local\temp\pip_build_user...
+Command C:\Anaconda\python.exe -c ""import setuptools, tokenize;__file__='c:\\users\\user\\appdata\\local\\temp\\pip_build_user\\numpy\\setup.py';exec(compile(getattr(tokenize, 'open', open)(__file__).read().replace('\r\n', '\n'), __file__, 'exec'))"" install --record c:\users\user\appdata\local\temp\pip-nm4fpu-record\install-record.txt --single-version-externally-managed --compile failed with error code 1 in c:\users\user\appdata\local\temp\pip_build_user\numpy
+Exception information:
+Traceback (most recent call last):
+  File ""C:\Anaconda\lib\site-packages\pip\basecommand.py"", line 122, in main
+    status = self.run(options, args)
+  File ""C:\Anaconda\lib\site-packages\pip\commands\install.py"", line 283, in run
+    requirement_set.install(install_options, global_options, root=options.root_path)
+  File ""C:\Anaconda\lib\site-packages\pip\req.py"", line 1435, in install
+    requirement.install(install_options, global_options, *args, **kwargs)
+  File ""C:\Anaconda\lib\site-packages\pip\req.py"", line 706, in install
+    cwd=self.source_dir, filter_stdout=self._filter_install, show_stdout=False)
+  File ""C:\Anaconda\lib\site-packages\pip\util.py"", line 697, in call_subprocess
+    % (command_desc, proc.returncode, cwd))
+InstallationError: Command C:\Anaconda\python.exe -c ""import setuptools, tokenize;__file__='c:\\users\\user\\appdata\\local\\temp\\pip_build_user\\numpy\\setup.py';exec(compile(getattr(tokenize, 'open', open)(__file__).read().replace('\r\n', '\n'), __file__, 'exec'))"" install --record c:\users\user\appdata\local\temp\pip-nm4fpu-record\install-record.txt --single-version-externally-managed --compile failed with error code 1 in c:\users\user\appdata\local\temp\pip_build_user\numpy
+</code></pre>
+"
+"Theano with Keras on Raspberry Pi","<p>I am trying to get Theano to run with Keras on a Raspberry Pi 3 (B) without success. I tried Ubuntu MATE and Raspbian as operating systems, without success. To install Theano and Keras, I have taken following steps:</p>
+
+<ol>
+<li>Install miniconda (armv7 distribution)</li>
+<li>Install all Theano dependencies (as shown <a href=""http://deeplearning.net/software/theano/install_ubuntu.html"" rel=""noreferrer"">here</a>) through Conda (if possible), <code>pip</code> and <code>apt-get</code></li>
+<li>Install Theano </li>
+<li>Install Keras</li>
+</ol>
+
+<p>The aforementioned steps work without any issues. In the next step, I built a little test script (test.py) which loads an already built model via </p>
+
+<pre><code>from keras.models import load_model
+model = load_model('model.hdf5')
+</code></pre>
+
+<p>When the model is being loaded, I get the following error</p>
+
+<pre><code>Segmentation fault (core dumped)
+</code></pre>
+
+<p>Then I tried to investigate the issue further, following this answer on SO (<a href=""https://stackoverflow.com/questions/10035541/what-causes-a-python-segmentation-fault"">What causes a Python segmentation fault?</a>):</p>
+
+<pre><code>gdb python
+&gt; run test.py
+</code></pre>
+
+<p>When I run this I get:</p>
+
+<pre><code>Program received SIGSEV, Segmentation fault.
+0x76fd9822 in ?? () from /lib/ld-linux-armhf.so.3
+</code></pre>
+
+<p>In the next step I ran in the gdb shell:</p>
+
+<pre><code>&gt; backtrace
+</code></pre>
+
+<p>and got</p>
+
+<pre><code>#0  0x76fd9822 in ?? () from /lib/ld-linux-armhf.so.3
+#1  0x76fd983a in ?? () from /lib/ld-linux-armhf.so.3
+</code></pre>
+
+<p>this is the point where I don't know any further and I would like to ask, if anyone could point me into a direction on how to fix this issue and get keras + theano to run on a Raspberry Pi.</p>
+
+<p>(I have also tried TensorFlow as an alternative, but getting the same issue)</p>
+
+<p>Thanks a lot.</p>
+
+<hr>
+
+<p>EDIT</p>
+
+<p>I have done some more investigations. If I <a href=""https://github.com/samjabrahams/tensorflow-on-raspberry-pi"" rel=""noreferrer"">run Keras with TensorFlow</a> the problem seems to change a little bit. I ran gdb again, but the error happens now in numpy, especially in libopenblas.so.0</p>
+
+<pre><code>Program received signal SIGSEV, Segmentation fault.
+0x75ead7cc in inner_thread()
+from /home/&lt;path&gt;/numpy/core/../../../../libopenblas.so.0
+</code></pre>
+
+<p>Does this help?</p>
+
+<hr>
+
+<p>EDIT 2</p>
+
+<p>I have installed everything without using Miniconda and Keras works now with TensorFlow (but not with Theano yet). </p>
+"
+"Getting gradient of model output w.r.t weights using Keras","<p>I am interesting in building reinforcement learning models with the simplicity of the Keras API. Unfortunately, I am unable to extract the gradient of the output (not error) with respect to the weights. I found the following code that performs a similar function (<a href=""https://stackoverflow.com/questions/36968128/saliency-maps-of-neural-networks-using-keras"">Saliency maps of neural networks (using Keras)</a>)</p>
+
+<pre><code>get_output = theano.function([model.layers[0].input],model.layers[-1].output,allow_input_downcast=True)
+fx = theano.function([model.layers[0].input] ,T.jacobian(model.layers[-1].output.flatten(),model.layers[0].input), allow_input_downcast=True)
+grad = fx([trainingData])
+</code></pre>
+
+<p>Any ideas on how to calculate the gradient of the model output with respect to the weights for each layer would be appreciated.</p>
+"
+"how does theano.scan's updates work?","<p><code>theano.scan</code> return two variables: values variable and updates variable.  For example,</p>
+
+<pre><code>a = theano.shared(1)
+
+values, updates = theano.scan(fn=lambda a:a+1, outputs_info=a,  n_steps=10)
+</code></pre>
+
+<p>However, I notice that in most of the examples I work with, the updates variable is empty.  It seems only when we write the function in <code>theano.scan</code> is a certain way, we get the updates.  For example,</p>
+
+<pre><code>a = theano.shared(1)
+
+values, updates = theano.scan(lambda: {a: a+1}, n_steps=10)
+</code></pre>
+
+<p>Can someone explain to me why in the first example the updates is empty, but in the second example, the updates variable is not empty?  and more generally, how does the updates variable in <code>theano.scan</code> work?  Thanks.</p>
+"
+"How to get reproducible results in keras","<p>I get different results (test accuracy) every time I run the <code>imdb_lstm.py</code> example from Keras framework (<a href=""https://github.com/fchollet/keras/blob/master/examples/imdb_lstm.py"">https://github.com/fchollet/keras/blob/master/examples/imdb_lstm.py</a>)
+The code contains <code>np.random.seed(1337)</code> in the top, before any keras imports. It should prevent it from generating different numbers for every run. What am I missing?  </p>
+
+<p>UPDATE: How to repro:  </p>
+
+<ol>
+<li>Install Keras (<a href=""http://keras.io/"">http://keras.io/</a>)   </li>
+<li>Execute <a href=""https://github.com/fchollet/keras/blob/master/examples/imdb_lstm.py"">https://github.com/fchollet/keras/blob/master/examples/imdb_lstm.py</a>  a few times. It will train the model and output test accuracy.<br>
+Expected result: Test accuracy is the same on every run.<br>
+Actual result: Test accuracy is different on every run.</li>
+</ol>
+
+<p>UPDATE2: I'm running it on Windows 8.1 with MinGW/msys, module versions:<br>
+theano 0.7.0<br>
+numpy 1.8.1<br>
+scipy 0.14.0c1</p>
+
+<p>UPDATE3: I narrowed the problem down a bit. If I run the example with GPU (set theano flag device=gpu0) then I get different test accuracy every time, but if I run it on CPU then everything works as expected. My graphics card: NVIDIA GeForce GT 635)</p>
+"
+"Installing theano on Windows 8 with GPU enabled","<p>I understand that the Theano support for Windows 8.1 is at experimental stage only but I wonder if anyone had any luck with resolving my issues. Depending on my config, I get three distinct types of errors. I assume that the resolution of any of my errors would solve my problem.</p>
+
+<p>I have installed Python using WinPython 32-bit system, using MinGW as described <a href=""http://deeplearning.net/software/theano/install.html"">here</a>. The contents of my <code>.theanorc</code> file are as follows:</p>
+
+<pre><code>[global]
+openmp=False
+device = gpu
+
+[nvcc]
+flags=-LC:\TheanoPython\python-2.7.6\libs
+compiler_bindir=C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\
+
+[blas]
+ldflags = 
+</code></pre>
+
+<p>When I run <code>import theano</code> the error is as follows:</p>
+
+<pre><code>nvcc fatal   : nvcc cannot find a supported version of Microsoft Visual Studio.
+Only the versions 2010, 2012, and 2013 are supported
+
+['nvcc', '-shared', '-g', '-O3', '--compiler-bindir', 'C:\\Program Files (x86)\\
+Microsoft Visual Studio 10.0\\VC\\bin# flags=-m32 # we have this hard coded for
+now', '-Xlinker', '/DEBUG', '-m32', '-Xcompiler', '-DCUDA_NDARRAY_CUH=d67f7c8a21
+306c67152a70a88a837011,/Zi,/MD', '-IC:\\TheanoPython\\python-2.7.6\\lib\\site-pa
+ckages\\theano\\sandbox\\cuda', '-IC:\\TheanoPython\\python-2.7.6\\lib\\site-pac
+kages\\numpy\\core\\include', '-IC:\\TheanoPython\\python-2.7.6\\include', '-o',
+ 'C:\\Users\\Matej\\AppData\\Local\\Theano\\compiledir_Windows-8-6.2.9200-Intel6
+4_Family_6_Model_60_Stepping_3_GenuineIntel-2.7.6-32\\cuda_ndarray\\cuda_ndarray
+.pyd', 'mod.cu', '-LC:\\TheanoPython\\python-2.7.6\\libs', '-LNone\\lib', '-LNon
+e\\lib64', '-LC:\\TheanoPython\\python-2.7.6', '-lpython27', '-lcublas', '-lcuda
+rt']
+ERROR (theano.sandbox.cuda): Failed to compile cuda_ndarray.cu: ('nvcc return st
+atus', 1, 'for cmd', 'nvcc -shared -g -O3 --compiler-bindir C:\\Program Files (x
+86)\\Microsoft Visual Studio 10.0\\VC\\bin# flags=-m32 # we have this hard coded
+ for now -Xlinker /DEBUG -m32 -Xcompiler -DCUDA_NDARRAY_CUH=d67f7c8a21306c67152a
+70a88a837011,/Zi,/MD -IC:\\TheanoPython\\python-2.7.6\\lib\\site-packages\\thean
+o\\sandbox\\cuda -IC:\\TheanoPython\\python-2.7.6\\lib\\site-packages\\numpy\\co
+re\\include -IC:\\TheanoPython\\python-2.7.6\\include -o C:\\Users\\Matej\\AppDa
+ta\\Local\\Theano\\compiledir_Windows-8-6.2.9200-Intel64_Family_6_Model_60_Stepp
+ing_3_GenuineIntel-2.7.6-32\\cuda_ndarray\\cuda_ndarray.pyd mod.cu -LC:\\TheanoP
+ython\\python-2.7.6\\libs -LNone\\lib -LNone\\lib64 -LC:\\TheanoPython\\python-2
+.7.6 -lpython27 -lcublas -lcudart')
+WARNING (theano.sandbox.cuda): CUDA is installed, but device gpu is not availabl
+e
+</code></pre>
+
+<p>I have also tested it using <code>Visual Studio 12.0</code> which is installed on my system with the following error:</p>
+
+<pre><code>mod.cu
+nvlink fatal   : Could not open input file 'C:/Users/Matej/AppData/Local/Temp/tm
+pxft_00001b70_00000000-28_mod.obj'
+
+['nvcc', '-shared', '-g', '-O3', '--compiler-bindir', 'C:\\Program Files (x86)\\
+Microsoft Visual Studio 12.0\\VC\\bin\\', '-Xlinker', '/DEBUG', '-m32', '-Xcompi
+ler', '-LC:\\TheanoPython\\python-2.7.6\\libs,-DCUDA_NDARRAY_CUH=d67f7c8a21306c6
+7152a70a88a837011,/Zi,/MD', '-IC:\\TheanoPython\\python-2.7.6\\lib\\site-package
+s\\theano\\sandbox\\cuda', '-IC:\\TheanoPython\\python-2.7.6\\lib\\site-packages
+\\numpy\\core\\include', '-IC:\\TheanoPython\\python-2.7.6\\include', '-o', 'C:\
+\Users\\Matej\\AppData\\Local\\Theano\\compiledir_Windows-8-6.2.9200-Intel64_Fam
+ily_6_Model_60_Stepping_3_GenuineIntel-2.7.6-32\\cuda_ndarray\\cuda_ndarray.pyd'
+, 'mod.cu', '-LC:\\TheanoPython\\python-2.7.6\\libs', '-LNone\\lib', '-LNone\\li
+b64', '-LC:\\TheanoPython\\python-2.7.6', '-lpython27', '-lcublas', '-lcudart']
+ERROR (theano.sandbox.cuda): Failed to compile cuda_ndarray.cu: ('nvcc return st
+atus', 1, 'for cmd', 'nvcc -shared -g -O3 --compiler-bindir C:\\Program Files (x
+86)\\Microsoft Visual Studio 12.0\\VC\\bin\\ -Xlinker /DEBUG -m32 -Xcompiler -LC
+:\\TheanoPython\\python-2.7.6\\libs,-DCUDA_NDARRAY_CUH=d67f7c8a21306c67152a70a88
+a837011,/Zi,/MD -IC:\\TheanoPython\\python-2.7.6\\lib\\site-packages\\theano\\sa
+ndbox\\cuda -IC:\\TheanoPython\\python-2.7.6\\lib\\site-packages\\numpy\\core\\i
+nclude -IC:\\TheanoPython\\python-2.7.6\\include -o C:\\Users\\Matej\\AppData\\L
+ocal\\Theano\\compiledir_Windows-8-6.2.9200-Intel64_Family_6_Model_60_Stepping_3
+_GenuineIntel-2.7.6-32\\cuda_ndarray\\cuda_ndarray.pyd mod.cu -LC:\\TheanoPython
+\\python-2.7.6\\libs -LNone\\lib -LNone\\lib64 -LC:\\TheanoPython\\python-2.7.6
+-lpython27 -lcublas -lcudart')
+WARNING (theano.sandbox.cuda): CUDA is installed, but device gpu is not availabl
+e
+</code></pre>
+
+<p>In the latter error, several pop-up windows ask me how would I like to open (.res) file before error is thrown.</p>
+
+<p><code>cl.exe</code> is present in both folders (i.e. VS 2010 and VS 2013). </p>
+
+<p>Finally, if I set VS 2013 in the environment path and set <code>.theanorc</code> contents as follows:</p>
+
+<pre><code>[global]
+base_compiledir=C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin
+openmp=False
+floatX = float32
+device = gpu
+
+[nvcc]
+flags=-LC:\TheanoPython\python-2.7.6\libs
+compiler_bindir=C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\
+
+[blas]
+ldflags = 
+</code></pre>
+
+<p>I get the following error:</p>
+
+<pre><code>c:\theanopython\python-2.7.6\include\pymath.h(22): warning: dllexport/dllimport conflict with ""round""
+c:\program files\nvidia gpu computing toolkit\cuda\v6.5\include\math_functions.h(2455): here; dllimport/dllexport dropped
+
+mod.cu(954): warning: statement is unreachable
+
+mod.cu(1114): error: namespace ""std"" has no member ""min""
+
+mod.cu(1145): error: namespace ""std"" has no member ""min""
+
+mod.cu(1173): error: namespace ""std"" has no member ""min""
+
+mod.cu(1174): error: namespace ""std"" has no member ""min""
+
+mod.cu(1317): error: namespace ""std"" has no member ""min""
+
+mod.cu(1318): error: namespace ""std"" has no member ""min""
+
+mod.cu(1442): error: namespace ""std"" has no member ""min""
+
+mod.cu(1443): error: namespace ""std"" has no member ""min""
+
+mod.cu(1742): error: namespace ""std"" has no member ""min""
+
+mod.cu(1777): error: namespace ""std"" has no member ""min""
+
+mod.cu(1781): error: namespace ""std"" has no member ""min""
+
+mod.cu(1814): error: namespace ""std"" has no member ""min""
+
+mod.cu(1821): error: namespace ""std"" has no member ""min""
+
+mod.cu(1853): error: namespace ""std"" has no member ""min""
+
+mod.cu(1861): error: namespace ""std"" has no member ""min""
+
+mod.cu(1898): error: namespace ""std"" has no member ""min""
+
+mod.cu(1905): error: namespace ""std"" has no member ""min""
+
+mod.cu(1946): error: namespace ""std"" has no member ""min""
+
+mod.cu(1960): error: namespace ""std"" has no member ""min""
+
+mod.cu(3750): error: namespace ""std"" has no member ""min""
+
+mod.cu(3752): error: namespace ""std"" has no member ""min""
+
+mod.cu(3784): error: namespace ""std"" has no member ""min""
+
+mod.cu(3786): error: namespace ""std"" has no member ""min""
+
+mod.cu(3789): error: namespace ""std"" has no member ""min""
+
+mod.cu(3791): error: namespace ""std"" has no member ""min""
+
+mod.cu(3794): error: namespace ""std"" has no member ""min""
+
+mod.cu(3795): error: namespace ""std"" has no member ""min""
+
+mod.cu(3836): error: namespace ""std"" has no member ""min""
+
+mod.cu(3838): error: namespace ""std"" has no member ""min""
+
+mod.cu(4602): error: namespace ""std"" has no member ""min""
+
+mod.cu(4604): error: namespace ""std"" has no member ""min""
+
+31 errors detected in the compilation of ""C:/Users/Matej/AppData/Local/Temp/tmpxft_00001d84_00000000-10_mod.cpp1.ii"".
+ERROR (theano.sandbox.cuda): Failed to compile cuda_ndarray.cu: ('nvcc return status', 2, 'for cmd', 'nvcc -shared -g -O3 -Xlinker /DEBUG -m32 -Xcompiler -DCUDA_NDARRAY_CUH=d67f7c8a21306c67152a70a88a837011,/Zi,/MD -IC:\\TheanoPython\\python-2.7.6\\lib\\site-packages\\theano\\sandbox\\cuda -IC:\\TheanoPython\\python-2.7.6\\lib\\site-packages\\numpy\\core\\include -IC:\\TheanoPython\\python-2.7.6\\include -o C:\\Users\\Matej\\AppData\\Local\\Theano\\compiledir_Windows-8-6.2.9200-Intel64_Family_6_Model_60_Stepping_3_GenuineIntel-2.7.6-32\\cuda_ndarray\\cuda_ndarray.pyd mod.cu -LC:\\TheanoPython\\python-2.7.6\\libs -LNone\\lib -LNone\\lib64 -LC:\\TheanoPython\\python-2.7.6 -lpython27 -lcublas -lcudart')
+ERROR:theano.sandbox.cuda:Failed to compile cuda_ndarray.cu: ('nvcc return status', 2, 'for cmd', 'nvcc -shared -g -O3 -Xlinker /DEBUG -m32 -Xcompiler -DCUDA_NDARRAY_CUH=d67f7c8a21306c67152a70a88a837011,/Zi,/MD -IC:\\TheanoPython\\python-2.7.6\\lib\\site-packages\\theano\\sandbox\\cuda -IC:\\TheanoPython\\python-2.7.6\\lib\\site-packages\\numpy\\core\\include -IC:\\TheanoPython\\python-2.7.6\\include -o C:\\Users\\Matej\\AppData\\Local\\Theano\\compiledir_Windows-8-6.2.9200-Intel64_Family_6_Model_60_Stepping_3_GenuineIntel-2.7.6-32\\cuda_ndarray\\cuda_ndarray.pyd mod.cu -LC:\\TheanoPython\\python-2.7.6\\libs -LNone\\lib -LNone\\lib64 -LC:\\TheanoPython\\python-2.7.6 -lpython27 -lcublas -lcudart')
+mod.cu
+
+['nvcc', '-shared', '-g', '-O3', '-Xlinker', '/DEBUG', '-m32', '-Xcompiler', '-DCUDA_NDARRAY_CUH=d67f7c8a21306c67152a70a88a837011,/Zi,/MD', '-IC:\\TheanoPython\\python-2.7.6\\lib\\site-packages\\theano\\sandbox\\cuda', '-IC:\\TheanoPython\\python-2.7.6\\lib\\site-packages\\numpy\\core\\include', '-IC:\\TheanoPython\\python-2.7.6\\include', '-o', 'C:\\Users\\Matej\\AppData\\Local\\Theano\\compiledir_Windows-8-6.2.9200-Intel64_Family_6_Model_60_Stepping_3_GenuineIntel-2.7.6-32\\cuda_ndarray\\cuda_ndarray.pyd', 'mod.cu', '-LC:\\TheanoPython\\python-2.7.6\\libs', '-LNone\\lib', '-LNone\\lib64', '-LC:\\TheanoPython\\python-2.7.6', '-lpython27', '-lcublas', '-lcudart']
+</code></pre>
+
+<p>If I run <code>import theano</code> without the GPU option on, it runs without a problem. Also CUDA samples run without a problem. </p>
+"
+"How to change Keras backend (where's the json file)?","<p>I have installed Keras, and wanted to switch the backend to Theano. I checked out <a href=""https://stackoverflow.com/questions/40036748/keras-backend-importerror-cannot-import-name-ctc-ops"">this post</a>, but still have no idea where to put the created json file. Also, below is the error I got when running <code>import keras</code> in Python Shell:</p>
+
+<blockquote>
+  <p>Using TensorFlow backend.</p>
+  
+  <p>Traceback (most recent call last):   File """", line 1, in
+  
+      import keras   File ""C:\Python27\lib\site-packages\keras__init__.py"", line 2, in 
+      from . import backend   File ""C:\Python27\lib\site-packages\keras\backend__init__.py"", line 64, in
+  
+      from .tensorflow_backend import *   File ""C:\Python27\lib\site-packages\keras\backend\tensorflow_backend.py"",
+  line 1, in 
+      import tensorflow as tf ImportError: No module named tensorflow</p>
+</blockquote>
+
+<p>When running <code>python -c ""import keras; print(keras.__version__)""</code> from Windows command line, I got:</p>
+
+<blockquote>
+  <p>Using TensorFlow backend. Traceback (most recent call last):   File
+  """", line 1, in    File
+  ""C:\Python27\lib\site-packages\keras__init__.py"", line 2, in 
+      from . import backend   File ""C:\Python27\lib\site-packages\keras\backend__init__.py"", line 64, in
+  
+      from .tensorflow_backend import *   File ""C:\Python27\lib\site-packages\keras\backend\tensorflow_backend.py"",
+  line 1, in 
+      import tensorflow as tf ImportError: No module named tensorflow</p>
+</blockquote>
+
+<p>Can someone please help? Thanks!</p>
+"
+"""g++ not detected"" while data set goes larger, is there any limit to matrix size in GPU?","<p>I got this message in using Keras to train an RNN for language model with a big 3D tensor (generated from a text, one hot encoded, and results a shape of (165717, 25, 7631)):</p>
+
+<pre><code>WARNING (theano.configdefaults): g++ not detected ! Theano will be unable to 
+execute optimized C-implementations (for both CPU and GPU) and will default to 
+Python implementations. Performance will be severely degraded. To remove this 
+warning, set Theano flags cxx to an empty string.
+ERROR (theano.sandbox.cuda): nvcc compiler not found on $PATH. Check your nvcc 
+installation and try again.
+</code></pre>
+
+<p>But everything goes well while I limit the size of data set into small. Thus I wonder that does Theano or CUDA limit the size of matrix? </p>
+
+<p>Besides, do I have a better way to do one hot representation? I mean, in the large 3D tensor, most elements are 0 due to the one-hot representation. However, I didn't found a layer which accepts index representation of words.</p>
+"
+"Unsupervised pre-training for convolutional neural network in theano","<p>I would like to design a deep net with one (or more) convolutional layers (CNN) and one or more fully connected hidden layers on top.<br>
+For deep network with fully connected layers there are methods in theano for unsupervised pre-training, e.g., using <a href=""http://www.deeplearning.net/tutorial/SdA.html"">denoising auto-encoders</a> or <a href=""http://www.deeplearning.net/tutorial/rbm.html"">RBMs</a>.</p>
+
+<p>My question is: How can I implement (in theano) an unsupervised pre-training stage for convolutional layers?</p>
+
+<p>I do not expect a full implementation as an answer, but I would appreciate a link to a good tutorial or a reliable reference.</p>
+"
+"Keras import error Nadam","<p>I am getting an import error when trying to import the Keras module Nadam:</p>
+
+<pre><code>&gt;&gt;&gt; from keras.optimizers import Nadam
+Traceback (most recent call last):
+  File ""&lt;stdin&gt;"", line 1, in &lt;module&gt;
+ImportError: cannot import name Nadam
+</code></pre>
+
+<p>I can import and use SGD, Adam, etc, just not this optimizer. Any help appreciated.</p>
+
+<p>I installed Keras using:</p>
+
+<pre><code>git clone https://github.com/fchollet/keras.git
+sudo python2.7 setup.py install
+</code></pre>
+
+<p>I have just found that, if I try to import it using the shell immediately after installation, the Nadam import works. But Nadam won't import in my script. So it's a path issue? </p>
+"
+"Select GPU during execution in Theano","<p>I am training neural nets with theano and lasagne on a 4 GPU machine. My <code>.theanorc</code> contains the following lines:</p>
+
+<pre><code>[global]
+device = gpu0
+</code></pre>
+
+<p>So when in python I execute  <code>import theano</code>, I get <code>Using gpu device 0: GRID K520</code></p>
+
+<p>What if, after importing theano, I chose to use say gpu1? I'd like to do this dynamically, that is, without editing <code>.theanorc</code> is it possible? Or even to choose it at runtime?</p>
+"
+"How to set up theano config","<p>I'm new to Theano.
+Trying to set up a config file.</p>
+
+<p>First of all, I notice that I have no .theanorc file:</p>
+
+<ol>
+<li><code>locate .theanorc</code> - returns nothing</li>
+<li><code>echo $THEANORC</code> - returns nothing</li>
+<li><code>theano.test()</code> - passes ok</li>
+</ol>
+
+<p>I'm guessing some default configuration was created wen i installed theano. Where is it?</p>
+"
+"How to get value from a theano tensor variable backed by a shared variable?","<p>I have a theano tensor variable created from casting a shared variable. How can I extract the original or casted values? (I need that so I don't have to carry the original shared/numpy values around.)</p>
+
+<pre><code>&gt;&gt;&gt; x = theano.shared(numpy.asarray([1, 2, 3], dtype='float'))
+&gt;&gt;&gt; y = theano.tensor.cast(x, 'int32')
+&gt;&gt;&gt; y.get_value(borrow=True)
+Traceback (most recent call last):
+  File ""&lt;stdin&gt;"", line 1, in &lt;module&gt;
+AttributeError: 'TensorVariable' object has no attribute 'get_value'
+# whereas I can do this against the original shared variable
+&gt;&gt;&gt; x.get_value(borrow=True)
+array([ 1.,  2.,  3.])
+</code></pre>
+"
+"Use of None in Array indexing in Python","<p>I am using the LSTM tutorial for Theano (<a href=""http://deeplearning.net/tutorial/lstm.html"">http://deeplearning.net/tutorial/lstm.html</a>). In the lstm.py (<a href=""http://deeplearning.net/tutorial/code/lstm.py"">http://deeplearning.net/tutorial/code/lstm.py</a>) file, I don't understand the following line:</p>
+
+<pre><code>c = m_[:, None] * c + (1. - m_)[:, None] * c_
+</code></pre>
+
+<p>What does <code>m_[:, None]</code> mean? In this case <code>m_</code> is the theano vector while <code>c</code> is a matrix.</p>
+"
+"Importing theano: AttributeError: 'module' object has no attribute 'find_graphviz'","<p>When I run <code>import theano</code> in Python, I get the following error message:</p>
+
+<pre><code>Python 2.7.6 (default, Jun 22 2015, 17:58:13)
+[GCC 4.8.2] on linux2
+Type ""help"", ""copyright"", ""credits"" or ""license"" for more information.
+&gt;&gt;&gt; import theano
+Traceback (most recent call last):
+  File ""&lt;stdin&gt;"", line 1, in &lt;module&gt;
+  File ""/usr/local/lib/python2.7/dist-packages/theano/__init__.py"", line 74, in &lt;module&gt;
+    from theano.printing import pprint, pp
+  File ""/usr/local/lib/python2.7/dist-packages/theano/printing.py"", line 35, in &lt;module&gt;
+    if pd.find_graphviz():
+AttributeError: 'module' object has no attribute 'find_graphviz'
+</code></pre>
+
+<p>What could be the issue, and how to fix it?</p>
+
+<p>I use Theano 0.8.2 on Ubuntu 14.04.4 LTS x64 with Python 2.7.6 x64.</p>
+
+<hr>
+
+<p>I unsuccessfully tried:</p>
+
+<ul>
+<li><code>sudo apt-get install -y graphviz libgraphviz-dev</code></li>
+</ul>
+"
+"Policy Gradients in Keras","<p>I've been trying to build a model using 'Deep Q-Learning' where I have a large number of actions (2908). After some limited success with using standard DQN:
+(<a href=""https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf"">https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf</a>), I decided to do some more research because I figured the action space was too large to do effective exploration. </p>
+
+<p>I then discovered this paper: <a href=""https://arxiv.org/pdf/1512.07679.pdf"">https://arxiv.org/pdf/1512.07679.pdf</a> where they use an actor-critic model and policy gradients, which then led me to: <a href=""https://arxiv.org/pdf/1602.01783.pdf"">https://arxiv.org/pdf/1602.01783.pdf</a> where they use policy gradients to get much better results then DQN overall.</p>
+
+<p>I've found a few sites where they have implemented policy gradients in Keras, <a href=""https://yanpanlau.github.io/2016/10/11/Torcs-Keras.html"">https://yanpanlau.github.io/2016/10/11/Torcs-Keras.html</a> and <a href=""https://oshearesearch.com/index.php/2016/06/14/kerlym-a-deep-reinforcement-learning-toolbox-in-keras/"">https://oshearesearch.com/index.php/2016/06/14/kerlym-a-deep-reinforcement-learning-toolbox-in-keras/</a> however I'm confused how they are implemented. In the former (and when I read the papers) it seems like instead of providing an input and output pair for the actor network, you provide the gradients for the all the weights and then use the network to update it, whereas, in the latter they just calculate an input-output pair.</p>
+
+<p>Have I just confused myself? Am I just supposed to be training the network by providing an input-output pair and use the standard 'fit', or do I have to do something special? If it's the latter, how do I do it with the Theano backend? (the examples above use tensorflow).</p>
+
+<p>Any help would be great!</p>
+"
+"How to install Theano on Anaconda Python 2.7 x64 on Windows?","<p>I wonder how to install Theano on Anaconda Python 2.7 x64 on Windows 7 x64. The Theano website provides some <a href=""http://deeplearning.net/software/theano/install_windows.html"">instructions</a> but is not clear as to what is specific to Anaconda.</p>
+"
+"Theano HiddenLayer Activation Function","<p>Is there anyway to use Rectified Linear Unit (ReLU) as the activation function of the hidden layer instead of <code>tanh()</code> or <code>sigmoid()</code> in Theano? The implementation of the hidden layer is as follows and as far as I have searched on the internet ReLU is not implemented inside the Theano.</p>
+
+<pre><code>class HiddenLayer(object):
+  def __init__(self, rng, input, n_in, n_out, W=None, b=None, activation=T.tanh):
+    pass
+</code></pre>
+"
+"How do I install Keras and Theano in Anaconda Python on Windows?","<p>I am trying to work on neural networks in Python using the following Keras packages:</p>
+
+<pre><code>from keras.utils import np_utils
+from keras.layers.core import Dense, Activation, Dropout
+from keras.models import Sequential
+from keras.layers.core import Dense, Dropout, Activation, Flatten
+from keras.layers.convolutional import Convolution2D, MaxPooling2D
+from keras.optimizers import SGD
+</code></pre>
+
+<p>But, I am getting the following error:</p>
+
+<pre><code> 15 import theano
+ ---&gt; 16 from theano import gof
+ 17 from theano.compat.python2x import partial
+ 18 import theano.compile.mode
+ ImportError: cannot import name gof
+</code></pre>
+
+<p>Installing installed <code>conda install keras</code>. Later I tried to use <code>pip install Theano</code>, but it did not work. I Tried to install using <code>pip install git</code>, but I am getting this error: <code>cannot find command git.</code> So I installed Git and I set the environment variables.</p>
+
+<p>So, is there any procedure to install these packages?</p>
+"
+"Python: rewrite a looping numpy math function to run on GPU","<p>Can someone help me rewrite this one function <em>(the <code>doTheMath</code> function)</em> to do the calculations on the GPU? I used a few good days now trying to get my head around it but to no result. I wonder maybe somebody can help me rewrite this function in whatever way you may seem fit as log as I gives the same result at the end. I tried to use <code>@jit</code> from <code>numba</code> but for some reason it is actually much slower than running the code as usual. With a huge sample size, the goal is to decrease the execution time considerably so naturally I believe the GPU is the fastest way to do it. </p>
+
+<p>I'll explain a little what is actually happening. The real data, which looks almost identical as the sample data created in the code below is divided into sample sizes of approx 5.000.000 rows each sample or around 150MB per file. In total there are around 600.000.000 rows or 20GB of data. I must loop through this data, sample by sample and then row by row in each sample, take the last 2000 (or another) rows as of each line and run the <code>doTheMath</code> function which returns a result. That result is then saved back to the hardrive where I can do some other things with it with another program. As you can see below, I do not need all of the results of all the rows, only those bigger than a specific amount. If I run my function as it is right now in python I get about 62seconds per 1.000.000 rows. This is a very long time considering all the data and how fast it should be done with.</p>
+
+<p>I must mention that I upload the real data file by file to the RAM with the help of <code>data = joblib.load(file)</code> so uploading the data is not the problem as it takes only about 0.29 seconds per file. Once uploaded I run the entire code below. What takes the longest time is the <code>doTheMath</code> function. I am willing to give all of my 500 reputation points I have on stackoverflow as a reward for somebody willing to help me rewrite this simple code to run on the GPU. My interest is specifically in the GPU, I really want to see how it is done on this problem at hand.</p>
+
+<p><strong>EDIT/UPDATE 1:</strong>
+Here is a link to a small sample of the real data: <a href=""https://mab.to/Nx8GvwTjQ"" rel=""nofollow noreferrer"">data_csv.zip</a> About 102000 rows of real data1 and 2000 rows for real data2a and data2b. Use <code>minimumLimit = 400</code> on the real sample data </p>
+
+<p><strong>EDIT/UPDATE 2:</strong>
+For those following this post here is a short summary of the answers below. Up until now we have 4 answers to the original solution. The one offered by @Divakar are just tweaks to the original code. Of the two tweaks only the first one is actually applicable to this problem, the second one is a good tweak but does not apply here. Out of the other three answers, two of them are CPU based solutions and one tensorflow-GPU try. The Tensorflow-GPU by Paul Panzer seems to be promising but when i actually run it on the GPU it is slower than the original, so the code still needs improvement.</p>
+
+<p>The other two CPU based solutions are submitted by @PaulPanzer (a pure numpy solution) and @MSeifert (a numba solution). Both solutions give very good results and both process data extremely fast compared to the original code. Of the two the one submitted by Paul Panzer is faster. It processes about 1.000.000 rows in about 3 seconds. The only problem is with smaller batchSizes, this can be overcome by either switching to the numba solution offered by MSeifert, or even the original code after all the tweaks that have been discussed below.</p>
+
+<p>I am very happy and thankful to @PaulPanzer and @MSeifert for the work they did on their answers. Still, since this is a question about a GPU based solution, i am waiting to see if anybody is willing to give it a try on a GPU version and see how much faster the data can be processed on the GPU when compared to the current CPU solutions. If there will be no other answers outperforming @PaulPanzer's pure numpy solution then i'll accept his answer as the right one and gets the bounty :) </p>
+
+<p><strong>EDIT/UPDATE 3:</strong>
+@Divakar has posted a new answer with a solution for the GPU. After my testings on real data, the speed is not even comparable to the CPU counterpart solutions. The GPU processes about 5.000.000 in about 1,5 seconds. This is incredible :) I am very excited about the GPU solution and i thank @Divakar for posting it. As well as i thank @PaulPanzer and @MSeifert for their CPU solutions :) Now my research continues with an incredible speed due to the GPU :) </p>
+
+<pre><code>import pandas as pd
+import numpy as np
+import time
+
+def doTheMath(tmpData1, data2a, data2b):
+    A = tmpData1[:, 0]
+    B = tmpData1[:,1]
+    C = tmpData1[:,2]
+    D = tmpData1[:,3]
+    Bmax = B.max()
+    Cmin  = C.min()
+    dif = (Bmax - Cmin)
+    abcd = ((((A - Cmin) / dif) + ((B - Cmin) / dif) + ((C - Cmin) / dif) + ((D - Cmin) / dif)) / 4)
+    return np.where(((abcd &lt;= data2a) &amp; (abcd &gt;= data2b)), 1, 0).sum()
+
+#Declare variables
+batchSize = 2000
+sampleSize = 5000000
+resultArray = []
+minimumLimit = 490 #use 400 on the real sample data 
+
+#Create Random Sample Data
+data1 = np.matrix(np.random.uniform(1, 100, (sampleSize + batchSize, 4)))
+data2a = np.matrix(np.random.uniform(0, 1, (batchSize, 1))) #upper limit
+data2b = np.matrix(np.random.uniform(0, 1, (batchSize, 1))) #lower limit
+#approx. half of data2a will be smaller than data2b, but that is only in the sample data because it is randomly generated, NOT the real data. The real data2a is always higher than data2b.
+
+
+#Loop through the data
+t0 = time.time()
+for rowNr in  range(data1.shape[0]):
+    tmp_df = data1[rowNr:rowNr + batchSize] #rolling window
+    if(tmp_df.shape[0] == batchSize):
+        result = doTheMath(tmp_df, data2a, data2b)
+        if (result &gt;= minimumLimit):
+            resultArray.append([rowNr , result])
+print('Runtime:', time.time() - t0)
+
+#Save data results
+resultArray = np.array(resultArray)
+print(resultArray[:,1].sum())
+resultArray = pd.DataFrame({'index':resultArray[:,0], 'result':resultArray[:,1]})
+resultArray.to_csv(""Result Array.csv"", sep=';')
+</code></pre>
+
+<p>The PC specs I am working on:</p>
+
+<pre><code>GTX970(4gb) video card; 
+i7-4790K CPU 4.00Ghz; 
+16GB RAM;
+a SSD drive 
+running Windows 7; 
+</code></pre>
+
+<p>As a side question, would a second video card in SLI help on this problem?</p>
+"
+"How to apply outer product for tensors without unnecessary increase of dimensions?","<p>I have two vectors <code>v</code> and <code>w</code> and I want to make a matrix <code>m</code> out of them such that:</p>
+
+<pre><code>m[i, j] = v[i] * w[j]
+</code></pre>
+
+<p>In other words I want to calculate the <strong>outer product</strong> of them. I can do it either by using <code>theano.tensor.outer</code> or by adding new indexes to <code>v</code> and <code>v</code> and using the <code>dot</code> product.</p>
+
+<pre><code>m = T.dot(v[:,numpy.newaxis], w[numpy.newaxis,:])
+</code></pre>
+
+<p>Now, I try to solve a bit more general problem. Instead of two vectors <code>v</code> and <code>w</code> I have two matrices (I call them <code>v</code> and <code>w</code> again) and I would like to calculate an outer product of each row from matrix <code>v</code> with the correspondent row of matrix <code>w</code> (i_th row in the first matrix should be multiplied with the i_th row of the second matrix). So, I would like to do something like that:</p>
+
+<pre><code>m1 = T.tensordot(v[:,:, numpy.newaxis], w[:,:,numpy.newaxis], axes = [[2],[2]])
+m[i, j, k] = m1[i, k, j, k]
+</code></pre>
+
+<p>In other words, <code>m[:,:,k]</code> is the matrix corresponding to outer product of <code>k_th</code> row from the matrix <code>v</code> and <code>k_th</code> row of the matrix <code>w</code>.</p>
+
+<p>I see two problems with the above ""solution"". First, it is not really a solution, since the second line of the code is not a proper theano code. So, my first question is how to do this ""advanced slicing"" by forcing some indexes to be equal. For example <code>m[i, k] = a[i, k, i, i, k]</code>. Second, I do not like the fact that I first create a 4D tesnor (<code>m1</code>) from two 2D tensors and then I reduce it back to a 3D tensor. It can be very memory consuming. I guess one can avoid it.</p>
+"
+"What is the number of filter in CNN?","<p>I am currently seeing the API of theano,</p>
+
+<pre><code>theano.tensor.nnet.conv2d(input, filters, input_shape=None, filter_shape=None, border_mode='valid', subsample=(1, 1), filter_flip=True, image_shape=None, **kwargs)
+</code></pre>
+
+<p>where the <code>filter_shape</code> is a tuple of <code>(num_filter, num_channel, height, width)</code>, I am confusing about this because isn't that the number of filter decided by the stride while sliding the filter window on the image? How can I specify on filter number just like this? It would be reasonable to me if it is calculated by the parameter stride (if there is any).</p>
+
+<p>Also, I am confused with the term feature map as well, is it the neurons at each layer? How about the batch size? How are they correlated?</p>
+"
+"how to setup cuDnn with theano on Windows 7 64 bit","<p>I have installed <code>Theano</code> framework and enabled CUDA on my machine, however when I ""import theano"" in my python console, I got the following message:</p>
+
+<pre><code>&gt;&gt;&gt; import theano
+Using gpu device 0: GeForce GTX 950 (CNMeM is disabled, CuDNN not available)
+</code></pre>
+
+<p>Now that ""CuDNN not available"",  I downloaded <code>cuDnn</code> from Nvidia website. I also updated 'path' in environment, and added 'optimizer_including=cudnn' in '.theanorc.txt' config file. </p>
+
+<p>Then, I tried again, but failed, with:</p>
+
+<pre><code>&gt;&gt;&gt; import theano
+Using gpu device 0: GeForce GTX 950 (CNMeM is disabled, CuDNN not available)
+Traceback (most recent call last):
+  File ""&lt;stdin&gt;"", line 1, in &lt;module&gt;
+  File ""C:\Anaconda2\lib\site-packages\theano\__init__.py"", line 111, in &lt;module&gt;
+    theano.sandbox.cuda.tests.test_driver.test_nvidia_driver1()
+  File ""C:\Anaconda2\lib\site-packages\theano\sandbox\cuda\tests\test_driver.py"", line 31, in test_nvidia_driver1
+    profile=False)
+  File ""C:\Anaconda2\lib\site-packages\theano\compile\function.py"", line 320, in function
+    output_keys=output_keys)
+  File ""C:\Anaconda2\lib\site-packages\theano\compile\pfunc.py"", line 479, in pfunc
+    output_keys=output_keys)
+  File ""C:\Anaconda2\lib\site-packages\theano\compile\function_module.py"", line 1776, in orig_function
+    output_keys=output_keys).create(
+  File ""C:\Anaconda2\lib\site-packages\theano\compile\function_module.py"", line 1456, in __init__
+    optimizer_profile = optimizer(fgraph)
+  File ""C:\Anaconda2\lib\site-packages\theano\gof\opt.py"", line 101, in __call__
+    return self.optimize(fgraph)
+  File ""C:\Anaconda2\lib\site-packages\theano\gof\opt.py"", line 89, in optimize
+    ret = self.apply(fgraph, *args, **kwargs)
+  File ""C:\Anaconda2\lib\site-packages\theano\gof\opt.py"", line 230, in apply
+    sub_prof = optimizer.optimize(fgraph)
+  File ""C:\Anaconda2\lib\site-packages\theano\gof\opt.py"", line 89, in optimize
+    ret = self.apply(fgraph, *args, **kwargs)
+  File ""C:\Anaconda2\lib\site-packages\theano\gof\opt.py"", line 230, in apply
+    sub_prof = optimizer.optimize(fgraph)
+  File ""C:\Anaconda2\lib\site-packages\theano\gof\opt.py"", line 89, in optimize
+    ret = self.apply(fgraph, *args, **kwargs)
+  File ""C:\Anaconda2\lib\site-packages\theano\sandbox\cuda\dnn.py"", line 2508, in apply
+    dnn_available.msg)
+AssertionError: cuDNN optimization was enabled, but Theano was not able to use it. We got this error:
+Theano can not compile with cuDNN. We got this error:
+
+&gt;&gt;&gt;
+</code></pre>
+
+<p>anyone can help me? Thanks.</p>
+"
+"Purpose of 'givens' variables in Theano.function","<p>I was reading the code for the logistic function given at <a href=""http://deeplearning.net/tutorial/logreg.html"" rel=""nofollow noreferrer"">http://deeplearning.net/tutorial/logreg.html</a>. I am confused about the difference between <code>inputs</code> &amp; <code>givens</code> variables for a function. The functions that compute mistakes made by a model on a minibatch are:</p>
+
+<pre><code> test_model = theano.function(inputs=[index],
+        outputs=classifier.errors(y),
+        givens={
+            x: test_set_x[index * batch_size: (index + 1) * batch_size],
+            y: test_set_y[index * batch_size: (index + 1) * batch_size]})
+
+validate_model = theano.function(inputs=[index],
+        outputs=classifier.errors(y),
+        givens={
+            x: valid_set_x[index * batch_size:(index + 1) * batch_size],
+            y: valid_set_y[index * batch_size:(index + 1) * batch_size]})
+</code></pre>
+
+<p>Why couldn't/wouldn't one just make x&amp; y shared input variables and let them be defined when an actual model instance is created?</p>
+"
+"Theano fails due to NumPy Fortran mixup under Ubuntu","<p>I installed <a href=""http://deeplearning.net/software/theano/"" rel=""noreferrer"">Theano</a> on my machine, but the nosetests break with a Numpy/Fortran related error message. For me it looks like Numpy was compiled with a different Fortran version than Theano. I already reinstalled Theano (<code>sudo pip uninstall theano</code> + <code>sudo pip install --upgrade --no-deps theano</code>) and Numpy / Scipy (<code>apt-get install --reinstall python-numpy python-scipy</code>), but this did not help.</p>
+
+<p>What steps would you recommend?</p>
+
+<h3>Complete error message:</h3>
+
+<pre><code>ImportError: ('/home/Nick/.theano/compiledir_Linux-2.6.35-31-generic-x86_64-with-Ubuntu-10.10-maverick--2.6.6/tmpIhWJaI/0c99c52c82f7ddc775109a06ca04b360.so: undefined symbol: _gfortran_st_write_done'
+</code></pre>
+
+<h3>My research:</h3>
+
+<p>The <a href=""http://www.scipy.org/Installing_SciPy/BuildingGeneral"" rel=""noreferrer"">Installing SciPy / BuildingGeneral</a> page about the <code>undefined symbol: _gfortran_st_write_done'</code> error:</p>
+
+<p>If you see an error message</p>
+
+<p><code>ImportError: /usr/lib/atlas/libblas.so.3gf: undefined symbol: _gfortran_st_write_done</code></p>
+
+<p>when building SciPy, it means that NumPy picked up the wrong Fortran compiler during build (e.g. ifort). </p>
+
+<p>Recompile NumPy using:</p>
+
+<p><code>python setup.py build --fcompiler=gnu95</code></p>
+
+<p>or whichever is appropriate (see <code>python setup.py build --help-fcompiler</code>).</p>
+
+<p>But:</p>
+
+<pre><code>Nick@some-serv2:/usr/local/lib/python2.6/dist-packages/numpy$ python setup.py build --help-fcompiler
+This is the wrong setup.py file to run
+</code></pre>
+
+<h3>Used software versions:</h3>
+
+<ul>
+<li>scipy 0.10.1 (scipy.test() works)</li>
+<li>NumPy 1.6.2 (numpy.test() works)</li>
+<li>theano 0.5.0 (several tests fails with <code>undefined symbol: _gfortran_st_write_done'</code>)</li>
+<li>python 2.6.6</li>
+<li>Ubuntu 10.10</li>
+</ul>
+
+<h2>[UPDATE]</h2>
+
+<p>So I removed numpy and scipy from my system with <code>apt-get remove</code> and using <code>find -name XXX -delete</code> of what was left.</p>
+
+<p>Than I installed numpy and scipy from the github sources with <code>sudo python setpy.py install</code>.</p>
+
+<p>Afterwards I entered again <code>sudo pip uninstall theano</code> and <code>sudo pip install --upgrade --no-deps theano</code>. </p>
+
+<p>Error persists :/</p>
+
+<p>I also tried the <code>apt-get source</code> ... + <code>apt-get build-dep ...</code> approach, but for my old Ubuntu (10.10) it installs too old version of numpy and scipy for theano: <code>ValueError: numpy &gt;= 1.4 is required (detected 1.3.0 from /usr/local/lib/python2.6/dist-packages/numpy/__init__.pyc)</code></p>
+"
+"Using Python+Theano with OpenCL in an AMD GPU","<p>I'm trying to use Python with Theano to accelerate some code with OpenCL. I installed <code>libgpuarray</code> and <code>pygpu</code> as instructed (I think), and got no errors. The installation detected the OpenCL runtime installed. </p>
+
+<p>I just cannot run the Theano example for OpenCL, mainly because I don't know how to specify my GPU. My GPU is a <code>Radeon HD 5340/5450/5470</code>, according to <code>inxi</code>. All code in the Theano documentation uses <code>device=cuda0</code> and the only place where OpenCL is mentioned, it says <code>device=openclN</code> where <code>N</code> is a number.</p>
+
+<p>I tried <code>device=opencl0</code> and got a <code>pygpu</code> error saying that the correct format is <code>opencl&lt;int&gt;:&lt;int&gt;</code>. I have since tried any number of combinations of numbers (<code>opencl0:0</code> and such), and always an <code>GpuArrayException: Unknown error</code>.</p>
+
+<p>My system is Ubuntu 14.04 x64 and my hardware is a Toshiba Satellite, 15"". I installed <code>Theano</code> with <code>pip</code>, and later installed <code>libgpuarray</code> following the instructions on their site.</p>
+
+<p>What am I doing wrong?</p>
+"
+"3d sliding window operation in Theano?","<p>TL.DR.  Is there a 3-dimensional friendly implementation of <a href=""https://github.com/Theano/Theano/blob/master/theano/tensor/nnet/neighbours.py"" rel=""noreferrer""><code>theano.tensor.nnet.neighbours.images2neibs</code></a>?</p>
+
+<p>I would like to perform voxel-wise classification of a volume (NxNxN) using a neural network that takes in a nxnxn image, where N>n.  To classify each voxel in the volume, I have to iterate through each voxel.  For each iterration, I obtain and pass the neighborhood voxels as the input to the neural network.  This is simply a sliding window operation, which the operation is the neural network.</p>
+
+<p>While my neural network is implemented in Theano, the sliding window implementation is in python/numpy.  Since this is not a pure Theano operation, the classification takes forever (> 3 hours) to classify all voxels in one volume.  For 2d sliding window operation, Theano has a helper method, <code>theano.tensor.nnet.neighbours.images2neibs</code>, is there a similar implementation for 3-dimensional images?</p>
+
+<p>edit:
+There are existing numpy solutions(<a href=""http://github.com/Theano/Theano/issues/2166"" rel=""noreferrer"">1</a> and <a href=""http://gist.github.com/seberg/3866040%20johnvinyard.com/blog/?p=268"" rel=""noreferrer"">2</a>) for n-d sliding window, both use np.lib.stride_tricks.as_strided to provide 'views of the sliding window', thus preventing memory issues.  In my implementation, the sliding window arrays are being passed from numpy (Cython) to Python and then to Theano.  To boost performance, it's likely I have to bypass Python.</p>
+"
+"Keras IndexError: indices are out-of-bounds","<p>I'm new to Keras and im trying to do Binary MLP on a dataset, and keep getting indices out of bounds with no idea why.</p>
+
+<pre><code>from keras.models import Sequential
+from keras.layers.core import Dense, Dropout, Activation
+from keras.optimizers import SGD
+
+model = Sequential()
+model.add(Dense(64, input_dim=20, init='uniform', activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(64, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(1, activation='sigmoid'))
+
+model.compile(loss='binary_crossentropy',
+          optimizer='rmsprop')
+model.fit(trainx, trainy, nb_epoch=20, batch_size=16) # THROWS INDICES ERROR
+</code></pre>
+
+<p>Error:</p>
+
+<pre><code>model.fit(trainx, trainy, nb_epoch=20, batch_size=16)
+
+Epoch 1/20
+Traceback (most recent call last):
+
+  File ""&lt;ipython-input-6-c81bd7606eb0&gt;"", line 1, in &lt;module&gt;
+model.fit(trainx, trainy, nb_epoch=20, batch_size=16)
+
+  File ""C:\Users\Thiru\Anaconda3\lib\site-packages\keras\models.py"", line 646, in fit
+shuffle=shuffle, metrics=metrics)
+
+  File ""C:\Users\Thiru\Anaconda3\lib\site-packages\keras\models.py"", line 271, in _fit
+ins_batch = slice_X(ins, batch_ids)
+
+  File ""C:\Users\Thiru\Anaconda3\lib\site-packages\keras\models.py"", line 65, in slice_X
+return [x[start] for x in X]
+
+  File ""C:\Users\Thiru\Anaconda3\lib\site-packages\keras\models.py"", line 65, in &lt;listcomp&gt;
+return [x[start] for x in X]
+
+  File ""C:\Users\Thiru\Anaconda3\lib\site-packages\pandas\core\frame.py"", line 1963, in __getitem__
+return self._getitem_array(key)
+
+  File ""C:\Users\Thiru\Anaconda3\lib\site-packages\pandas\core\frame.py"", line 2008, in _getitem_array
+return self.take(indexer, axis=1, convert=True)
+
+  File ""C:\Users\Thiru\Anaconda3\lib\site-packages\pandas\core\generic.py"", line 1371, in take
+convert=True, verify=True)
+
+  File ""C:\Users\Thiru\Anaconda3\lib\site-packages\pandas\core\internals.py"", line 3619, in take
+indexer = maybe_convert_indices(indexer, n)
+
+  File ""C:\Users\Thiru\Anaconda3\lib\site-packages\pandas\core\indexing.py"", line 1750, in maybe_convert_indices
+raise IndexError(""indices are out-of-bounds"")
+
+IndexError: indices are out-of-bounds
+</code></pre>
+
+<p>Does anyone have any idea why this is happening? Im able to run other models just fine</p>
+"
+"Implementing sparse connections in neural network (Theano)","<p>Some use cases for neural networks requires that not all neurons are connected between two consecutive layers. For my neural network architecture, I need to have a layer, where each neuron only has connections to some prespecified neurons in the previous layer (at somewhat arbitrary places, not with a pattern such as a convolution layer). This is needed in order to model data on a specific graph. I need to implement this ""Sparse"" layer in Theano, but I'm not used to the Theano way of programming. </p>
+
+<p>It seems that the most efficient way of programming sparse connections in Theano would be to use <a href=""http://deeplearning.net/software/theano/library/tensor/nnet/blocksparse.html"">theano.tensor.nnet.blocksparse.SparseBlockGemv</a>. An alternative would be to do matrix multiplication, where many weights are set to 0 (= no connection), but that would be very inefficient compared to <code>SparseBlockGemv</code> as each neuron is only connected to 2-6 neurons in the previous layer out of ~100000 neurons. Moreover, a weight matrix of 100000x100000 would not fit on my RAM/GPU. Could someone therefore provide an example of how to implement sparse connections using the <code>SparseBlockGemv</code> method or another computationally-efficient method?</p>
+
+<p>A perfect example would be to extend the <a href=""http://deeplearning.net/tutorial/mlp.html#mlp"">MLP Theano Tutorial</a> with an extra layer after the hidden layer (and before softmax), where each neuron only has connections to a subset of neurons in the previous layer. However, other examples are also very welcome!</p>
+
+<p><strong>Edit:</strong> Note that the layer must be implemented in Theano as it is just a small part of a larger architecture.</p>
+"
+"Convert Keras model to C++","<p>I am using Keras (with Theano) to train my CNN model. Does anyone has idea how can I use it in my C++ application? Does anyone tried something similar? I have idea to write some python code that will generate a c++ code with network functions - any suggestion on it?</p>
+
+<p>I found a similar question <a href=""https://stackoverflow.com/questions/36412098/convert-keras-model-to-tensorflow-protobuf"">here</a> how to use Tensorflow Keras model in C++ but without answer.</p>
+"
+"theano g++ not detected","<p>I installed <code>theano</code> but when I try to use it I got this error:</p>
+
+<blockquote>
+  <p>WARNING (theano.configdefaults): g++ not detected! Theano will be unable to execute 
+   optimized C-implementations (for both CPU and GPU) and will default to Python 
+   implementations. Performance will be severely degraded.</p>
+</blockquote>
+
+<p>I installed <code>g++</code>, and put the correct path in the environment variables, so it is like <code>theano</code> does not detect it.</p>
+
+<p>Does anyone know how to solve the problem or which may be the cause?</p>
+"
+"Error importing Theano","<p>After installing python, numpy, scipy and theano to ~/.local, I tried to import theano but it threw an error:</p>
+
+<pre><code>&gt;&gt;&gt; import theano
+Problem occurred during compilation with the command line below:
+g++ -shared -g -march=core2 -mcx16 -msahf --param l1-cache-size=32 --param l1-cache-line-size=64 --param l2-cache-size=4096 -mtune=core2 -D NPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION -D NPY_ARRAY_ENSUREARRAY=NPY_ENSUREARRAY -D NPY_ARRAY_ENSURECOPY=NPY_ENSURECOPY -D NPY_ARRAY_ALIGNED=NPY_ALIGNED -D NPY_ARRAY_WRITEABLE=NPY_WRITEABLE -D NPY_ARRAY_UPDATE_ALL=NPY_UPDATE_ALL -D NPY_ARRAY_C_CONTIGUOUS=NPY_C_CONTIGUOUS -D NPY_ARRAY_F_CONTIGUOUS=NPY_F_CONTIGUOUS -m64 -fPIC -I/opt/python/lib/python2.7/site-packages/numpy/core/include -I/home/minh.lengoc/.local/include/python2.7 -o /home/minh.lengoc/.theano/compiledir_Linux-2.6.32-279.14.1.el6.x86_64-x86_64-with-centos-6.3-Final-x86_64-2.7.6-64/lazylinker_ext/lazylinker_ext.so /home/minh.lengoc/.theano/compiledir_Linux-2.6.32-279.14.1.el6.x86_64-x86_64-with-centos-6.3-Final-x86_64-2.7.6-64/lazylinker_ext/mod.cpp -L/home/minh.lengoc/.local/lib -lpython2.7
+/usr/bin/ld: /home/minh.lengoc/.local/lib/libpython2.7.a(abstract.o): relocation R_X86_64_32 against `.rodata.str1.8' can not be used when making a shared object; recompile with -fPIC
+/home/minh.lengoc/.local/lib/libpython2.7.a: could not read symbols: Bad value
+collect2: ld returned 1 exit status
+
+Traceback (most recent call last):
+  File ""&lt;stdin&gt;"", line 1, in &lt;module&gt;
+  File ""/home/minh.lengoc/setup/Theano/theano/__init__.py"", line 55, in &lt;module&gt;
+    from theano.compile import \
+  File ""/home/minh.lengoc/setup/Theano/theano/compile/__init__.py"", line 6, in &lt;module&gt;
+    from theano.compile.function_module import *
+  File ""/home/minh.lengoc/setup/Theano/theano/compile/function_module.py"", line 18, in &lt;module&gt;
+    import theano.compile.mode
+  File ""/home/minh.lengoc/setup/Theano/theano/compile/mode.py"", line 11, in &lt;module&gt;
+    import theano.gof.vm
+  File ""/home/minh.lengoc/setup/Theano/theano/gof/vm.py"", line 516, in &lt;module&gt;
+    import lazylinker_c
+  File ""/home/minh.lengoc/setup/Theano/theano/gof/lazylinker_c.py"", line 86, in &lt;module&gt;
+    preargs=args)
+  File ""/home/minh.lengoc/setup/Theano/theano/gof/cmodule.py"", line 1975, in compile_str
+    (status, compile_stderr.replace('\n', '. ')))
+Exception: Compilation failed (return status=1): /usr/bin/ld: /home/minh.lengoc/.local/lib/libpython2.7.a(abstract.o): relocation R_X86_64_32 against `.rodata.str1.8' can not be used when making a shared object; recompile with -fPIC. /home/minh.lengoc/.local/lib/libpython2.7.a: could not read symbols: Bad value. collect2: ld returned 1 exit status. 
+</code></pre>
+
+<p>I'm installing on a Red Hat box:</p>
+
+<pre><code>$ cat /proc/version
+Linux version 2.6.32-279.14.1.el6.x86_64 (mockbuild@c6b8.bsys.dev.centos.org) (gcc version 4.4.6 20120305 (Red Hat 4.4.6-4) (GCC) ) #1 SMP Tue Nov 6 23:43:09 UTC 2012
+</code></pre>
+
+<p>What should I do...?</p>
+"
+"Keras: ""RuntimeError: Failed to import pydot."" after installing graphviz and pydot","<p>I'm using Anaconda Python 2.7 on windows 10</p>
+
+<p>I was planning on doing Keras visualization so (whilst spyder was open) I opened the Anaconda command prompt and pip installed graphviz and pydot. Now when I try run the following:</p>
+
+<pre><code>from keras.models import Sequential
+</code></pre>
+
+<p>or any sort of ""from keras."" ,  I get the error:</p>
+
+<pre><code>ImportError: cannot import name gof
+</code></pre>
+
+<p>I have uninstalled and reinstalled Keras, Graphviz and pydot. i am using the development version of theano. I cannot find a fix. </p>
+
+<p><strong>P.S</strong></p>
+
+<p>If I uninstall graphviz and pydot, keras works again</p>
+
+<p><strong>EDIT</strong></p>
+
+<p>After uninstalling anaconda and reinstalling it including theano, keras, <strong>graphviz and pydot</strong> I now get the following error:</p>
+
+<pre><code>from keras.utils.visualize_util import plot
+
+Using Theano backend.
+Using gpu device 0: GeForce GTX 970M (CNMeM is disabled, cuDNN not available)
+Traceback (most recent call last):
+
+  File ""&lt;ipython-input-1-65016ddab3cd&gt;"", line 1, in &lt;module&gt;
+  from keras.utils.visualize_util import plot
+
+  File ""C:\Anaconda2\lib\site-packages\keras\utils\visualize_util.py"", line  8, in &lt;module&gt;
+  raise RuntimeError('Failed to import pydot. You must install pydot'
+
+RuntimeError: Failed to import pydot. You must install pydot and graphviz  for `pydotprint` to work.
+</code></pre>
+
+<p>I used <code>pip install graphviz</code> and <code>pip install git+https://github.com/nlhepler/pydot.git</code></p>
+"
+"Keras not using multiple cores","<p>Based on the famous <code>check_blas.py</code> script, I wrote this one to check that theano can in fact use multiple cores:</p>
+
+
+
+<pre class=""lang-py prettyprint-override""><code>import os
+os.environ['MKL_NUM_THREADS'] = '8'
+os.environ['GOTO_NUM_THREADS'] = '8'
+os.environ['OMP_NUM_THREADS'] = '8'
+os.environ['THEANO_FLAGS'] = 'device=cpu,blas.ldflags=-lblas -lgfortran'
+
+import numpy
+import theano
+import theano.tensor as T
+
+M=2000
+N=2000
+K=2000
+iters=100
+order='C'
+
+a = theano.shared(numpy.ones((M, N), dtype=theano.config.floatX, order=order))
+b = theano.shared(numpy.ones((N, K), dtype=theano.config.floatX, order=order))
+c = theano.shared(numpy.ones((M, K), dtype=theano.config.floatX, order=order))
+f = theano.function([], updates=[(c, 0.4 * c + .8 * T.dot(a, b))])
+
+for i in range(iters):
+    f(y)
+</code></pre>
+
+<p>Running this as <code>python3 check_theano.py</code> shows that 8 threads are being used. And more importantly, the code runs approximately 9 times faster than without the <code>os.environ</code> settings, which apply just 1 core: 7.863s vs 71.292s on a single run.</p>
+
+<p>So, I would expect that Keras now also uses multiple cores when calling <code>fit</code> (or <code>predict</code> for that matter). However this is not the case for the following code:</p>
+
+<pre class=""lang-py prettyprint-override""><code>import os
+os.environ['MKL_NUM_THREADS'] = '8'
+os.environ['GOTO_NUM_THREADS'] = '8'
+os.environ['OMP_NUM_THREADS'] = '8'
+os.environ['THEANO_FLAGS'] = 'device=cpu,blas.ldflags=-lblas -lgfortran'
+
+import numpy
+from keras.models import Sequential
+from keras.layers import Dense
+
+coeffs = numpy.random.randn(100)
+
+x = numpy.random.randn(100000, 100);
+y = numpy.dot(x, coeffs) + numpy.random.randn(100000) * 0.01
+
+model = Sequential()
+model.add(Dense(20, input_shape=(100,)))
+model.add(Dense(1, input_shape=(20,)))
+model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
+
+model.fit(x, y, verbose=0, nb_epoch=10)
+</code></pre>
+
+<p>This script uses only 1 core with this output:</p>
+
+<pre class=""lang-py prettyprint-override""><code>Using Theano backend.
+/home/herbert/venv3/lib/python3.4/site-packages/theano/tensor/signal/downsample.py:5: UserWarning: downsample module has been moved to the pool module.
+warnings.warn(""downsample module has been moved to the pool module."")
+</code></pre>
+
+<p>Why does the <code>fit</code> of Keras only use 1 core for the same setup? Is the <code>check_blas.py</code> script actually representative for neural network training calculations?</p>
+
+<p>FYI:</p>
+
+<pre class=""lang-py prettyprint-override""><code>(venv3)herbert@machine:~/ $ python3 -c 'import numpy, theano, keras; print(numpy.__version__); print(theano.__version__); print(keras.__version__);'
+ERROR (theano.sandbox.cuda): nvcc compiler not found on $PATH. Check your nvcc installation and try again.
+1.11.0
+0.8.0rc1.dev-e6e88ce21df4fbb21c76e68da342e276548d4afd
+0.3.2
+(venv3)herbert@machine:~/ $
+</code></pre>
+
+<p><strong>EDIT</strong></p>
+
+<p>I created a Theano implementaiton of a simple MLP as well, which also does not run multi-core:</p>
+
+<pre class=""lang-py prettyprint-override""><code>import os
+os.environ['MKL_NUM_THREADS'] = '8'
+os.environ['GOTO_NUM_THREADS'] = '8'
+os.environ['OMP_NUM_THREADS'] = '8'
+os.environ['THEANO_FLAGS'] = 'device=cpu,blas.ldflags=-lblas -lgfortran'
+
+import numpy
+import theano
+import theano.tensor as T
+
+M=2000
+N=2000
+K=2000
+iters=100
+order='C'
+
+coeffs = numpy.random.randn(100)
+x = numpy.random.randn(100000, 100).astype(theano.config.floatX)
+y = (numpy.dot(x, coeffs) + numpy.random.randn(100000) * 0.01).astype(theano.config.floatX).reshape(100000, 1)
+
+x_shared = theano.shared(x)
+y_shared = theano.shared(y)
+
+x_tensor = T.matrix('x')
+y_tensor = T.matrix('y')
+
+W0_values = numpy.asarray(
+    numpy.random.uniform(
+        low=-numpy.sqrt(6. / 120),
+        high=numpy.sqrt(6. / 120),
+        size=(100, 20)
+    ),
+    dtype=theano.config.floatX
+)
+W0 = theano.shared(value=W0_values, name='W0', borrow=True)
+
+b0_values = numpy.zeros((20,), dtype=theano.config.floatX)
+b0 = theano.shared(value=b0_values, name='b0', borrow=True)
+
+output0 = T.dot(x_tensor, W0) + b0
+
+W1_values = numpy.asarray(
+    numpy.random.uniform(
+        low=-numpy.sqrt(6. / 120),
+        high=numpy.sqrt(6. / 120),
+        size=(20, 1)
+    ),
+    dtype=theano.config.floatX
+)
+W1 = theano.shared(value=W1_values, name='W1', borrow=True)
+
+b1_values = numpy.zeros((1,), dtype=theano.config.floatX)
+b1 = theano.shared(value=b1_values, name='b1', borrow=True)
+
+output1 = T.dot(output0, W1) + b1
+
+params = [W0, b0, W1, b1]
+cost = ((output1 - y_tensor) ** 2).sum()
+
+gradients = [T.grad(cost, param) for param in params]
+
+learning_rate = 0.0000001
+
+updates = [
+    (param, param - learning_rate * gradient)
+    for param, gradient in zip(params, gradients)
+]
+
+train_model = theano.function(
+    inputs=[],#x_tensor, y_tensor],
+    outputs=cost,
+    updates=updates,
+    givens={
+        x_tensor: x_shared,
+        y_tensor: y_shared
+    }
+)
+
+errors = []
+for i in range(1000):
+    errors.append(train_model())
+
+print(errors[0:50:])
+</code></pre>
+"
+"Theano CNN on CPU: AbstractConv2d Theano optimization failed","<p>I'm trying to train a CNN for object detection on images with the CIFAR10 dataset for a seminar at my university but I get the following Error:</p>
+
+<blockquote>
+  <p>AssertionError: AbstractConv2d Theano optimization failed: there is no
+  implementation available supporting the requested options. Did you
+  exclude both ""conv_dnn"" and ""conv_gemm"" from the optimizer? If on GPU,
+  is cuDNN available and does the GPU support it? If on CPU, do you have
+  a BLAS library installed Theano can link against?</p>
+</blockquote>
+
+<p>I am running Anaconda 2.7 within a Jupyter notebook (CNN training on CPU) from a Windows 10 machine. As I already have updated to the newest theano version using git clone I tried the following things:</p>
+
+<ul>
+<li>exclude dnn and gemm directly from within the code <code>THEANO_FLAGS='optimizer_excluding=conv_dnn, optimizer_excluding=conv_gemm'</code></li>
+<li>exclude dnn and gemm directly from cmd typing <code>THEANO_FLAGS='...' python &lt;myscript&gt;.py</code> which not suprisingly gives an ""unknown command"" error.</li>
+<li>exclude dnn and gemm from a .theanorc.txt which I put into C:/user/myusername</li>
+</ul>
+
+<p>Unfortunately, I still get the same error and when I call <code>print(teano.config)</code> the terms ""conv_dnn"" and ""conv_gemm"" do not appear.</p>
+
+<ul>
+<li>Furthermore I tried to find out what BLAS my numpy package is using (which generally works well for) and if that package is static using a tool from dependencywalker.com but I failed miserably</li>
+</ul>
+
+<p>So here's my question: How on earth can I set the theano flags properly and how can I check if I suceeded in doing so? If that doesn't help, how can I check what BLAS I am building? Which one should I use and how can I change the dependency for theano?</p>
+
+<p>As you might have guessed I am not an expert when it comes to all this package, dependency, built and other fancy computer science stuff and the documentation I find only is just not noob proof so I would be most grateful I you guys could help me out!</p>
+
+<p>Best</p>
+
+<p>Jonas</p>
+"
+"Keras model.summary() result - Understanding the # of Parameters","<p>I have a simple NN model for detecting hand-written digits from a 28x28px image written in python using Keras (Theano backend):</p>
+
+<pre><code>model0 = Sequential()
+
+#number of epochs to train for
+nb_epoch = 12
+#amount of data each iteration in an epoch sees
+batch_size = 128
+
+model0.add(Flatten(input_shape=(1, img_rows, img_cols)))
+model0.add(Dense(nb_classes))
+model0.add(Activation('softmax'))
+model0.compile(loss='categorical_crossentropy', 
+         optimizer='sgd',
+         metrics=['accuracy'])
+
+model0.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch,
+      verbose=1, validation_data=(X_test, Y_test))
+
+score = model0.evaluate(X_test, Y_test, verbose=0)
+
+print('Test score:', score[0])
+print('Test accuracy:', score[1])
+</code></pre>
+
+<p>This runs well and I get ~90% accuracy. I then perform the following command to get a summary of my network's structure by doing <code>print(model0.summary())</code>. This outputs the following:</p>
+
+<pre><code>Layer (type)         Output Shape   Param #     Connected to                     
+=====================================================================
+flatten_1 (Flatten)   (None, 784)     0           flatten_input_1[0][0]            
+dense_1 (Dense)     (None, 10)       7850        flatten_1[0][0]                  
+activation_1        (None, 10)          0           dense_1[0][0]                    
+======================================================================
+Total params: 7850
+</code></pre>
+
+<p>I don't understand how they get to 7850 total params and what that actually means?</p>
+"
+"Using Deep Learning to Predict Subsequence from Sequence","<p>I have a data that looks like this:</p>
+
+<p><a href=""https://i.stack.imgur.com/CNK0K.jpg"" rel=""nofollow noreferrer""><img src=""https://i.stack.imgur.com/CNK0K.jpg"" alt=""enter image description here""></a></p>
+
+<p>It can be viewed <a href=""http://dpaste.com/2PZ9WH6"" rel=""nofollow noreferrer"">here</a> and has been included in the code below.
+In actuality I have ~7000 samples (row), <a href=""http://www.filedropper.com/test_148"" rel=""nofollow noreferrer"">downloadable too</a>. </p>
+
+<p>The task is given antigen, predict the corresponding epitope.
+So epitope is always an exact substring of antigen. This is equivalent with 
+the <strong><a href=""http://papers.nips.cc/paper/5346-sequence-to-sequence-learning-with-neural-networks.pdf"" rel=""nofollow noreferrer"">Sequence to Sequence Learning</a></strong>. Here is my code running on Recurrent Neural Network under Keras. It was modeled according the <a href=""https://github.com/fchollet/keras/blob/master/examples/addition_rnn.py"" rel=""nofollow noreferrer""><strong>example</strong></a>.</p>
+
+<p>My question are:</p>
+
+<ol>
+<li>Can RNN, LSTM or GRU used to predict subsequence as posed above?</li>
+<li>How can I improve the accuracy of my code?</li>
+<li>How can I modify my code so that it can run faster?</li>
+</ol>
+
+<p>Here is my running code which gave very bad accuracy score.</p>
+
+<pre><code>#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from __future__ import print_function
+import sys
+import json
+import pandas as pd
+from keras.models import Sequential
+from keras.engine.training import slice_X
+from keras.layers.core import Activation,  RepeatVector, Dense
+from keras.layers import recurrent, TimeDistributed
+import numpy as np
+from six.moves import range
+
+class CharacterTable(object):
+    '''
+    Given a set of characters:
+    + Encode them to a one hot integer representation
+    + Decode the one hot integer representation to their character output
+    + Decode a vector of probabilties to their character output
+    '''
+    def __init__(self, chars, maxlen):
+        self.chars = sorted(set(chars))
+        self.char_indices = dict((c, i) for i, c in enumerate(self.chars))
+        self.indices_char = dict((i, c) for i, c in enumerate(self.chars))
+        self.maxlen = maxlen
+
+    def encode(self, C, maxlen=None):
+        maxlen = maxlen if maxlen else self.maxlen
+        X = np.zeros((maxlen, len(self.chars)))
+        for i, c in enumerate(C):
+            X[i, self.char_indices[c]] = 1
+        return X
+
+    def decode(self, X, calc_argmax=True):
+        if calc_argmax:
+            X = X.argmax(axis=-1)
+        return ''.join(self.indices_char[x] for x in X)
+
+class colors:
+    ok = '\033[92m'
+    fail = '\033[91m'
+    close = '\033[0m'
+
+INVERT = True
+HIDDEN_SIZE = 128
+BATCH_SIZE = 64
+LAYERS = 3
+# Try replacing GRU, or SimpleRNN
+RNN = recurrent.LSTM
+
+
+def main():
+    """"""
+    Epitope_core = answers
+    Antigen      = questions
+    """"""
+
+    epi_antigen_df = pd.io.parsers.read_table(""http://dpaste.com/2PZ9WH6.txt"")
+    antigens = epi_antigen_df[""Antigen""].tolist()
+    epitopes = epi_antigen_df[""Epitope Core""].tolist()
+
+    if INVERT:
+        antigens = [ x[::-1] for x in antigens]
+
+    allchars = """".join(antigens+epitopes)
+    allchars = list(set(allchars))
+    aa_chars =  """".join(allchars)
+    sys.stderr.write(aa_chars + ""\n"")
+
+    max_antigen_len = len(max(antigens, key=len))
+    max_epitope_len = len(max(epitopes, key=len))
+
+    X = np.zeros((len(antigens),max_antigen_len, len(aa_chars)),dtype=np.bool)
+    y = np.zeros((len(epitopes),max_epitope_len, len(aa_chars)),dtype=np.bool)
+
+    ctable = CharacterTable(aa_chars, max_antigen_len)
+
+    sys.stderr.write(""Begin vectorization\n"")
+    for i, antigen in enumerate(antigens):
+        X[i] = ctable.encode(antigen, maxlen=max_antigen_len)
+    for i, epitope in enumerate(epitopes):
+        y[i] = ctable.encode(epitope, maxlen=max_epitope_len)
+
+
+    # Shuffle (X, y) in unison as the later parts of X will almost all be larger digits
+    indices = np.arange(len(y))
+    np.random.shuffle(indices)
+    X = X[indices]
+    y = y[indices]
+
+    # Explicitly set apart 10% for validation data that we never train over
+    split_at = len(X) - len(X) / 10
+    (X_train, X_val) = (slice_X(X, 0, split_at), slice_X(X, split_at))
+    (y_train, y_val) = (y[:split_at], y[split_at:])
+
+    sys.stderr.write(""Build model\n"")
+    model = Sequential()
+    # ""Encode"" the input sequence using an RNN, producing an output of HIDDEN_SIZE
+    # note: in a situation where your input sequences have a variable length,
+    # use input_shape=(None, nb_feature).
+    model.add(RNN(HIDDEN_SIZE, input_shape=(max_antigen_len, len(aa_chars))))
+    # For the decoder's input, we repeat the encoded input for each time step
+    model.add(RepeatVector(max_epitope_len))
+    # The decoder RNN could be multiple layers stacked or a single layer
+    for _ in range(LAYERS):
+        model.add(RNN(HIDDEN_SIZE, return_sequences=True))
+
+    # For each of step of the output sequence, decide which character should be chosen
+    model.add(TimeDistributed(Dense(len(aa_chars))))
+    model.add(Activation('softmax'))
+
+    model.compile(loss='categorical_crossentropy',
+                optimizer='adam',
+                metrics=['accuracy'])
+
+    # Train the model each generation and show predictions against the validation dataset
+    for iteration in range(1, 200):
+        print()
+        print('-' * 50)
+        print('Iteration', iteration)
+        model.fit(X_train, y_train, batch_size=BATCH_SIZE, nb_epoch=5,
+                validation_data=(X_val, y_val))
+        ###
+        # Select 10 samples from the validation set at random so we can visualize errors
+        for i in range(10):
+            ind = np.random.randint(0, len(X_val))
+            rowX, rowy = X_val[np.array([ind])], y_val[np.array([ind])]
+            preds = model.predict_classes(rowX, verbose=0)
+            q = ctable.decode(rowX[0])
+            correct = ctable.decode(rowy[0])
+            guess = ctable.decode(preds[0], calc_argmax=False)
+            # print('Q', q[::-1] if INVERT else q)
+            print('T', correct)
+            print(colors.ok + '☑' + colors.close if correct == guess else colors.fail + '☒' + colors.close, guess)
+            print('---')
+
+if __name__ == '__main__':
+    main()
+</code></pre>
+"
+"NaN loss when training regression network","<p>I have a data matrix in ""one-hot encoding"" (all ones and zeros) with 260,000 rows and 35 columns.  I am using Keras to train a simple neural network to predict a continuous variable.  The code to make the network is the following:</p>
+
+<pre><code>model = Sequential()
+model.add(Dense(1024, input_shape=(n_train,)))
+model.add(Activation('relu'))
+model.add(Dropout(0.1))
+
+model.add(Dense(512))
+model.add(Activation('relu'))
+model.add(Dropout(0.1))
+
+model.add(Dense(256))
+model.add(Activation('relu'))
+model.add(Dropout(0.1))
+model.add(Dense(1))
+
+sgd = SGD(lr=0.01, nesterov=True);
+#rms = RMSprop()
+#model.compile(loss='categorical_crossentropy', optimizer=rms, metrics=['accuracy'])
+model.compile(loss='mean_absolute_error', optimizer=sgd)
+model.fit(X_train, Y_train, batch_size=32, nb_epoch=3, verbose=1, validation_data=(X_test,Y_test), callbacks=[EarlyStopping(monitor='val_loss', patience=4)] )
+</code></pre>
+
+<p>However, during the training process, I see the loss decrease nicely, but during the middle of the second epoch, it goes to nan:</p>
+
+<pre><code>Train on 260000 samples, validate on 64905 samples
+Epoch 1/3
+260000/260000 [==============================] - 254s - loss: 16.2775 - val_loss:
+ 13.4925
+Epoch 2/3
+ 88448/260000 [=========&gt;....................] - ETA: 161s - loss: nan
+</code></pre>
+
+<p>I tried using <code>RMSProp</code> instead of <code>SGD</code>, I tried <code>tanh</code> instead of <code>relu</code>, I tried with and without dropout, all to no avail.  I tried with a smaller model, i.e. with only one hidden layer, and same issue (it becomes nan at a different point).  However, it does work with less features, i.e. if there are only 5 columns, and gives quite good predictions. It seems to be there is some kind of overflow, but I can't imagine why--the loss is not unreasonably large at all.  </p>
+
+<p>Python version 2.7.11, running on a linux machine, CPU only.  I tested it with the latest version of Theano, and I also get Nans, so I tried going to Theano 0.8.2 and have the same problem.  With the latest version of Keras has the same problem, and also with the 0.3.2 version.  </p>
+"
+"Keras, how do I predict after I trained a model?","<p>I'm playing with the reuters-example dataset and it runs fine (my model is trained).  I read about how to save a model, so I could load it later to use again.  But how do I use this saved model to predict a new text?  Do I use <code>models.predict()</code>?</p>
+
+<p>Do I have to prepare this text in a special way?</p>
+
+<p>I tried it with</p>
+
+<pre><code>import keras.preprocessing.text
+
+text = np.array(['this is just some random, stupid text'])
+print(text.shape)
+
+tk = keras.preprocessing.text.Tokenizer(
+        nb_words=2000,
+        filters=keras.preprocessing.text.base_filter(),
+        lower=True,
+        split="" "")
+
+tk.fit_on_texts(text)
+pred = tk.texts_to_sequences(text)
+print(pred)
+
+model.predict(pred)
+</code></pre>
+
+<p>But I always get</p>
+
+<pre><code>(1L,)
+[[2, 4, 1, 6, 5, 7, 3]]
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+&lt;ipython-input-83-42d744d811fb&gt; in &lt;module&gt;()
+      7 print(pred)
+      8 
+----&gt; 9 model.predict(pred)
+
+C:\Users\bkey\Anaconda2\lib\site-packages\keras\models.pyc in predict(self, x, batch_size, verbose)
+    457         if self.model is None:
+    458             self.build()
+--&gt; 459         return self.model.predict(x, batch_size=batch_size, verbose=verbose)
+    460 
+    461     def predict_on_batch(self, x):
+
+C:\Users\bkey\Anaconda2\lib\site-packages\keras\engine\training.pyc in predict(self, x, batch_size, verbose)
+   1132         x = standardize_input_data(x, self.input_names,
+   1133                                    self.internal_input_shapes,
+-&gt; 1134                                    check_batch_dim=False)
+   1135         if self.stateful:
+   1136             if x[0].shape[0] &gt; batch_size and x[0].shape[0] % batch_size != 0:
+
+C:\Users\bkey\Anaconda2\lib\site-packages\keras\engine\training.pyc in standardize_input_data(data, names, shapes, check_batch_dim, exception_prefix)
+     79     for i in range(len(names)):
+     80         array = arrays[i]
+---&gt; 81         if len(array.shape) == 1:
+     82             array = np.expand_dims(array, 1)
+     83             arrays[i] = array
+
+AttributeError: 'list' object has no attribute 'shape'
+</code></pre>
+
+<p>Do you have any recommendations as to how to make predictions with a trained model?</p>
+"
+"Python theano with index computed inside the loop","<p>I have installed the Theano library for increasing the speed of a computation, so that I can use the power of a GPU.</p>
+
+<p>However, inside the inner loop of the computation a new index is calculated, based on the loop index and corresponding values of a couple of arrays.</p>
+
+<p>That calculated index is then used to access an element of another array, which, in turn, is used for another calculation.</p>
+
+<p>Is this too complicated to expect any significant speedups from Theano?</p>
+
+<p>So let me rephrase my question, the other way round.
+Here is an example of GPU code snippet. Some initialisations are left out for reasons of brevity. Can I translate this to Python/Theano without increasing computation times considerably?</p>
+
+<pre><code>__global__ void SomeKernel(const cuComplex* __restrict__  data,
+                                 float* __restrict__ voxels)
+</code></pre>
+
+<p>{   </p>
+
+<pre><code>unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+unsigned int idy = blockIdx.y * blockDim.y + threadIdx.y;
+
+unsigned int pos = (idy * NX + idx);
+
+unsigned int ind1 = pos * 3;
+float x = voxels[ind1];
+float y = voxels[ind1 + 1];
+float z = voxels[ind1 + 2];
+
+int m;
+
+for (m = 0; m &lt; M; ++m)
+{
+    unsigned int ind2 = 3 * m;
+
+    float diff_x = x - some_pos[ind2];
+    float diff_y = y - some_pos[ind2 + 1];
+    float diff_z = z - some_pos[ind2 + 2];
+
+    float distance = sqrtf(diff_x * diff_x
+                         + diff_y * diff_y
+                         + diff_z * diff_z);
+
+    unsigned int dist = rintf(distance/some_factor);
+    ind3 = m * another_factor + dist;
+
+    cuComplex some_element = data[ind3];
+
+    Main calculation starts, involving some_element.
+</code></pre>
+"
+"How can I assign/update subset of tensor shared variable in Theano?","<p>When compiling a function in <code>theano</code>, a shared variable(say X) can be updated by specifying <code>updates=[(X, new_value)]</code>.
+Now I am trying to update only subset of a shared variable:</p>
+
+<pre><code>from theano import tensor as T
+from theano import function
+import numpy
+
+X = T.shared(numpy.array([0,1,2,3,4]))
+Y = T.vector()
+f = function([Y], updates=[(X[2:4], Y)] # error occur:
+                                        # 'update target must 
+                                        # be a SharedVariable'
+</code></pre>
+
+<p>The codes will raise a error ""update target must be a SharedVariable"", I guess that means update targets can't be non-shared variables. So is there any way to compile a function to just udpate subset of shared variables?</p>
+"
+"does nolearn/lasagne support python 3","<p>I am working with Neural Net implementation in <code>nolearn.lasagne</code> as mentioned <a href=""http://nbviewer.ipython.org/github/ottogroup/kaggle/blob/master/Otto_Group_Competition.ipynb"">here</a><br>
+However I get the following error:<br>
+<code>ImportError: No module named 'cPickle'</code><br>
+I figure out that <code>cPickle</code> is <code>pickle</code> in python-3<br>
+Does nolearn/lasagne support python-3 ? If not, is there any workaround ?</p>
+"
+"How can I change device used of theano","<p>I tried to change the device used in theano-based program. </p>
+
+<pre><code>from theano import config
+config.device = ""gpu1""
+</code></pre>
+
+<p>However I got error</p>
+
+<pre><code>Exception: Can't change the value of this config parameter after initialization!
+</code></pre>
+
+<p>I wonder what is the best way of change gpu to gpu1 in code ?</p>
+
+<p>Thanks</p>
+"
+"input dimensions to a one dimensional convolutional network in keras","<p>really finding it hard to understand the input dimensions to the convolutional 1d <a href=""http://keras.io/layers/convolutional/#convolution1d"" rel=""noreferrer"">layer</a> in keras:</p>
+
+<p>Input shape</p>
+
+<p>3D tensor with shape: (samples, steps, input_dim).</p>
+
+<p>Output shape</p>
+
+<p>3D tensor with shape: (samples, new_steps, nb_filter). steps value might have changed due to padding.</p>
+
+<p>I want my network to take in a time series of prices (101, in order) and output 4 probabilities. My current non-convolutional network which does this fairly well (with a training set of 28000) looks like this:</p>
+
+<pre><code>standardModel = Sequential()
+standardModel.add(Dense(input_dim=101, output_dim=100, W_regularizer=l2(0.5), activation='sigmoid'))
+standardModel.add(Dense(4, W_regularizer=l2(0.7), activation='softmax'))
+</code></pre>
+
+<p>To improve this, I want to make a feature map from the input layer which has a local receptive field of length 10. (and therefore has 10 shared weights and 1 shared bias). I then want to use max pooling and feed this in to a hidden layer of 40 or so neurons and then output this with 4 neurons with softmax in the outer layer. </p>
+
+<p><a href=""http://i.stack.imgur.com/Kx8yT.png"" rel=""noreferrer"">picture (it's quite awful sorry!)</a></p>
+
+<p>So ideally, the convolutional layer would take a 2d tensor of dimensions:</p>
+
+<p>(minibatch_size, 101)</p>
+
+<p>and output a 3d tensor of dimensions</p>
+
+<p>(minibatch_size, 91, no_of_featuremaps)</p>
+
+<p>However, the keras layer seems to require a dimension in the input called step. I've tried understanding this and still don't quite get it. In my case, should step be 1 as each step in the vector is an increase in the time by 1? Also, what is new_step? </p>
+
+<p>In addition, how do you turn the output of the pooling layers (a 3d tensor) into input suitable for the standard hidden layer (i.e a Dense keras layer) in the form of a 2d tensor?</p>
+
+<p>Update: After the very helpful suggestions given, I tried making a convolutional network like so:</p>
+
+<pre><code>conv = Sequential()
+conv.add(Convolution1D(64, 10, input_shape=(1,101)))
+conv.add(Activation('relu'))
+conv.add(MaxPooling1D(2))
+conv.add(Flatten())
+conv.add(Dense(10))
+conv.add(Activation('tanh'))
+conv.add(Dense(4))
+conv.add(Activation('softmax'))
+</code></pre>
+
+<p>The line conv.Add(Flatten()) throws a range exceeds valid bounds error. Interestingly, this error is <strong>not</strong> thrown for just this code:</p>
+
+<pre><code>conv = Sequential()
+conv.add(Convolution1D(64, 10, input_shape=(1,101)))
+conv.add(Activation('relu'))
+conv.add(MaxPooling1D(2))
+conv.add(Flatten())
+</code></pre>
+
+<p>doing </p>
+
+<pre><code>print conv.input_shape
+print conv.output_shape
+</code></pre>
+
+<p>results in </p>
+
+<pre><code>(None, 1, 101
+(None, -256)
+</code></pre>
+
+<p>being returned</p>
+
+<p>Update 2:</p>
+
+<p>Changed </p>
+
+<pre><code>conv.add(Convolution1D(64, 10, input_shape=(1,101)))
+</code></pre>
+
+<p>to</p>
+
+<pre><code>conv.add(Convolution1D(10, 10, input_shape=(101,1))
+</code></pre>
+
+<p>and it started working. However, is there any important different between 
+inputting (None, 101, 1) to a 1d conv layer or (None, 1, 101) that I should be aware of? Why does (None, 1, 101) not work?</p>
+"
+"Keras uses way too much GPU memory when calling train_on_batch, fit, etc","<p>I've been messing with Keras, and like it so far. There's one big issue I have been having, when working with fairly deep networks: When calling model.train_on_batch, or model.fit etc., Keras allocates significantly more GPU memory than what the model itself should need. This is not caused by trying to train on some really large images, it's the network model itself that seems to require a lot of GPU memory. I have created this toy example to show what I mean. Here's essentially what's going on:</p>
+
+<p>I first create a fairly deep network, and use model.summary() to get the total number of parameters needed for the network (in this case 206538153, which corresponds to about 826 MB). I then use nvidia-smi to see how much GPU memory Keras has allocated, and I can see that it makes perfect sense (849 MB).</p>
+
+<p>I then compile the network, and can confirm that this does not increase GPU memory usage. And as we can see in this case, I have almost 1 GB of VRAM available at this point.</p>
+
+<p>Then I try to feed a simple 16x16 image and a 1x1 ground truth to the network, and then everything blows up, because Keras starts allocating lots of memory again, for no reason that is obvious to me. Something about training the network seems to require a lot more memory than just having the model, which doesn't make sense to me. I have trained significantly deeper networks on this GPU in other frameworks, so that makes me think that I'm using Keras wrong (or there's something wrong in my setup, or in Keras, but of course that's hard to know for sure).</p>
+
+<p>Here's the code:</p>
+
+
+
+<pre class=""lang-python prettyprint-override""><code>from scipy import misc
+import numpy as np
+from keras.models import Sequential
+from keras.layers import Dense, Activation, Convolution2D, MaxPooling2D, Reshape, Flatten, ZeroPadding2D, Dropout
+import os
+
+model = Sequential()
+
+model.add(Convolution2D(256, 3, 3, border_mode='same', input_shape=(16,16,1)))
+model.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
+model.add(Convolution2D(512, 3, 3, border_mode='same'))
+model.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
+model.add(Convolution2D(256, 3, 3, border_mode='same'))
+model.add(Convolution2D(32, 3, 3, border_mode='same'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Flatten())
+model.add(Dense(4))
+model.add(Dense(1))
+
+model.summary()
+
+os.system(""nvidia-smi"")
+raw_input(""Press Enter to continue..."")    
+
+model.compile(optimizer='sgd',
+              loss='mse', 
+              metrics=['accuracy'])
+
+os.system(""nvidia-smi"")              
+raw_input(""Compiled model. Press Enter to continue..."")
+
+n_batches = 1
+batch_size = 1
+for ibatch in range(n_batches):
+    x = np.random.rand(batch_size, 16,16,1)
+    y = np.random.rand(batch_size, 1)
+
+    os.system(""nvidia-smi"")
+    raw_input(""About to train one iteration. Press Enter to continue..."")
+
+    model.train_on_batch(x, y)         
+    print(""Trained one iteration"")
+</code></pre>
+
+<p>Which gives the following output for me:</p>
+
+<pre class=""lang-python prettyprint-override""><code>Using Theano backend.
+Using gpu device 0: GeForce GTX 960 (CNMeM is disabled, cuDNN 5103)
+/usr/local/lib/python2.7/dist-packages/theano/sandbox/cuda/__init__.py:600: UserWarning: Your cuDNN version is more recent than the one Theano officially supports. If you see any problems, try updating Theano or downgrading cuDNN to version 5.
+  warnings.warn(warn)
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+convolution2d_1 (Convolution2D)  (None, 16, 16, 256)   2560        convolution2d_input_1[0][0]      
+____________________________________________________________________________________________________
+maxpooling2d_1 (MaxPooling2D)    (None, 8, 8, 256)     0           convolution2d_1[0][0]            
+____________________________________________________________________________________________________
+convolution2d_2 (Convolution2D)  (None, 8, 8, 512)     1180160     maxpooling2d_1[0][0]             
+____________________________________________________________________________________________________
+maxpooling2d_2 (MaxPooling2D)    (None, 4, 4, 512)     0           convolution2d_2[0][0]            
+____________________________________________________________________________________________________
+convolution2d_3 (Convolution2D)  (None, 4, 4, 1024)    4719616     maxpooling2d_2[0][0]             
+____________________________________________________________________________________________________
+convolution2d_4 (Convolution2D)  (None, 4, 4, 1024)    9438208     convolution2d_3[0][0]            
+____________________________________________________________________________________________________
+convolution2d_5 (Convolution2D)  (None, 4, 4, 1024)    9438208     convolution2d_4[0][0]            
+____________________________________________________________________________________________________
+convolution2d_6 (Convolution2D)  (None, 4, 4, 1024)    9438208     convolution2d_5[0][0]            
+____________________________________________________________________________________________________
+convolution2d_7 (Convolution2D)  (None, 4, 4, 1024)    9438208     convolution2d_6[0][0]            
+____________________________________________________________________________________________________
+convolution2d_8 (Convolution2D)  (None, 4, 4, 1024)    9438208     convolution2d_7[0][0]            
+____________________________________________________________________________________________________
+convolution2d_9 (Convolution2D)  (None, 4, 4, 1024)    9438208     convolution2d_8[0][0]            
+____________________________________________________________________________________________________
+convolution2d_10 (Convolution2D) (None, 4, 4, 1024)    9438208     convolution2d_9[0][0]            
+____________________________________________________________________________________________________
+convolution2d_11 (Convolution2D) (None, 4, 4, 1024)    9438208     convolution2d_10[0][0]           
+____________________________________________________________________________________________________
+convolution2d_12 (Convolution2D) (None, 4, 4, 1024)    9438208     convolution2d_11[0][0]           
+____________________________________________________________________________________________________
+convolution2d_13 (Convolution2D) (None, 4, 4, 1024)    9438208     convolution2d_12[0][0]           
+____________________________________________________________________________________________________
+convolution2d_14 (Convolution2D) (None, 4, 4, 1024)    9438208     convolution2d_13[0][0]           
+____________________________________________________________________________________________________
+convolution2d_15 (Convolution2D) (None, 4, 4, 1024)    9438208     convolution2d_14[0][0]           
+____________________________________________________________________________________________________
+convolution2d_16 (Convolution2D) (None, 4, 4, 1024)    9438208     convolution2d_15[0][0]           
+____________________________________________________________________________________________________
+convolution2d_17 (Convolution2D) (None, 4, 4, 1024)    9438208     convolution2d_16[0][0]           
+____________________________________________________________________________________________________
+convolution2d_18 (Convolution2D) (None, 4, 4, 1024)    9438208     convolution2d_17[0][0]           
+____________________________________________________________________________________________________
+convolution2d_19 (Convolution2D) (None, 4, 4, 1024)    9438208     convolution2d_18[0][0]           
+____________________________________________________________________________________________________
+convolution2d_20 (Convolution2D) (None, 4, 4, 1024)    9438208     convolution2d_19[0][0]           
+____________________________________________________________________________________________________
+convolution2d_21 (Convolution2D) (None, 4, 4, 1024)    9438208     convolution2d_20[0][0]           
+____________________________________________________________________________________________________
+convolution2d_22 (Convolution2D) (None, 4, 4, 1024)    9438208     convolution2d_21[0][0]           
+____________________________________________________________________________________________________
+convolution2d_23 (Convolution2D) (None, 4, 4, 1024)    9438208     convolution2d_22[0][0]           
+____________________________________________________________________________________________________
+convolution2d_24 (Convolution2D) (None, 4, 4, 1024)    9438208     convolution2d_23[0][0]           
+____________________________________________________________________________________________________
+maxpooling2d_3 (MaxPooling2D)    (None, 2, 2, 1024)    0           convolution2d_24[0][0]           
+____________________________________________________________________________________________________
+convolution2d_25 (Convolution2D) (None, 2, 2, 256)     2359552     maxpooling2d_3[0][0]             
+____________________________________________________________________________________________________
+convolution2d_26 (Convolution2D) (None, 2, 2, 32)      73760       convolution2d_25[0][0]           
+____________________________________________________________________________________________________
+maxpooling2d_4 (MaxPooling2D)    (None, 1, 1, 32)      0           convolution2d_26[0][0]           
+____________________________________________________________________________________________________
+flatten_1 (Flatten)              (None, 32)            0           maxpooling2d_4[0][0]             
+____________________________________________________________________________________________________
+dense_1 (Dense)                  (None, 4)             132         flatten_1[0][0]                  
+____________________________________________________________________________________________________
+dense_2 (Dense)                  (None, 1)             5           dense_1[0][0]                    
+====================================================================================================
+Total params: 206538153
+____________________________________________________________________________________________________
+None
+Thu Oct  6 09:05:42 2016       
++------------------------------------------------------+                       
+| NVIDIA-SMI 352.63     Driver Version: 352.63         |                       
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|===============================+======================+======================|
+|   0  GeForce GTX 960     Off  | 0000:01:00.0      On |                  N/A |
+| 30%   37C    P2    28W / 120W |   1082MiB /  2044MiB |      9%      Default |
++-------------------------------+----------------------+----------------------+
+
++-----------------------------------------------------------------------------+
+| Processes:                                                       GPU Memory |
+|  GPU       PID  Type  Process name                               Usage      |
+|=============================================================================|
+|    0      1796    G   /usr/bin/X                                     155MiB |
+|    0      2597    G   compiz                                          65MiB |
+|    0      5966    C   python                                         849MiB |
++-----------------------------------------------------------------------------+
+Press Enter to continue...
+Thu Oct  6 09:05:44 2016       
++------------------------------------------------------+                       
+| NVIDIA-SMI 352.63     Driver Version: 352.63         |                       
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|===============================+======================+======================|
+|   0  GeForce GTX 960     Off  | 0000:01:00.0      On |                  N/A |
+| 30%   38C    P2    28W / 120W |   1082MiB /  2044MiB |      0%      Default |
++-------------------------------+----------------------+----------------------+
+
++-----------------------------------------------------------------------------+
+| Processes:                                                       GPU Memory |
+|  GPU       PID  Type  Process name                               Usage      |
+|=============================================================================|
+|    0      1796    G   /usr/bin/X                                     155MiB |
+|    0      2597    G   compiz                                          65MiB |
+|    0      5966    C   python                                         849MiB |
++-----------------------------------------------------------------------------+
+Compiled model. Press Enter to continue...
+Thu Oct  6 09:05:44 2016       
++------------------------------------------------------+                       
+| NVIDIA-SMI 352.63     Driver Version: 352.63         |                       
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|===============================+======================+======================|
+|   0  GeForce GTX 960     Off  | 0000:01:00.0      On |                  N/A |
+| 30%   38C    P2    28W / 120W |   1082MiB /  2044MiB |      0%      Default |
++-------------------------------+----------------------+----------------------+
+
++-----------------------------------------------------------------------------+
+| Processes:                                                       GPU Memory |
+|  GPU       PID  Type  Process name                               Usage      |
+|=============================================================================|
+|    0      1796    G   /usr/bin/X                                     155MiB |
+|    0      2597    G   compiz                                          65MiB |
+|    0      5966    C   python                                         849MiB |
++-----------------------------------------------------------------------------+
+About to train one iteration. Press Enter to continue...
+Error allocating 37748736 bytes of device memory (out of memory). Driver report 34205696 bytes free and 2144010240 bytes total 
+Traceback (most recent call last):
+  File ""memtest.py"", line 65, in &lt;module&gt;
+    model.train_on_batch(x, y)         
+  File ""/usr/local/lib/python2.7/dist-packages/keras/models.py"", line 712, in train_on_batch
+    class_weight=class_weight)
+  File ""/usr/local/lib/python2.7/dist-packages/keras/engine/training.py"", line 1221, in train_on_batch
+    outputs = self.train_function(ins)
+  File ""/usr/local/lib/python2.7/dist-packages/keras/backend/theano_backend.py"", line 717, in __call__
+    return self.function(*inputs)
+  File ""/usr/local/lib/python2.7/dist-packages/theano/compile/function_module.py"", line 871, in __call__
+    storage_map=getattr(self.fn, 'storage_map', None))
+  File ""/usr/local/lib/python2.7/dist-packages/theano/gof/link.py"", line 314, in raise_with_op
+    reraise(exc_type, exc_value, exc_trace)
+  File ""/usr/local/lib/python2.7/dist-packages/theano/compile/function_module.py"", line 859, in __call__
+    outputs = self.fn()
+MemoryError: Error allocating 37748736 bytes of device memory (out of memory).
+Apply node that caused the error: GpuContiguous(GpuDimShuffle{3,2,0,1}.0)
+Toposort index: 338
+Inputs types: [CudaNdarrayType(float32, 4D)]
+Inputs shapes: [(1024, 1024, 3, 3)]
+Inputs strides: [(1, 1024, 3145728, 1048576)]
+Inputs values: ['not shown']
+Outputs clients: [[GpuDnnConv{algo='small', inplace=True}(GpuContiguous.0, GpuContiguous.0, GpuAllocEmpty.0, GpuDnnConvDesc{border_mode='half', subsample=(1, 1), conv_mode='conv', precision='float32'}.0, Constant{1.0}, Constant{0.0}), GpuDnnConvGradI{algo='none', inplace=True}(GpuContiguous.0, GpuContiguous.0, GpuAllocEmpty.0, GpuDnnConvDesc{border_mode='half', subsample=(1, 1), conv_mode='conv', precision='float32'}.0, Constant{1.0}, Constant{0.0})]]
+
+HINT: Re-running with most Theano optimization disabled could give you a back-trace of when this node was created. This can be done with by setting the Theano flag 'optimizer=fast_compile'. If that does not work, Theano optimizations can be disabled with 'optimizer=None'.
+HINT: Use the Theano flag 'exception_verbosity=high' for a debugprint and storage map footprint of this apply node.
+</code></pre>
+
+<p>A few things to note: </p>
+
+<ul>
+<li>I have tried both Theano and TensorFlow backends. Both have the same problems, and run out of memory at the same line. In TensorFlow, it seems that Keras preallocates a lot of memory (about 1.5 GB) so nvidia-smi doesn't help us track what's going on there, but I get the same out-of-memory exceptions. Again, this points towards an error in (my usage of) Keras (although it's hard to be certain about such things, it could be something with my setup).</li>
+<li>I tried using CNMEM in Theano, which behaves like TensorFlow: It preallocates a large amount of memory (about 1.5 GB) yet crashes in the same place.</li>
+<li>There are some warnings about the CudNN-version. I tried running the Theano backend with CUDA but not CudNN and I got the same errors, so that is not the source of the problem.</li>
+<li>If you want to test this on your own GPU, you might want to make the network deeper/shallower depending on how much GPU memory you have to test this.</li>
+<li>My configuration is as follows: Ubuntu 14.04, GeForce GTX 960, CUDA 7.5.18, CudNN 5.1.3, Python 2.7, Keras 1.1.0 (installed via pip)</li>
+<li>I've tried changing the compilation of the model to use different optimizers and losses, but that doesn't seem to change anything.</li>
+<li>I've tried changing the train_on_batch function to use fit instead, but it has the same problem.</li>
+<li>I saw one similar question here on StackOverflow - <a href=""https://stackoverflow.com/questions/35757151/why-does-this-keras-model-require-over-6gb-of-memory"">Why does this Keras model require over 6GB of memory?</a> - but as far as I can tell, I don't have those issues in my configuration. I've never had multiple versions of CUDA installed, and I've double checked my PATH, LD_LIBRARY_PATH and CUDA_ROOT variables more times than I can count.</li>
+<li>Julius suggested that the activation parameters themselves take up GPU memory. If this is true, can somebody explain it a bit more clearly? I have tried changing the activation function of my convolution layers to functions that are clearly hard-coded with no learnable parameters as far as I can tell, and that doesn't change anything. Also, it seems unlikely that these parameters would take up almost as much memory as the rest of the network itself.</li>
+<li>After thorough testing, the largest network I can train is about 453 MB of parameters, out of my ~2 GB of GPU RAM. Is this normal? </li>
+<li>After testing Keras on some smaller CNNs that do fit in my GPU, I can see that there are very sudden spikes in GPU RAM usage. If I run a network with about 100 MB of parameters, 99% of the time during training it'll be using less than 200 MB of GPU RAM. But every once in a while, memory usage spikes to about 1.3 GB. It seems safe to assume that it's these spikes that are causing my problems. I've never seen these spikes in other frameworks, but they might be there for a good reason? <strong>If anybody knows what causes them, and if there's a way to avoid them, please chime in!</strong></li>
+</ul>
+"

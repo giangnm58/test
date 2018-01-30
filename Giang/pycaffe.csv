@@ -1,0 +1,117 @@
+Title,Body
+"What is a `""Python""` layer in caffe?","<p>Caffe has a layer type <code>""Python""</code>.  </p>
+
+<p>For instance, this layer type can be used as a <a href=""https://github.com/BVLC/caffe/blob/master/examples/pycaffe/layers/pyloss.py"" rel=""noreferrer"">loss layer</a>.<br>
+On other occasions it is used as an <a href=""https://stackoverflow.com/a/34996628/1714410"">input layer</a>.</p>
+
+<p>What is this layer type?<br>
+How can this layer be used?</p>
+"
+"Cheat sheet for caffe / pycaffe?","<p>Does anyone know whether there is a cheat sheet for all important pycaffe commands?
+I was so far using caffe only via Matlab interface and terminal + bash scripts.</p>
+
+<p>I wanted to shift towards using ipython and work through the ipython notebook examples. However I find it hard to get an overview of all the functions that are inside the caffe module for python. (I'm also quite new to python).</p>
+"
+"Multiple category classification in Caffe","<p>I thought we might be able to compile a Caffeinated description of some methods of performing <em>multiple category classification</em>.</p>
+
+<p><strong>By multi category classification I mean:</strong> The input data containing representations of multiple model output categories and/or simply being classifiable under multiple model output categories.</p>
+
+<p>E.g. An image containing a cat &amp; dog would output (ideally) ~1 for both the cat &amp; dog prediction categories and ~0 for all others.</p>
+
+<ol>
+<li><p>Based on <a href=""http://arxiv.org/pdf/1312.6082v4.pdf"" rel=""noreferrer"">this paper</a>, <a href=""https://github.com/BVLC/caffe/pull/523"" rel=""noreferrer"">this stale and closed PR</a> and <a href=""https://github.com/BVLC/caffe/issues/1698"" rel=""noreferrer"">this open PR</a>, it seems caffe is perfectly capable of accepting labels. Is this correct?</p></li>
+<li><p>Would the construction of such a network require the use of multiple neuron (inner product -> relu -> inner product) and softmax layers as in <a href=""http://arxiv.org/pdf/1312.6082v4.pdf"" rel=""noreferrer"">page 13 of this paper</a>; or does Caffe's ip &amp; softmax presently support multiple label dimensions?</p></li>
+<li><p>When I'm passing my labels to the network which example would illustrate the correct approach (if not both)?:</p>
+
+<p><strong>E.g. Cat eating apple</strong> Note: Python syntax, but I use the c++ source.</p>
+
+<p>Column 0 - Class is in input;
+Column 1 - Class is not in input</p>
+
+<pre><code>[[1,0],  # Apple
+ [0,1],  # Baseball
+ [1,0],  # Cat
+ [0,1]]  # Dog
+</code></pre>
+
+<p>or</p>
+
+<p>Column 0 - Class is in input</p>
+
+<pre><code>[[1],  # Apple
+ [0],  # Baseball
+ [1],  # Cat
+ [0]]  # Dog
+</code></pre></li>
+</ol>
+
+<p><strong>If anything lacks clarity please let me know and I will generate pictorial examples of the questions I'm trying to ask.</strong></p>
+"
+"Building custom Caffe layer in python","<p>After parsing many links regarding building Caffe layers in Python i still have difficulties in understanding few concepts. Can please someone clarify them?  </p>
+
+<ul>
+<li>Blobs and weights python structure for network is explained here: <a href=""https://stackoverflow.com/questions/31324739/finding-gradient-of-a-caffe-conv-filter-with-regards-to-input"">Finding gradient of a Caffe conv-filter with regards to input</a>.  </li>
+<li>Network and Solver structure is explained here: <a href=""https://stackoverflow.com/questions/32379878/cheat-sheet-for-caffe-pycaffe"">Cheat sheet for caffe / pycaffe?</a>.  </li>
+<li>Example of defining python layer is here: <a href=""https://github.com/BVLC/caffe/blob/master/examples/pycaffe/layers/pyloss.py"" rel=""nofollow noreferrer"">pyloss.py on git</a>.  </li>
+<li>Layer tests here: <a href=""https://github.com/BVLC/caffe/blob/master/python/caffe/test/test_python_layer_with_param_str.py"" rel=""nofollow noreferrer"">test layer on  git</a>.  </li>
+<li>Development of new layers for C++ is described here: <a href=""https://github.com/BVLC/caffe/wiki/Development"" rel=""nofollow noreferrer"">git wiki</a>.</li>
+</ul>
+
+<p>What I am still missing is:</p>
+
+<ol>
+<li><code>setup()</code> method: what I should do here? Why in example I should compare the lenght of 'bottom' param with '2'? Why it should be 2? It seems not a batch size because its arbitrary? And bottom as I understand is blob, and then the first dimension is batch size?</li>
+<li><code>reshape()</code> method: as I understand 'bottom' input param is blob of below layer, and 'top' param is blob of upper layer, and I need to reshape top layer according to output shape of my calculations with forward pass. But why do I need to do this every forward pass if these shapes do not change from pass to pass, only weights change?</li>
+<li><code>reshape</code> and <code>forward</code> methods have 0 indexes for 'top' input param used. Why would I need to use <code>top[0].data=...</code> or <code>top[0].input=...</code> instead of <code>top.data=...</code> and <code>top.input=...</code>? Whats this index about? If we do not use other part of this top list, why it is exposed in this way? I can suspect its or C++ backbone coincidence, but it would be good to know exactly.</li>
+<li><p><code>reshape()</code> method, line with:</p>
+
+<pre><code>if bottom[0].count != bottom[1].count
+</code></pre>
+
+<p>what I do here? why its dimension is 2 again? And what I am counting here? Why both part of blobs (0 and 1) should be equal in amount of some members (<code>count</code>)?</p></li>
+<li><p><code>forward()</code> method, what I define by this line:</p>
+
+<pre><code>self.diff[...] = bottom[0].data - bottom[1].data
+</code></pre>
+
+<p>When it is used after forward path if I define it? Can we just use</p>
+
+<pre><code>diff = bottom[0].data - bottom[1].data 
+</code></pre>
+
+<p>instead to count loss later in this method, without assigning to <code>self</code>, or its done with some purpose?</p></li>
+<li><p><code>backward()</code> method: what's this about: <code>for i in range(2):</code>? Why again range is 2?</p></li>
+<li><code>backward()</code> method, <code>propagate_down</code> parameter: why it is defined? I mean if its True, gradient should be assigned to <code>bottom[X].diff</code> as I see, but why would someone call method which would do nothing with <code>propagate_down = False</code>, if it just do nothing and still cycling inside?</li>
+</ol>
+
+<p>I'm sorry if those questions are too obvious, I just wasn't able to find a good guide to understand them and asking for help here.</p>
+"
+"caffe data layer example step by step","<p>I want to find a caffe python data layer example to learn.
+I know that Fast-RCNN has a python data layer, but it's rather complicated since I
+am not familiar with object detection.<br>
+So my question is, is there a python data layer example where I can learn how to define my own data preparation procedure?<br>
+For example, how to do define a python data layer do much more data augmentation
+(such as translation, rotation etc.) than caffe <code>""ImageDataLayer""</code>.</p>
+
+<p>Thank you very much</p>
+"
+"Faster RCNN for TensorFlow","<p>Has anyone implement the FRCNN for TensorFlow version?
+I found some related repos as following:</p>
+
+<ol>
+<li><a href=""https://github.com/yuxng/tensorflow"">Implement roi pool layer</a></li>
+<li><a href=""https://github.com/ExonRen/tf-fast-rcnn"">Implement fast RCNN based on py-faster-rcnn repo</a></li>
+</ol>
+
+<p>but for 1: assume the roi pooling layer works (I haven't tried), and there are something need to be implemented as following:</p>
+
+<ul>
+<li>ROI data layer e.g. <a href=""https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/roi_data_layer/roidb.py"">roidb</a>.</li>
+<li>Linear Regression e.g. <a href=""https://github.com/rbgirshick/caffe-fast-rcnn/blob/0dcd397b29507b8314e252e850518c5695efbb83/src/caffe/layers/smooth_L1_loss_layer.cu"">SmoothL1Loss</a></li>
+<li>ROI pool layer post-processing for end-to-end training which should convert the ROI pooling layer's results to feed into CNN for classifier.</li>
+</ul>
+
+<p>For 2: em...., it seems based on py-faster-rcnn which based on Caffe to prepared pre-processing (e.g. roidb) and feed data into Tensorflow to train the model, it seems weird, so I may not tried it.</p>
+
+<p>So what I want to know is that, will <a href=""https://github.com/tensorflow/tensorflow/issues/739"">Tensorflow support Faster RCNN in the future</a>?. If not, do I have any mis-understand which mentioned above? or has any repo or someone support that?</p>
+"

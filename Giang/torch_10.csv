@@ -1,0 +1,541 @@
+Title,Body
+"Scientific libraries for Lua?","<p>Are there any scientific packages for Lua comparable to Scipy?</p>
+"
+"How catch ctrl-c in lua when ctrl-c is sent via the command line","<p>I would like to know when the user from a command line presses control-c so I can save some stuff. </p>
+
+<p>How do I do this? I've looked but haven't really seen anything.</p>
+
+<p>Note: I'm somewhat familiar with lua, but I'm no expert. I mostly use lua to use the library Torch (<a href=""http://torch.ch/"">http://torch.ch/</a>)</p>
+"
+"How view() method works for tensor in torch","<p>I have confusion about the method <code>view()</code> in the following code snippet.</p>
+
+<pre><code>class Net(nn.Module):
+    def __init__(self):
+        super(Net, self).__init__()
+        self.conv1 = nn.Conv2d(3, 6, 5)
+        self.pool  = nn.MaxPool2d(2,2)
+        self.conv2 = nn.Conv2d(6, 16, 5)
+        self.fc1   = nn.Linear(16*5*5, 120)
+        self.fc2   = nn.Linear(120, 84)
+        self.fc3   = nn.Linear(84, 10)
+
+    def forward(self, x):
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.conv2(x)))
+        x = x.view(-1, 16*5*5)
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
+
+net = Net()
+</code></pre>
+
+<p>My confusion is regarding the following line.</p>
+
+<pre><code>x = x.view(-1, 16*5*5)
+</code></pre>
+
+<p>What does <code>tensor.view()</code> function do? I have seen its usage in many places but I can't understand how it interprets its' parameters. </p>
+
+<p>What happens if I give negative values as parameters to the <code>view()</code> function? For example, what happens if I call, <code>tensor_variable.view(1, 1, -1)</code>?</p>
+
+<p>Can anyone explain the main principle of <code>view()</code> function with some examples?</p>
+"
+"Model summary in pytorch","<p>Is there any way, I can print the summary of a model in PyTorch like <code>model.summary()</code> method does in Keras as follows?</p>
+
+<pre><code>Model Summary:
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+input_1 (InputLayer)             (None, 1, 15, 27)     0                                            
+____________________________________________________________________________________________________
+convolution2d_1 (Convolution2D)  (None, 8, 15, 27)     872         input_1[0][0]                    
+____________________________________________________________________________________________________
+maxpooling2d_1 (MaxPooling2D)    (None, 8, 7, 27)      0           convolution2d_1[0][0]            
+____________________________________________________________________________________________________
+flatten_1 (Flatten)              (None, 1512)          0           maxpooling2d_1[0][0]             
+____________________________________________________________________________________________________
+dense_1 (Dense)                  (None, 1)             1513        flatten_1[0][0]                  
+====================================================================================================
+Total params: 2,385
+Trainable params: 2,385
+Non-trainable params: 0
+</code></pre>
+"
+"Torch / Lua, how to select a subset of an array or tensor?","<p>I'm working on Torch/Lua and have an array <code>dataset</code> of 10 elements.</p>
+
+<pre><code>dataset = {11,12,13,14,15,16,17,18,19,20}
+</code></pre>
+
+<p>If I write <code>dataset[1]</code>, I can read the structure of the 1st element of the array.</p>
+
+<pre><code>th&gt; dataset[1]
+11  
+</code></pre>
+
+<p>I need to select just 3 elements among all the 10, but I don't know which command to use.
+If I were working on Matlab, I would write: <code>dataset[1:3]</code>, but here does not work.</p>
+
+<p>Do you have any suggestions?</p>
+"
+"Generating new images with PyTorch","<p>I am studying GANs I've completed the one course which gave me an example of a program that generates images based on examples inputed.</p>
+
+<p>The example can be found here:</p>
+
+<pre><code>https://github.com/davidsonmizael/gan
+</code></pre>
+
+<p>So I decided to use that to generate new images based on a dataset of frontal photos of faces, but I am not having any success. Differently from the example above, the code only generates noise, while the input has actual images.</p>
+
+<p>Actually I don't have any clue about what should I change to make the code point to the right direction and learn from images. I haven't change a single value on the code provided in the example, yet it does not work.</p>
+
+<p>If anyone can help me understand this and point me to the right direction would be very helpful. Thanks in advance.</p>
+
+<p>My Discriminator:</p>
+
+<pre><code>class D(nn.Module):
+
+    def __init__(self):
+        super(D, self).__init__()
+        self.main = nn.Sequential(
+                nn.Conv2d(3, 64, 4, 2, 1, bias = False),
+                nn.LeakyReLU(0.2, inplace = True),
+                nn.Conv2d(64, 128, 4, 2, 1, bias = False),
+                nn.BatchNorm2d(128),
+                nn.LeakyReLU(0.2, inplace = True),
+                nn.Conv2d(128, 256, 4, 2, 1, bias = False),
+                nn.BatchNorm2d(256),
+                nn.LeakyReLU(0.2, inplace = True),
+                nn.Conv2d(256, 512, 4, 2, 1, bias = False),
+                nn.BatchNorm2d(512),
+                nn.LeakyReLU(0.2, inplace = True),
+                nn.Conv2d(512, 1, 4, 1, 0, bias = False),
+                nn.Sigmoid()
+                )
+
+    def forward(self, input):
+        return self.main(input).view(-1)
+</code></pre>
+
+<p>My Generator:</p>
+
+<pre><code>class G(nn.Module):
+
+    def __init__(self):
+        super(G, self).__init__()
+        self.main = nn.Sequential(
+                nn.ConvTranspose2d(100, 512, 4, 1, 0, bias = False),
+                nn.BatchNorm2d(512),
+                nn.ReLU(True),
+                nn.ConvTranspose2d(512, 256, 4, 2, 1, bias = False),
+                nn.BatchNorm2d(256),
+                nn.ReLU(True),
+                nn.ConvTranspose2d(256, 128, 4, 2, 1, bias = False),
+                nn.BatchNorm2d(128),
+                nn.ReLU(True),
+                nn.ConvTranspose2d(128, 64, 4, 2, 1, bias = False),
+                nn.BatchNorm2d(64),
+                nn.ReLU(True),
+                nn.ConvTranspose2d(64, 3, 4, 2, 1, bias = False),
+                nn.Tanh()
+                )
+
+    def forward(self, input):
+        return self.main(input)
+</code></pre>
+
+<p>My function to start the weights:</p>
+
+<pre><code>def weights_init(m):
+    classname = m.__class__.__name__
+    if classname.find('Conv') != -1:
+        m.weight.data.normal_(0.0, 0.02)
+    elif classname.find('BatchNorm') != -1:
+        m.weight.data.normal_(1.0, 0.02)
+        m.bias.data.fill_(0)
+</code></pre>
+
+<p>Full code can be seen here:</p>
+
+<pre><code>https://github.com/davidsonmizael/criminal-gan
+</code></pre>
+
+<p>Noise generated on epoch number 25:
+<a href=""https://i.stack.imgur.com/rJVxb.png"" rel=""noreferrer""><img src=""https://i.stack.imgur.com/rJVxb.png"" alt=""Noise generated on epoch number 25""></a></p>
+
+<p>Input with real images:
+<a href=""https://i.stack.imgur.com/PiV7H.png"" rel=""noreferrer""><img src=""https://i.stack.imgur.com/PiV7H.png"" alt=""Input with real images.""></a></p>
+"
+"What is the difference and relation among 'cuda' 'cudnn' 'cunn' and 'cutorch' in torch?","<p>I see many torch codes use:</p>
+
+<pre><code>require cudnn
+require cunn
+require cutorch
+</code></pre>
+
+<p>What are these package used for? What is their relation with Cuda?</p>
+"
+"PyTorch: How to use DataLoaders for custom Datasets","<p>How to make use of the <code>torch.utils.data.Dataset</code> and <code>torch.utils.data.DataLoader</code> on your own data (not just the <code>torchvision.datasets</code>)?</p>
+
+<p>Is there a way to use the inbuilt <code>DataLoaders</code> which they use on <code>TorchVisionDatasets</code> to be used on any dataset?</p>
+"
+"How to get past 1gb memory limit of 64 bit LuaJIT on Linux?","<p>The overview is I am prototyping code to understand my problem space, and I am running into 'PANIC: unprotected error in call to Lua API (not enough memory)' errors.  I am looking for ways to get around this limit.</p>
+
+<p>The environment bottom line is Torch, a scientific computing framework that runs on LuaJIT, and LuaJIT runs on Lua.  I need Torch because I eventually want to hammer on my problem with neural nets on a GPU, but to get there I need a good representation of the problem to feed to the nets.  I am (stuck) on Centos Linux, and I suspect that trying to rebuild all the pieces from source in 32bit mode (this is reported to extend the LuaJIT memory limit to 4gb) will be a nightmare if it works at all for all of the libraries.</p>
+
+<p>The problem space itself is probably not particularly relevant, but in overview I have datafiles of points that I calculate distances between and then bin (i.e. make histograms of) these distances to try and work out the most useful ranges.  Conveniently I can create complicated Lua tables with various sets of bins and torch.save() the mess of counts out, then pick it up later and inspect with different normalisations etc. -- so after one month of playing I am finding this to be really easy and powerful.  </p>
+
+<p>I can make it work looking at up to 3 distances with 15 bins each (15x15x15 plus overhead), but this only by adding explicit garbagecollection() calls and using fork()/wait() for each datafile so that the outer loop will keep running if one datafile (of several thousand) still blows the memory limit and crashes the child.  This gets extra painful as each successful child process now has to read, modify and write the current set of bin counts -- and my largest files for this are currently 36mb.  I would like to go larger (more bins), and would really prefer to just hold the counts in the 15 gigs of RAM I can't seem to access.</p>
+
+<p>So, here are some paths I have thought of; please do comment if you can confirm/deny that any of them will/won't get me outside of the 1gb boundary, or will just improve my efficiency within it.  Please do comment if you can suggest another approach that I have not thought of.</p>
+
+<ul>
+<li><p>am I missing a way to fire off a Lua process that I can read an arbitrary table back in from?  No doubt I can break my problem into smaller pieces, but parsing a return table from stdio (as from a system call to another Lua script) seems error prone, and writing/reading small intermediate files will be a lot of disk i/o.</p></li>
+<li><p>am I missing a stash-and-access-table-in-high-memory module ?  This seems like what I really want, but not found it yet</p></li>
+<li><p>can FFI C data structures be put outside the 1gb?  Doesn't seem like that would be the case but certainly I lack a full understanding of what is causing the limit in the first place.  I suspect that this will just get me an efficiency improvement over generic Lua tables for the few pieces that have moved beyond prototyping?  (unless I do a bunch of coding for each change)</p></li>
+<li><p>Surely I can get out by writing an extension in C (Torch appears to support nets that should go outside of the limit), but my brief investigation there turns up references to 'lightuserdata' pointers -- does this mean that a more normal extension won't get outside 1gb either?  This also seems like it has the heavy development cost for what should be a prototyping exercise.</p></li>
+</ul>
+
+<p>I know C well so going the FFI or extension route doesn't bother me - but I know from experience that encapsulating algorithms in this way can be both really elegant and really painful with two places to hide bugs.  Working through data structures containing tables within tables on the stack doesn't seem great either.  Before I make this effort I would like to be certain that the end result really will solve my problem.</p>
+
+<p>Thanks for reading the long post.</p>
+"
+"Best way to save a trained model in PyTorch?","<p>I was looking for alternative ways to save a trained model in PyTorch. So far, I have found two alternatives.</p>
+
+<ol>
+<li><a href=""https://github.com/torch/torch7/blob/master/doc/serialization.md#torchsavefilename-object--format-referenced"" rel=""noreferrer"">torch.save()</a> to save a model and <a href=""https://github.com/torch/torch7/blob/master/doc/serialization.md#object-torchloadfilename--format-referenced"" rel=""noreferrer"">torch.load()</a> to load a model.</li>
+<li><a href=""http://pytorch.org/docs/nn.html#torch.nn.Module.state_dict"" rel=""noreferrer"">model.state_dict()</a> to save a trained model and <a href=""http://pytorch.org/docs/nn.html#torch.nn.Module.load_state_dict"" rel=""noreferrer"">model.load_state_dict()</a> to load the saved model.</li>
+</ol>
+
+<p>I have come across to this <a href=""https://discuss.pytorch.org/t/how-to-save-load-torch-models/718"" rel=""noreferrer"">discussion</a> where approach 2 is recommended over approach 1.</p>
+
+<p>My question is, why the second approach is preferred? Is it only because <a href=""http://pytorch.org/docs/nn.html"" rel=""noreferrer"">torch.nn</a> modules have those two function and we are encouraged to use them?</p>
+"
+"Pytorch reshape tensor dimension","<p>For example, I have 1D vector with dimension (5). I would like to reshape it into 2D matrix (1,5).</p>
+
+<p>Here is how I do it with numpy</p>
+
+<pre><code>&gt;&gt;&gt; import numpy as np
+&gt;&gt;&gt; a = np.array([1,2,3,4,5])
+&gt;&gt;&gt; a.shape
+(5,)
+&gt;&gt;&gt; a = np.reshape(a, (1,5))
+&gt;&gt;&gt; a.shape
+(1, 5)
+&gt;&gt;&gt; a
+array([[1, 2, 3, 4, 5]])
+&gt;&gt;&gt; 
+</code></pre>
+
+<p>But how can I do that with Pytorch Tensor (and Variable). I don't want to switch back to numpy and switch to Torch variable again, because it will loss backpropagation information.</p>
+
+<p>Here is what I have in Pytorch</p>
+
+<pre><code>&gt;&gt;&gt; import torch
+&gt;&gt;&gt; from torch.autograd import Variable
+&gt;&gt;&gt; a = torch.Tensor([1,2,3,4,5])
+&gt;&gt;&gt; a
+
+ 1
+ 2
+ 3
+ 4
+ 5
+[torch.FloatTensor of size 5]
+
+&gt;&gt;&gt; a.size()
+(5L,)
+&gt;&gt;&gt; a_var = variable(a)
+&gt;&gt;&gt; a_var = Variable(a)
+&gt;&gt;&gt; a_var.size()
+(5L,)
+.....do some calculation in forward function
+&gt;&gt;&gt; a_var.size()
+(5L,)
+</code></pre>
+
+<p>Now I want it size to be (1, 5).
+How can I resize or reshape the dimension of pytorch tensor in Variable without loss grad information. (because I will feed into another model before backward) </p>
+"
+"Accuracy score in pyTorch LSTM","<p>I have been running <a href=""http://pytorch.org/tutorials/beginner/nlp/sequence_models_tutorial.html"" rel=""noreferrer"">this LSTM tutorial</a> on the <a href=""http://downloads.schwa.org/wikiner/wikigold.conll.txt"" rel=""noreferrer"">wikigold.conll NER data set</a></p>
+
+<p><code>training_data</code> contains a list of tuples of sequences and tags, for example:</p>
+
+<pre><code>training_data = [
+    (""They also have a song called \"" wake up \"""".split(), [""O"", ""O"", ""O"", ""O"", ""O"", ""O"", ""I-MISC"", ""I-MISC"", ""I-MISC"", ""I-MISC""]),
+    (""Major General John C. Scheidt Jr."".split(), [""O"", ""O"", ""I-PER"", ""I-PER"", ""I-PER""])
+]
+</code></pre>
+
+<p>And I wrote down this function</p>
+
+<pre><code>def predict(indices):
+    """"""Gets a list of indices of training_data, and returns a list of predicted lists of tags""""""
+    for index in indicies:
+        inputs = prepare_sequence(training_data[index][0], word_to_ix)
+        tag_scores = model(inputs)
+        values, target = torch.max(tag_scores, 1)
+        yield target
+</code></pre>
+
+<p>This way I can get the predicted labels for specific indices in the training data.</p>
+
+<p>However, how do I evaluate the accuracy score across all training data.</p>
+
+<p>Accuracy being, the amount of words correctly classified across all sentences divided by the word count.</p>
+
+<h2>This is what I came up with, which is extremely slow and ugly:</h2>
+
+<pre><code>y_pred = list(predict([s for s, t in training_data]))
+y_true = [t for s, t in training_data]
+c=0
+s=0
+for i in range(len(training_data)):
+    n = len(y_true[i])
+    #super ugly and ineffiicient
+    s+=(sum(sum(list(y_true[i].view(-1, n) == y_pred[i].view(-1, n).data))))
+    c+=n
+
+print ('Training accuracy:{a}'.format(a=float(s)/c))
+</code></pre>
+
+<h2>How can this be done efficiently in pytorch ?</h2>
+
+<p>P.S:
+I've been trying to use <a href=""http://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html"" rel=""noreferrer"">sklearn's accuracy_score</a> unsuccessfully</p>
+"
+"How to install Torch on windows 8.1?","<p><a href=""http://torch.ch/"" rel=""noreferrer"">Torch</a> is a scientific computing framework with wide support for machine learning algorithms. It is easy to use and efficient, thanks to an easy and fast scripting language, LuaJIT, and an underlying C/CUDA implementation.</p>
+
+<h2>Q:</h2>
+
+<p>Is there a way to install torch on MS Windows 8.1?</p>
+"
+"Pytorch, what are the gradient arguments","<p>I am reading through the documentation of PyTorch and found an example where they write </p>
+
+<pre><code>gradients = torch.FloatTensor([0.1, 1.0, 0.0001])
+y.backward(gradients)
+print(x.grad)
+</code></pre>
+
+<p>where x was an initial variable, from which y was constructed (a 3-vector). The question is, what are the 0.1, 1.0 and 0.0001 arguments of the gradients tensor ? The documentation is not very clear on that.</p>
+"
+"LSTM time sequence generation using PyTorch","<p>For several days now, I am trying to build a simple sine-wave sequence generation using LSTM, without any glimpse of success so far.</p>
+
+<p>I started from the <a href=""https://github.com/pytorch/examples/tree/master/time_sequence_prediction"" rel=""noreferrer"">time sequence prediction example</a></p>
+
+<p>All what I wanted to do differently is:</p>
+
+<ul>
+<li>Use different optimizers (e.g RMSprob) than LBFGS</li>
+<li>Try different signals (more sine-wave components)</li>
+</ul>
+
+<p>This is the link to <a href=""https://github.com/osm3000/sequence_generation_pytorch.git"" rel=""noreferrer"">my code</a>. ""experiment.py"" is the main file</p>
+
+<p>What I do is:</p>
+
+<ul>
+<li>I generate artificial time-series data (sine waves)</li>
+<li>I cut those time-series data into small sequences</li>
+<li>The input to my model is a sequence of time 0...T, and the output is a sequence of time 1...T+1</li>
+</ul>
+
+<p>What happens is:</p>
+
+<ul>
+<li>The training and the validation losses goes down smoothly</li>
+<li>The test loss is very low</li>
+<li>However, when I try to generate arbitrary-length sequences, starting from a seed (a random sequence from the test data), everything goes wrong. The output always flats out</li>
+</ul>
+
+<p><a href=""https://i.stack.imgur.com/crO8z.png"" rel=""noreferrer""><img src=""https://i.stack.imgur.com/crO8z.png"" alt=""Shape of the generated signal""></a></p>
+
+<p>I simply don't see what the problem is. I am playing with this for a week now, with no progress in sight.
+I would be very grateful for any help.</p>
+
+<p>Thank you</p>
+"
+"How to get mini-batches in pytorch in a clean and efficient way?","<p>I was trying to do a simple thing which was train a linear model with Stochastic Gradient Descent (SGD) using torch:</p>
+
+<pre><code>import numpy as np
+
+import torch
+from torch.autograd import Variable
+
+import pdb
+
+def get_batch2(X,Y,M,dtype):
+    X,Y = X.data.numpy(), Y.data.numpy()
+    N = len(Y)
+    valid_indices = np.array( range(N) )
+    batch_indices = np.random.choice(valid_indices,size=M,replace=False)
+    batch_xs = torch.FloatTensor(X[batch_indices,:]).type(dtype)
+    batch_ys = torch.FloatTensor(Y[batch_indices]).type(dtype)
+    return Variable(batch_xs, requires_grad=False), Variable(batch_ys, requires_grad=False)
+
+def poly_kernel_matrix( x,D ):
+    N = len(x)
+    Kern = np.zeros( (N,D+1) )
+    for n in range(N):
+        for d in range(D+1):
+            Kern[n,d] = x[n]**d;
+    return Kern
+
+## data params
+N=5 # data set size
+Degree=4 # number dimensions/features
+D_sgd = Degree+1
+##
+x_true = np.linspace(0,1,N) # the real data points
+y = np.sin(2*np.pi*x_true)
+y.shape = (N,1)
+## TORCH
+dtype = torch.FloatTensor
+# dtype = torch.cuda.FloatTensor # Uncomment this to run on GPU
+X_mdl = poly_kernel_matrix( x_true,Degree )
+X_mdl = Variable(torch.FloatTensor(X_mdl).type(dtype), requires_grad=False)
+y = Variable(torch.FloatTensor(y).type(dtype), requires_grad=False)
+## SGD mdl
+w_init = torch.zeros(D_sgd,1).type(dtype)
+W = Variable(w_init, requires_grad=True)
+M = 5 # mini-batch size
+eta = 0.1 # step size
+for i in range(500):
+    batch_xs, batch_ys = get_batch2(X_mdl,y,M,dtype)
+    # Forward pass: compute predicted y using operations on Variables
+    y_pred = batch_xs.mm(W)
+    # Compute and print loss using operations on Variables. Now loss is a Variable of shape (1,) and loss.data is a Tensor of shape (1,); loss.data[0] is a scalar value holding the loss.
+    loss = (1/N)*(y_pred - batch_ys).pow(2).sum()
+    # Use autograd to compute the backward pass. Now w will have gradients
+    loss.backward()
+    # Update weights using gradient descent; w1.data are Tensors,
+    # w.grad are Variables and w.grad.data are Tensors.
+    W.data -= eta * W.grad.data
+    # Manually zero the gradients after updating weights
+    W.grad.data.zero_()
+
+#
+c_sgd = W.data.numpy()
+X_mdl = X_mdl.data.numpy()
+y = y.data.numpy()
+#
+Xc_pinv = np.dot(X_mdl,c_sgd)
+print('J(c_sgd) = ', (1/N)*(np.linalg.norm(y-Xc_pinv)**2) )
+print('loss = ',loss.data[0])
+</code></pre>
+
+<p>the code runs fine and all though my <code>get_batch2</code> method seems really dum/naive, its probably because I am new to pytorch but I have not found a good place where they discuss how to retrieve data batches. I went through their tutorials (<a href=""http://pytorch.org/tutorials/beginner/pytorch_with_examples.html"" rel=""noreferrer"">http://pytorch.org/tutorials/beginner/pytorch_with_examples.html</a>) and through the data set (<a href=""http://pytorch.org/tutorials/beginner/data_loading_tutorial.html"" rel=""noreferrer"">http://pytorch.org/tutorials/beginner/data_loading_tutorial.html</a>) with no luck. The tutorials all seem to assume that one already has the batch and batch-size at the beginning and then proceeds to train with that data without changing it (specifically look at <a href=""http://pytorch.org/tutorials/beginner/pytorch_with_examples.html#pytorch-variables-and-autograd"" rel=""noreferrer"">http://pytorch.org/tutorials/beginner/pytorch_with_examples.html#pytorch-variables-and-autograd</a>).</p>
+
+<p>So my question is do I really need to turn my data back into numpy so that I can fetch some random sample of it and then turn it back to pytorch with Variable to be able to train in memory? Is there no way to get mini-batches with torch?</p>
+
+<p>I looked at a few functions torch provides but with no luck:</p>
+
+<pre><code>#pdb.set_trace()
+#valid_indices = torch.arange(0,N).numpy()
+#valid_indices = np.array( range(N) )
+#batch_indices = np.random.choice(valid_indices,size=M,replace=False)
+#indices = torch.LongTensor(batch_indices)
+#batch_xs, batch_ys = torch.index_select(X_mdl, 0, indices), torch.index_select(y, 0, indices)
+#batch_xs,batch_ys = torch.index_select(X_mdl, 0, indices), torch.index_select(y, 0, indices)
+</code></pre>
+
+<p>even though the code I provided works fine I am worried that its not an efficient implementation AND that if I were to use GPUs that there would be a considerable further slow down (because my guess it putting things in memory and then fetching them back to put them GPU like that is silly).</p>
+
+<hr>
+
+<p>I implemented a new one based on the answer that suggested to use <code>torch.index_select()</code>:</p>
+
+<pre><code>def get_batch2(X,Y,M):
+    '''
+    get batch for pytorch model
+    '''
+    # TODO fix and make it nicer, there is pytorch forum question
+    #X,Y = X.data.numpy(), Y.data.numpy()
+    X,Y = X, Y
+    N = X.size()[0]
+    batch_indices = torch.LongTensor( np.random.randint(0,N+1,size=M) )
+    pdb.set_trace()
+    batch_xs = torch.index_select(X,0,batch_indices)
+    batch_ys = torch.index_select(Y,0,batch_indices)
+    return Variable(batch_xs, requires_grad=False), Variable(batch_ys, requires_grad=False)
+</code></pre>
+
+<p>however, this seems to have issues because it does not work if <code>X,Y</code> are NOT variables...which is really odd. I added this to the pytorch forum: <a href=""https://discuss.pytorch.org/t/how-to-get-mini-batches-in-pytorch-in-a-clean-and-efficient-way/10322"" rel=""noreferrer"">https://discuss.pytorch.org/t/how-to-get-mini-batches-in-pytorch-in-a-clean-and-efficient-way/10322</a></p>
+
+<p>Right now what I am struggling with is making this work for gpu. My most current version:</p>
+
+<pre><code>def get_batch2(X,Y,M,dtype):
+    '''
+    get batch for pytorch model
+    '''
+    # TODO fix and make it nicer, there is pytorch forum question
+    #X,Y = X.data.numpy(), Y.data.numpy()
+    X,Y = X, Y
+    N = X.size()[0]
+    if dtype ==  torch.cuda.FloatTensor:
+        batch_indices = torch.cuda.LongTensor( np.random.randint(0,N,size=M) )# without replacement
+    else:
+        batch_indices = torch.LongTensor( np.random.randint(0,N,size=M) ).type(dtype)  # without replacement
+    pdb.set_trace()
+    batch_xs = torch.index_select(X,0,batch_indices)
+    batch_ys = torch.index_select(Y,0,batch_indices)
+    return Variable(batch_xs, requires_grad=False), Variable(batch_ys, requires_grad=False)
+</code></pre>
+
+<p>the error:</p>
+
+<pre><code>RuntimeError: tried to construct a tensor from a int sequence, but found an item of type numpy.int64 at index (0)
+</code></pre>
+
+<p>I don't get it, do I really have to do:</p>
+
+<pre><code>ints = [ random.randint(0,N) for i i range(M)]
+</code></pre>
+
+<p>to get the integers?</p>
+
+<p>It would also be ideal if the data could be a variable. It seems that it <code>torch.index_select</code> does not work for <code>Variable</code> type data.</p>
+
+<p>this list of integers thing still doesn't work:</p>
+
+<pre><code>TypeError: torch.addmm received an invalid combination of arguments - got (int, torch.cuda.FloatTensor, int, torch.cuda.FloatTensor, torch.FloatTensor, out=torch.cuda.FloatTensor), but expected one of:
+ * (torch.cuda.FloatTensor source, torch.cuda.FloatTensor mat1, torch.cuda.FloatTensor mat2, *, torch.cuda.FloatTensor out)
+ * (torch.cuda.FloatTensor source, torch.cuda.sparse.FloatTensor mat1, torch.cuda.FloatTensor mat2, *, torch.cuda.FloatTensor out)
+ * (float beta, torch.cuda.FloatTensor source, torch.cuda.FloatTensor mat1, torch.cuda.FloatTensor mat2, *, torch.cuda.FloatTensor out)
+ * (torch.cuda.FloatTensor source, float alpha, torch.cuda.FloatTensor mat1, torch.cuda.FloatTensor mat2, *, torch.cuda.FloatTensor out)
+ * (float beta, torch.cuda.FloatTensor source, torch.cuda.sparse.FloatTensor mat1, torch.cuda.FloatTensor mat2, *, torch.cuda.FloatTensor out)
+ * (torch.cuda.FloatTensor source, float alpha, torch.cuda.sparse.FloatTensor mat1, torch.cuda.FloatTensor mat2, *, torch.cuda.FloatTensor out)
+ * (float beta, torch.cuda.FloatTensor source, float alpha, torch.cuda.FloatTensor mat1, torch.cuda.FloatTensor mat2, *, torch.cuda.FloatTensor out)
+      didn't match because some of the arguments have invalid types: (int, torch.cuda.FloatTensor, int, torch.cuda.FloatTensor, torch.FloatTensor, out=torch.cuda.FloatTensor)
+ * (float beta, torch.cuda.FloatTensor source, float alpha, torch.cuda.sparse.FloatTensor mat1, torch.cuda.FloatTensor mat2, *, torch.cuda.FloatTensor out)
+      didn't match because some of the arguments have invalid types: (int, torch.cuda.FloatTensor, int, torch.cuda.FloatTensor, torch.FloatTensor, out=torch.cuda.FloatTensor)
+</code></pre>
+"
+"Is there special meaning for ()() syntax in Lua","<p>I see this type of syntax a lot in some Lua source file I was reading lately, what does it mean, especially the second pair of brackets
+An example, line 8 in
+<a href=""https://github.com/karpathy/char-rnn/blob/master/model/LSTM.lua"">https://github.com/karpathy/char-rnn/blob/master/model/LSTM.lua</a></p>
+
+<pre><code>local LSTM = {}
+function LSTM.lstm(input_size, rnn_size, n, dropout)
+  dropout = dropout or 0 
+
+  -- there will be 2*n+1 inputs
+  local inputs = {}
+  table.insert(inputs, nn.Identity()())  -- line 8
+  -- ...
+</code></pre>
+
+<p>The source code of <code>nn.Identity</code>
+<a href=""https://github.com/torch/nn/blob/master/Identity.lua"">https://github.com/torch/nn/blob/master/Identity.lua</a></p>
+
+<p>********** UPDATE **************</p>
+
+<p>The ()() pattern is used in torch library 'nn' a lot. The first pair of bracket creates an object of the container/node, and the second pair of bracket references the depending node.</p>
+
+<p>For example, y = nn.Linear(2,4)(x) means x connects to y, and the transformation is linear from 1*2 to 1*4.
+I just understand the usage, how it is wired seems to be answered by one of the answers below.</p>
+
+<p>Anyway, the usage of the interface is well documented below.
+<a href=""https://github.com/torch/nngraph/blob/master/README.md"">https://github.com/torch/nngraph/blob/master/README.md</a></p>
+"

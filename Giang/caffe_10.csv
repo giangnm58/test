@@ -1,0 +1,2161 @@
+Title,Body
+"What is a `""Python""` layer in caffe?","<p>Caffe has a layer type <code>""Python""</code>.  </p>
+
+<p>For instance, this layer type can be used as a <a href=""https://github.com/BVLC/caffe/blob/master/examples/pycaffe/layers/pyloss.py"" rel=""noreferrer"">loss layer</a>.<br>
+On other occasions it is used as an <a href=""https://stackoverflow.com/a/34996628/1714410"">input layer</a>.</p>
+
+<p>What is this layer type?<br>
+How can this layer be used?</p>
+"
+"Cheat sheet for caffe / pycaffe?","<p>Does anyone know whether there is a cheat sheet for all important pycaffe commands?
+I was so far using caffe only via Matlab interface and terminal + bash scripts.</p>
+
+<p>I wanted to shift towards using ipython and work through the ipython notebook examples. However I find it hard to get an overview of all the functions that are inside the caffe module for python. (I'm also quite new to python).</p>
+"
+"Modifying the Caffe C++ prediction code for multiple inputs","<p>I implemented a modified version of the <a href=""https://github.com/BVLC/caffe/blob/master/examples/cpp_classification/classification.cpp"">Caffe C++ example</a> and while it works really well, it's incredibly slow because it only accepts images one by one. Ideally I'd like to pass Caffe a vector of 200 images and return the best prediction for each one. I received some <a href=""https://groups.google.com/forum/#!topic/caffe-users/oh-ehSXxDR8"">great help from Fanglin Wang</a> and implemented some of his recommendations, but am still having some trouble working out how to retrieve the best result from each image. </p>
+
+<p>The Classify method is now passed a vector of <code>cv::Mat</code> objects (variable <code>input_channels</code>) which is a vector of grayscale floating point images. I've eliminated the preprocessing method in the code because I don't need to convert these images to floating point or subtract the mean image. I've also been trying to get rid of the <code>N</code> variable because I only want to return the top prediction and probability for each image.</p>
+
+<pre><code>#include ""Classifier.h""
+using namespace caffe;
+using std::string;
+
+Classifier::Classifier(const string&amp; model_file, const string&amp; trained_file, const string&amp; label_file) {
+#ifdef CPU_ONLY
+  Caffe::set_mode(Caffe::CPU);
+#else
+  Caffe::set_mode(Caffe::GPU);
+#endif
+
+  /* Load the network. */
+  net_.reset(new Net&lt;float&gt;(model_file, TEST));
+  net_-&gt;CopyTrainedLayersFrom(trained_file);
+
+  Blob&lt;float&gt;* input_layer = net_-&gt;input_blobs()[0];
+  num_channels_ = input_layer-&gt;channels();
+  input_geometry_ = cv::Size(input_layer-&gt;width(), input_layer-&gt;height());
+
+  /* Load labels. */
+  std::ifstream labels(label_file.c_str());
+  CHECK(labels) &lt;&lt; ""Unable to open labels file "" &lt;&lt; label_file;
+  string line;
+  while (std::getline(labels, line))
+    labels_.push_back(string(line));
+
+  Blob&lt;float&gt;* output_layer = net_-&gt;output_blobs()[0];
+  CHECK_EQ(labels_.size(), output_layer-&gt;channels())
+    &lt;&lt; ""Number of labels is different from the output layer dimension."";
+}
+
+static bool PairCompare(const std::pair&lt;float, int&gt;&amp; lhs, const std::pair&lt;float, int&gt;&amp; rhs) {
+  return lhs.first &gt; rhs.first;
+}
+
+/* Return the indices of the top N values of vector v. */
+static std::vector&lt;int&gt; Argmax(const std::vector&lt;float&gt;&amp; v, int N) {
+  std::vector&lt;std::pair&lt;float, int&gt; &gt; pairs;
+  for (size_t i = 0; i &lt; v.size(); ++i)
+    pairs.push_back(std::make_pair(v[i], i));
+  std::partial_sort(pairs.begin(), pairs.begin() + N, pairs.end(), PairCompare);
+
+  std::vector&lt;int&gt; result;
+  for (int i = 0; i &lt; N; ++i)
+    result.push_back(pairs[i].second);
+  return result;
+}
+
+/* Return the top N predictions. */
+std::vector&lt;Prediction&gt; Classifier::Classify(const std::vector&lt;cv::Mat&gt; &amp;input_channels) {
+  std::vector&lt;float&gt; output = Predict(input_channels);
+
+    std::vector&lt;int&gt; maxN = Argmax(output, 1);
+    int idx = maxN[0];
+    predictions.push_back(std::make_pair(labels_[idx], output[idx]));
+    return predictions;
+}
+
+std::vector&lt;float&gt; Classifier::Predict(const std::vector&lt;cv::Mat&gt; &amp;input_channels, int num_images) {
+  Blob&lt;float&gt;* input_layer = net_-&gt;input_blobs()[0];
+  input_layer-&gt;Reshape(num_images, num_channels_,
+                       input_geometry_.height, input_geometry_.width);
+  /* Forward dimension change to all layers. */
+  net_-&gt;Reshape();
+
+  WrapInputLayer(&amp;input_channels);
+
+  net_-&gt;ForwardPrefilled();
+
+  /* Copy the output layer to a std::vector */
+  Blob&lt;float&gt;* output_layer = net_-&gt;output_blobs()[0];
+  const float* begin = output_layer-&gt;cpu_data();
+  const float* end = begin + num_images * output_layer-&gt;channels();
+  return std::vector&lt;float&gt;(begin, end);
+}
+
+/* Wrap the input layer of the network in separate cv::Mat objects (one per channel). This way we save one memcpy operation and we don't need to rely on cudaMemcpy2D. The last preprocessing operation will write the separate channels directly to the input layer. */
+void Classifier::WrapInputLayer(std::vector&lt;cv::Mat&gt;* input_channels) {
+  Blob&lt;float&gt;* input_layer = net_-&gt;input_blobs()[0];
+
+  int width = input_layer-&gt;width();
+  int height = input_layer-&gt;height();
+  float* input_data = input_layer-&gt;mutable_cpu_data();
+  for (int i = 0; i &lt; input_layer-&gt;channels() * num_images; ++i) {
+    cv::Mat channel(height, width, CV_32FC1, input_data);
+    input_channels-&gt;push_back(channel);
+    input_data += width * height;
+  }
+}
+</code></pre>
+
+<p><strong>UPDATE</strong></p>
+
+<p>Thank-you so much for your help Shai, I made the changes you recommended but seem to be getting some strange compilation issues I can't work out (I managed to sort out a few of the issues).</p>
+
+<p>These are the changes I made:</p>
+
+<p>Header File:</p>
+
+<pre><code>#ifndef __CLASSIFIER_H__
+#define __CLASSIFIER_H__
+
+#include &lt;caffe/caffe.hpp&gt;
+#include &lt;opencv2/core/core.hpp&gt;
+#include &lt;opencv2/highgui/highgui.hpp&gt;
+#include &lt;opencv2/imgproc/imgproc.hpp&gt;
+#include &lt;algorithm&gt;
+#include &lt;iosfwd&gt;
+#include &lt;memory&gt;
+#include &lt;string&gt;
+#include &lt;utility&gt;
+#include &lt;vector&gt;
+
+
+using namespace caffe;  // NOLINT(build/namespaces)
+using std::string;
+
+/* Pair (label, confidence) representing a prediction. */
+typedef std::pair&lt;string, float&gt; Prediction;
+
+class Classifier {
+ public:
+  Classifier(const string&amp; model_file,
+             const string&amp; trained_file,
+             const string&amp; label_file);
+
+  std::vector&lt; std::pair&lt;int,float&gt; &gt; Classify(const std::vector&lt;cv::Mat&gt;&amp; img);
+
+ private:
+
+  std::vector&lt; std::vector&lt;float&gt; &gt; Predict(const std::vector&lt;cv::Mat&gt;&amp; img, int nImages);
+
+  void WrapInputLayer(std::vector&lt;cv::Mat&gt;* input_channels, int nImages);
+
+  void Preprocess(const std::vector&lt;cv::Mat&gt;&amp; img,
+                  std::vector&lt;cv::Mat&gt;* input_channels, int nImages);
+
+ private:
+  shared_ptr&lt;Net&lt;float&gt; &gt; net_;
+  cv::Size input_geometry_;
+  int num_channels_;
+  std::vector&lt;string&gt; labels_;
+};
+
+#endif /* __CLASSIFIER_H__ */
+</code></pre>
+
+<p>Class File:</p>
+
+<pre><code>#define CPU_ONLY
+#include ""Classifier.h""
+
+using namespace caffe;  // NOLINT(build/namespaces)
+using std::string;
+
+Classifier::Classifier(const string&amp; model_file,
+                       const string&amp; trained_file,
+                       const string&amp; label_file) {
+#ifdef CPU_ONLY
+  Caffe::set_mode(Caffe::CPU);
+#else
+  Caffe::set_mode(Caffe::GPU);
+#endif
+
+  /* Load the network. */
+  net_.reset(new Net&lt;float&gt;(model_file, TEST));
+  net_-&gt;CopyTrainedLayersFrom(trained_file);
+
+  CHECK_EQ(net_-&gt;num_inputs(), 1) &lt;&lt; ""Network should have exactly one input."";
+  CHECK_EQ(net_-&gt;num_outputs(), 1) &lt;&lt; ""Network should have exactly one output."";
+
+  Blob&lt;float&gt;* input_layer = net_-&gt;input_blobs()[0];
+  num_channels_ = input_layer-&gt;channels();
+  CHECK(num_channels_ == 3 || num_channels_ == 1)
+    &lt;&lt; ""Input layer should have 1 or 3 channels."";
+  input_geometry_ = cv::Size(input_layer-&gt;width(), input_layer-&gt;height());
+
+  /* Load labels. */
+  std::ifstream labels(label_file.c_str());
+  CHECK(labels) &lt;&lt; ""Unable to open labels file "" &lt;&lt; label_file;
+  string line;
+  while (std::getline(labels, line))
+    labels_.push_back(string(line));
+
+  Blob&lt;float&gt;* output_layer = net_-&gt;output_blobs()[0];
+  CHECK_EQ(labels_.size(), output_layer-&gt;channels())
+    &lt;&lt; ""Number of labels is different from the output layer dimension."";
+}
+
+static bool PairCompare(const std::pair&lt;float, int&gt;&amp; lhs,
+                        const std::pair&lt;float, int&gt;&amp; rhs) {
+  return lhs.first &gt; rhs.first;
+}
+
+/* Return the indices of the top N values of vector v. */
+static std::vector&lt;int&gt; Argmax(const std::vector&lt;float&gt;&amp; v, int N) {
+  std::vector&lt;std::pair&lt;float, int&gt; &gt; pairs;
+  for (size_t i = 0; i &lt; v.size(); ++i)
+    pairs.push_back(std::make_pair(v[i], i));
+  std::partial_sort(pairs.begin(), pairs.begin() + N, pairs.end(), PairCompare);
+
+  std::vector&lt;int&gt; result;
+  for (int i = 0; i &lt; N; ++i)
+    result.push_back(pairs[i].second);
+  return result;
+}
+
+std::vector&lt; std::pair&lt;int,float&gt; &gt; Classifier::Classify(const std::vector&lt;cv::Mat&gt;&amp; img) {
+  std::vector&lt; std::vector&lt;float&gt; &gt; output = Predict(img, img.size());
+
+  std::vector&lt; std::pair&lt;int,float&gt; &gt; predictions;
+  for ( int i = 0 ; i &lt; output.size(); i++ ) {
+    std::vector&lt;int&gt; maxN = Argmax(output[i], 1);
+    int idx = maxN[0];
+    predictions.push_back(std::make_pair(labels_[idx], output[idx]));
+  }
+  return predictions;
+}
+
+std::vector&lt; std::vector&lt;float&gt; &gt; Classifier::Predict(const std::vector&lt;cv::Mat&gt;&amp; img, int nImages) {
+  Blob&lt;float&gt;* input_layer = net_-&gt;input_blobs()[0];
+  input_layer-&gt;Reshape(nImages, num_channels_,
+                       input_geometry_.height, input_geometry_.width);
+  /* Forward dimension change to all layers. */
+  net_-&gt;Reshape();
+
+  std::vector&lt;cv::Mat&gt; input_channels;
+  WrapInputLayer(&amp;input_channels, nImages);
+
+  Preprocess(img, &amp;input_channels, nImages);
+
+  net_-&gt;ForwardPrefilled();
+
+  /* Copy the output layer to a std::vector */
+
+  Blob&lt;float&gt;* output_layer = net_-&gt;output_blobs()[0];
+  std::vector &lt;std::vector&lt;float&gt; &gt; ret;
+  for (int i = 0; i &lt; nImages; i++) {
+    const float* begin = output_layer-&gt;cpu_data() + i*output_layer-&gt;channels();
+    const float* end = begin + output_layer-&gt;channels();
+    ret.push_back( std::vector&lt;float&gt;(begin, end) );
+  }
+  return ret;
+}
+
+/* Wrap the input layer of the network in separate cv::Mat objects
+ * (one per channel). This way we save one memcpy operation and we
+ * don't need to rely on cudaMemcpy2D. The last preprocessing
+ * operation will write the separate channels directly to the input
+ * layer. */
+void Classifier::WrapInputLayer(std::vector&lt;cv::Mat&gt;* input_channels, int nImages) {
+  Blob&lt;float&gt;* input_layer = net_-&gt;input_blobs()[0];
+
+  int width = input_layer-&gt;width();
+  int height = input_layer-&gt;height();
+  float* input_data = input_layer-&gt;mutable_cpu_data();
+  for (int i = 0; i &lt; input_layer-&gt;channels()* nImages; ++i) {
+    cv::Mat channel(height, width, CV_32FC1, input_data);
+    input_channels-&gt;push_back(channel);
+    input_data += width * height;
+  }
+}
+
+void Classifier::Preprocess(const std::vector&lt;cv::Mat&gt;&amp; img,
+                            std::vector&lt;cv::Mat&gt;* input_channels, int nImages) {
+  for (int i = 0; i &lt; nImages; i++) {
+      vector&lt;cv::Mat&gt; channels;
+      cv::split(img[i], channels);
+      for (int j = 0; j &lt; channels.size(); j++){
+           channels[j].copyTo((*input_channels)[i*num_channels_[0]+j]);
+      }
+  }
+}
+</code></pre>
+"
+"Could not insert 'nvidia_352': No such device","<p>I am trying to run <a href=""http://caffe.berkeleyvision.org/"">caffe</a> on <code>Linux Ubuntu</code>. 
+After installation, I run caffe in gpu and the error is </p>
+
+<pre><code>I0910 13:28:13.606891 10629 caffe.cpp:296] Use GPU with device ID 0
+modprobe: ERROR: could not insert 'nvidia_352': No such device
+F0910 13:28:13.728612 10629 common.cpp:142] Check failed: error == cudaSuccess (38 vs. 0)  no CUDA-capable device is detected
+*** Check failure stack trace: ***
+    @     0x7ffd3b9a7daa  (unknown)
+    @     0x7ffd3b9a7ce4  (unknown)
+    @     0x7ffd3b9a76e6  (unknown)
+    @     0x7ffd3b9aa687  (unknown)
+    @     0x7ffd3bf91cb5  caffe::Caffe::SetDevice()
+    @           0x40a5a7  time()
+    @           0x4080f8  main
+    @     0x7ffd3aeb9ec5  (unknown)
+    @           0x408618  (unknown)
+    @              (nil)  (unknown)
+Aborted (core dumped)
+</code></pre>
+
+<p>My NVIDIA driver is 352.41.
+I installed 352 and it is installed latest version.</p>
+
+<pre><code>sudo apt-get install nvidia-352[sudo] 
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+nvidia-352 is already the newest version.
+The following packages were automatically installed and are no longer required:
+  account-plugin-windows-live libupstart1
+Use 'apt-get autoremove' to remove them.
+0 upgraded, 0 newly installed, 0 to remove and 31 not upgraded.
+</code></pre>
+
+<p>My Ubuntu has NVIDIA driver 352 and why I have error like</p>
+
+<pre><code>I0910 13:28:13.606891 10629 caffe.cpp:296] Use GPU with device ID 0
+    modprobe: ERROR: could not insert 'nvidia_352': No such device
+    F0910 13:28:13.728612 10629 common.cpp:142] Check failed: error == cudaSuccess (38 vs. 0)  no CUDA-capable device is detected
+</code></pre>
+
+<p>I checked whether I have CUDA capable device like</p>
+
+<pre><code>lspci | grep -i nvidia
+05:00.0 VGA compatible controller: NVIDIA Corporation GK107GL [Quadro K2000] (rev a1)
+05:00.1 Audio device: NVIDIA Corporation GK107 HDMI Audio Controller (rev a1)
+</code></pre>
+
+<p>I have CUDA capable device and why I get the error?</p>
+
+<p>EDIT 1:
+Yeah my test with ./deviceQuery failed.</p>
+
+<pre><code>../NVIDIA_CUDA-7.5_Samples/bin/x86_64/linux/release/deviceQuery Starting...
+
+ CUDA Device Query (Runtime API) version (CUDART static linking)
+
+cudaGetDeviceCount returned 38
+-&gt; no CUDA-capable device is detected
+Result = FAIL
+</code></pre>
+
+<p>I checked in the dev/ folder, I have nvidia0.</p>
+
+<pre><code>crwxrwxrwx  1 root root    195,   0 Sep 10 16:51 nvidia0
+crw-rw-rw-  1 root root    195, 255 Sep 10 16:51 nvidiactl
+</code></pre>
+
+<p>My nvcc -V check gave me</p>
+
+<pre><code>li@li-HP-Z420-Workstation:/dev$ nvcc -V
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2015 NVIDIA Corporation
+Built on Tue_Aug_11_14:27:32_CDT_2015
+Cuda compilation tools, release 7.5, V7.5.17
+</code></pre>
+
+<p>Then my version check</p>
+
+<pre><code>li@li-HP-Z420-Workstation:/dev$ cat /proc/driver/nvidia/version
+NVRM version: NVIDIA UNIX x86_64 Kernel Module  352.41  Fri Aug 21 23:09:52 PDT 2015
+GCC version:  gcc version 4.8.4 (Ubuntu 4.8.4-2ubuntu1~14.04) 
+</code></pre>
+
+<p>What could be wrong?</p>
+"
+"How to interpret caffe log with debug_info?","<p>When facing difficulties during training (<a href=""https://stackoverflow.com/a/33980220/1714410""><code>nan</code>s</a>, <a href=""https://stackoverflow.com/q/41234297/1714410"">loss does not converge</a>, etc.) it is sometimes useful to look at more verbose training log by setting <a href=""https://stackoverflow.com/a/33980220/1714410""><code>debug_info: true</code></a> in the <code>'solver.prototxt'</code> file.</p>
+
+<p>The training log then looks something like:</p>
+
+<blockquote>
+<pre><code>I1109 ...]     [Forward] Layer data, top blob data data: 0.343971    
+I1109 ...]     [Forward] Layer conv1, top blob conv1 data: 0.0645037
+I1109 ...]     [Forward] Layer conv1, param blob 0 data: 0.00899114
+I1109 ...]     [Forward] Layer conv1, param blob 1 data: 0
+I1109 ...]     [Forward] Layer relu1, top blob conv1 data: 0.0337982
+I1109 ...]     [Forward] Layer conv2, top blob conv2 data: 0.0249297
+I1109 ...]     [Forward] Layer conv2, param blob 0 data: 0.00875855
+I1109 ...]     [Forward] Layer conv2, param blob 1 data: 0
+I1109 ...]     [Forward] Layer relu2, top blob conv2 data: 0.0128249
+. 
+.
+.
+I1109 ...]     [Forward] Layer fc1, top blob fc1 data: 0.00728743
+I1109 ...]     [Forward] Layer fc1, param blob 0 data: 0.00876866
+I1109 ...]     [Forward] Layer fc1, param blob 1 data: 0
+I1109 ...]     [Forward] Layer loss, top blob loss data: 2031.85
+I1109 ...]     [Backward] Layer loss, bottom blob fc1 diff: 0.124506
+I1109 ...]     [Backward] Layer fc1, bottom blob conv6 diff: 0.00107067
+I1109 ...]     [Backward] Layer fc1, param blob 0 diff: 0.483772
+I1109 ...]     [Backward] Layer fc1, param blob 1 diff: 4079.72
+.
+.
+.
+I1109 ...]     [Backward] Layer conv2, bottom blob conv1 diff: 5.99449e-06
+I1109 ...]     [Backward] Layer conv2, param blob 0 diff: 0.00661093
+I1109 ...]     [Backward] Layer conv2, param blob 1 diff: 0.10995
+I1109 ...]     [Backward] Layer relu1, bottom blob conv1 diff: 2.87345e-06
+I1109 ...]     [Backward] Layer conv1, param blob 0 diff: 0.0220984
+I1109 ...]     [Backward] Layer conv1, param blob 1 diff: 0.0429201
+E1109 ...]     [Backward] All net params (data, diff): L1 norm = (2711.42, 7086.66); L2 norm = (6.11659, 4085.07)
+</code></pre>
+</blockquote>
+
+<p>What does it mean?</p>
+"
+"caffe with multi-label images","<p>I have a dataset of images that have multiple labels; There are 100 classes in the dataset, and each image has 1 to 5 labels associated with them.</p>
+
+<p>I'm following the instruction in the following URL:</p>
+
+<p><a href=""https://github.com/BVLC/caffe/issues/550"" rel=""noreferrer"">https://github.com/BVLC/caffe/issues/550</a></p>
+
+<p>It says that I need to generate a text file listing the images and its labels as in </p>
+
+<blockquote>
+<pre><code>/home/my_test_dir/picture-foo.jpg 0
+/home/my_test_dir/picture-foo1.jpg 1
+</code></pre>
+</blockquote>
+
+<p>In my case, since I have multi-label images, does it work to simply add labels as in following?</p>
+
+<blockquote>
+<pre><code>/home/my_test_dir/picture-foo.jpg 0 2 5
+/home/my_test_dir/picture-foo1.jpg 1 4
+</code></pre>
+</blockquote>
+
+<p>I have a feeling that it's probably not going to be that simple, and if I'm right, in what step and how should I integrate the multi-label-ness of the dataset in the process of setting up Caffe?</p>
+"
+"Multiple category classification in Caffe","<p>I thought we might be able to compile a Caffeinated description of some methods of performing <em>multiple category classification</em>.</p>
+
+<p><strong>By multi category classification I mean:</strong> The input data containing representations of multiple model output categories and/or simply being classifiable under multiple model output categories.</p>
+
+<p>E.g. An image containing a cat &amp; dog would output (ideally) ~1 for both the cat &amp; dog prediction categories and ~0 for all others.</p>
+
+<ol>
+<li><p>Based on <a href=""http://arxiv.org/pdf/1312.6082v4.pdf"" rel=""noreferrer"">this paper</a>, <a href=""https://github.com/BVLC/caffe/pull/523"" rel=""noreferrer"">this stale and closed PR</a> and <a href=""https://github.com/BVLC/caffe/issues/1698"" rel=""noreferrer"">this open PR</a>, it seems caffe is perfectly capable of accepting labels. Is this correct?</p></li>
+<li><p>Would the construction of such a network require the use of multiple neuron (inner product -> relu -> inner product) and softmax layers as in <a href=""http://arxiv.org/pdf/1312.6082v4.pdf"" rel=""noreferrer"">page 13 of this paper</a>; or does Caffe's ip &amp; softmax presently support multiple label dimensions?</p></li>
+<li><p>When I'm passing my labels to the network which example would illustrate the correct approach (if not both)?:</p>
+
+<p><strong>E.g. Cat eating apple</strong> Note: Python syntax, but I use the c++ source.</p>
+
+<p>Column 0 - Class is in input;
+Column 1 - Class is not in input</p>
+
+<pre><code>[[1,0],  # Apple
+ [0,1],  # Baseball
+ [1,0],  # Cat
+ [0,1]]  # Dog
+</code></pre>
+
+<p>or</p>
+
+<p>Column 0 - Class is in input</p>
+
+<pre><code>[[1],  # Apple
+ [0],  # Baseball
+ [1],  # Cat
+ [0]]  # Dog
+</code></pre></li>
+</ol>
+
+<p><strong>If anything lacks clarity please let me know and I will generate pictorial examples of the questions I'm trying to ask.</strong></p>
+"
+"Building custom Caffe layer in python","<p>After parsing many links regarding building Caffe layers in Python i still have difficulties in understanding few concepts. Can please someone clarify them?  </p>
+
+<ul>
+<li>Blobs and weights python structure for network is explained here: <a href=""https://stackoverflow.com/questions/31324739/finding-gradient-of-a-caffe-conv-filter-with-regards-to-input"">Finding gradient of a Caffe conv-filter with regards to input</a>.  </li>
+<li>Network and Solver structure is explained here: <a href=""https://stackoverflow.com/questions/32379878/cheat-sheet-for-caffe-pycaffe"">Cheat sheet for caffe / pycaffe?</a>.  </li>
+<li>Example of defining python layer is here: <a href=""https://github.com/BVLC/caffe/blob/master/examples/pycaffe/layers/pyloss.py"" rel=""nofollow noreferrer"">pyloss.py on git</a>.  </li>
+<li>Layer tests here: <a href=""https://github.com/BVLC/caffe/blob/master/python/caffe/test/test_python_layer_with_param_str.py"" rel=""nofollow noreferrer"">test layer on  git</a>.  </li>
+<li>Development of new layers for C++ is described here: <a href=""https://github.com/BVLC/caffe/wiki/Development"" rel=""nofollow noreferrer"">git wiki</a>.</li>
+</ul>
+
+<p>What I am still missing is:</p>
+
+<ol>
+<li><code>setup()</code> method: what I should do here? Why in example I should compare the lenght of 'bottom' param with '2'? Why it should be 2? It seems not a batch size because its arbitrary? And bottom as I understand is blob, and then the first dimension is batch size?</li>
+<li><code>reshape()</code> method: as I understand 'bottom' input param is blob of below layer, and 'top' param is blob of upper layer, and I need to reshape top layer according to output shape of my calculations with forward pass. But why do I need to do this every forward pass if these shapes do not change from pass to pass, only weights change?</li>
+<li><code>reshape</code> and <code>forward</code> methods have 0 indexes for 'top' input param used. Why would I need to use <code>top[0].data=...</code> or <code>top[0].input=...</code> instead of <code>top.data=...</code> and <code>top.input=...</code>? Whats this index about? If we do not use other part of this top list, why it is exposed in this way? I can suspect its or C++ backbone coincidence, but it would be good to know exactly.</li>
+<li><p><code>reshape()</code> method, line with:</p>
+
+<pre><code>if bottom[0].count != bottom[1].count
+</code></pre>
+
+<p>what I do here? why its dimension is 2 again? And what I am counting here? Why both part of blobs (0 and 1) should be equal in amount of some members (<code>count</code>)?</p></li>
+<li><p><code>forward()</code> method, what I define by this line:</p>
+
+<pre><code>self.diff[...] = bottom[0].data - bottom[1].data
+</code></pre>
+
+<p>When it is used after forward path if I define it? Can we just use</p>
+
+<pre><code>diff = bottom[0].data - bottom[1].data 
+</code></pre>
+
+<p>instead to count loss later in this method, without assigning to <code>self</code>, or its done with some purpose?</p></li>
+<li><p><code>backward()</code> method: what's this about: <code>for i in range(2):</code>? Why again range is 2?</p></li>
+<li><code>backward()</code> method, <code>propagate_down</code> parameter: why it is defined? I mean if its True, gradient should be assigned to <code>bottom[X].diff</code> as I see, but why would someone call method which would do nothing with <code>propagate_down = False</code>, if it just do nothing and still cycling inside?</li>
+</ol>
+
+<p>I'm sorry if those questions are too obvious, I just wasn't able to find a good guide to understand them and asking for help here.</p>
+"
+"Convert Tensorflow model to Caffe model","<p>I would like to be able to convert a Tensorflow model to Caffe model.</p>
+
+<p>I searched on google but I was able to find only converters from caffe to tensorflow but not the opposite.</p>
+
+<p>Does anyone have an idea on how to do it?</p>
+
+<p>Thanks,
+Evi</p>
+"
+"Caffe | solver.prototxt values setting strategy","<p>On Caffe, I am trying to implement a Fully Convolution Network for semantic segmentation. I was wondering is there a specific strategy to set up your <code>'solver.prototxt'</code> values for the following hyper-parameters:</p>
+
+<ul>
+<li>test_iter</li>
+<li>test_interval</li>
+<li>iter_size</li>
+<li>max_iter</li>
+</ul>
+
+<p>Does it depend on the number of images you have for your training set? If so, how? </p>
+"
+"How to convolve two blobs in caffe","<p>In caffe, the <code>convolution</code> layer takes one bottom blob, and convolves it with learned filters (which are initialized using the weight type - ""Xavier"", ""MSRA"" etc.). However, my question is whether we can simply convolve two bottom blobs and produce a top blob. What would be the most elegant way of doing this? The purpose of this is: one of the bottom blob will be <code>data</code> and the other one will be a dynamic filter (changing depending on the <code>data</code>) produced by previous layers (I am trying to implement <a href=""http://www.cs.tau.ac.il/~wolf/papers/dynconv.pdf"" rel=""noreferrer"">dynamic convolution</a>). </p>
+
+<p><strong>My attempt:</strong></p>
+
+<p>One way which came to my mind was to modify the <code>filler.hpp</code> and assign a bottom blob as a <code>filler</code> matrix itself (instead of ""Xavier"", ""MSRA"" etc.). Then I thought the convolution layer would pick up from there. We can set <code>lr = 0</code> to indicate that the weight initialized by our custom filler should not be changed. However, after I looked at the source code, I still don't know how to do it. On the other hand, I don't want to break the workflow of caffe. I still want conv layers to function normally, if I want them to.</p>
+
+<p>Obviously a more tedious way is to use a combination of <code>Slice</code>, <code>tile</code> and/or <code>Scale</code> layer to literally implement convolution. I think it would work, but it will turn out to be messy. Any other thoughts?</p>
+
+<p><strong>Edit 1:</strong></p>
+
+<p>I wrote a new layer by modifying the convolution layer of caffe. In particular, in <code>src/caffe/layers/conv_layer.cpp</code>, on line 27, it takes the weight defined by the <code>filler</code> and convolves it with the bottom blob. So instead of populating that blob from the <code>filler</code>, I modified the layer such that it now takes two bottoms. One of the bottom directly gets assigned to the filler. Now I had to make some other changes such as:</p>
+
+<ol>
+<li><code>weight</code> blob has the same value for all the samples. Here it will have a different value for different samples. So I changed line 32 from:</li>
+</ol>
+
+<pre class=""lang-cpp prettyprint-override""><code>this-&gt;forward_cpu_gemm(
+    bottom_data + n * this-&gt;bottom_dim_, 
+    weight, 
+    top_data + n * this-&gt;top_dim_);
+</code></pre>
+
+<p>to:</p>
+
+<pre class=""lang-cpp prettyprint-override""><code>this-&gt;forward_cpu_gemm(
+    bottom_data + n * bottom[1]-&gt;count(1),
+    bottom[0]-&gt;cpu_data() + n * bottom[0]-&gt;count(1), 
+    top_data + n * this-&gt;top_dim_);
+</code></pre>
+
+<p>To make things easier, I assumed that there is no bias term involved, stride is always 1, padding can always be 0, group will always be 1 etc. However, when I tested the forward pass, it gave me some weird answer (with a simple convolution kernel = <code>np.ones((1,1,3,3))</code>. The learning rates were set to zero for this kernel so that it doesn't change. However, I can't get a right answer. Any suggestions will be appreciated.</p>
+
+<p>Please do not propose solutions using existing layers such as <code>Slice, Eltwise, Crop</code>. I have already implemented - it works - but it is unbelievable complex and memory inefficient.</p>
+"
+"Finding gradient of a Caffe conv-filter with regards to input","<p>I need to find the gradient with regards to the input layer for a single convolutional filter in a convolutional neural network (CNN) as a way to <a href=""http://research.google.com/pubs/pub38115.html"" rel=""noreferrer"">visualize the filters</a>.<br>
+Given a trained network in the Python interface of <a href=""http://caffe.berkeleyvision.org/"" rel=""noreferrer"">Caffe</a> such as the one in <a href=""http://nbviewer.ipython.org/github/BVLC/caffe/blob/tutorial/examples/01-learning-lenet.ipynb"" rel=""noreferrer"">this example</a>, how can I then find the gradient of a conv-filter with respect to the data in the input layer?</p>
+
+<p><strong>Edit:</strong></p>
+
+<p>Based on the <a href=""https://stackoverflow.com/a/31349941/1714410"">answer by cesans</a>, I added the code below. The dimensions of my input layer is <code>[8, 8, 7, 96]</code>. My first conv-layer, <code>conv1</code>, has 11 filters with a size of <code>1x5</code>, resulting in the dimensions <code>[8, 11, 7, 92]</code>.</p>
+
+<pre><code>net = solver.net
+diffs = net.backward(diffs=['data', 'conv1'])
+print diffs.keys() # &gt;&gt; ['conv1', 'data']
+print diffs['data'].shape # &gt;&gt; (8, 8, 7, 96)
+print diffs['conv1'].shape # &gt;&gt; (8, 11, 7, 92)
+</code></pre>
+
+<p>As you can see from the output, the dimensions of the arrays returned by <code>net.backward()</code> are equal to the dimensions of my layers in Caffe. After some testing I've found that this output is the gradients of the loss with regards to respectively the <code>data</code> layer and the <code>conv1</code> layer.</p>
+
+<p>However, my question was how to find the gradient of a single conv-filter with respect to the data in the input layer, which is something else. How can I achieve this?</p>
+"
+"How to verify CuDNN installation?","<p>I have searched many places but ALL I get is HOW to install it, not how to verify that it is installed. I can verify my NVIDIA driver is installed, and that CUDA is installed, but I don't know how to verify CuDNN is installed. Help will be much appreciated, thanks!</p>
+
+<p>PS.<br>
+This is for a caffe implementation. Currently everything is working without CuDNN enabled.</p>
+"
+"LSTM module for Caffe","<p>Does anyone know if there exists a nice LSTM module for Caffe? I found one from a github account by russel91 but apparantly the webpage containing examples and explanations disappeared (Formerly <a href=""http://apollo.deepmatter.io/"" rel=""nofollow"">http://apollo.deepmatter.io/</a> --> it now redirects only to the <a href=""https://github.com/russell91/apollocaffe"" rel=""nofollow"">github page</a> which has no examples or explanations anymore).</p>
+"
+"Monitor training/validation process in Caffe","<p>I'm training Caffe Reference Model for classifying images.
+My work requires me to monitor the training process by drawing graph of accuracy of the model after every 1000 iterations on entire training set and validation set which has 100K and 50K images respectively. 
+Right now, Im taking the naive approach, make snapshots after every 1000 iterations, run the C++ classififcation code which reads raw JPEG image and forward to the net and output the predicted labels. However, this takes too much time on my machine (with a Geforce GTX 560 Ti)</p>
+
+<p>Is there any faster way that I can do to have the graph of accuracy of the snapshot models on both training and validation sets?</p>
+
+<p>I was thinking about using LMDB format instead of raw images. However, I cannot find documentation/code about doing classification in C++ using LMDB format.</p>
+"
+"Auto-encoders with tied weights in Caffe","<p>From my understanding, normally an auto-encoder uses tied weights in the encoding and decoding networks right?</p>
+
+<p>I took a look at <a href=""https://github.com/BVLC/caffe/blob/master/examples/mnist/mnist_autoencoder.prototxt"">Caffe's auto-encoder example</a>, but I didn't see how the weights are tied. I noticed that the encoding and decoding networks share the same blobs, but how is it guaranteed that the weights are updated correctly?</p>
+
+<p>How to implement tied weights auto-encoders in Caffe?</p>
+"
+"What is `weight_decay` meta parameter in Caffe?","<p>Looking at an example <a href=""https://github.com/BVLC/caffe/blob/tutorial/examples/cifar10/cifar10_full_solver.prototxt#L15"" rel=""noreferrer""><code>'solver.prototxt'</code></a>, posted on BVLC/caffe git, there is a training meta parameter</p>
+
+<pre><code>weight_decay: 0.04
+</code></pre>
+
+<p>What does this meta parameter mean? And what value should I assign to it?</p>
+"
+"How to train a caffe model?","<p>Has anyone successfully trained a caffe model? I have a training ready image set that I would like to use to create a caffe model for use with Google's Deep Dream. </p>
+
+<p>The only resources I've been able to find on how to train a model are these:<br>
+<a href=""https://github.com/jgoode21/caffe-oxford102"" rel=""noreferrer"">ImageNet Tutorial</a><br>
+EDIT:  Here's another, but it's not creating a deploy.prototxt file. When I try to use one from another model it ""works"" but isn't correct.<br>
+<a href=""https://github.com/jgoode21/caffe-oxford102"" rel=""noreferrer"">caffe-oxford 102</a><br>
+Can anyone point me in the right direction to training my own model?</p>
+"
+"How to enable multithreading with Caffe?","<p>I would like to compile / configure Caffe so that when I trained an artificial neural network with it, the training is multi-threaded (CPU only, no GPU). How to enable multithreading with Caffe? I use Caffe on Ubuntu 14.04 LTS x64.</p>
+"
+"A guide to convert_imageset.cpp","<p>I am relatively new to machine learning/python/ubuntu.</p>
+
+<p>I have a set of images in .jpg format where half contain a feature I want caffe to learn and half don't. I'm having trouble in finding a way to convert them to the required lmdb format.</p>
+
+<p>I have the necessary text input files. </p>
+
+<p>My question is can anyone provide a step by step guide on how to use <code>convert_imageset.cpp</code> in the ubuntu terminal?</p>
+
+<p>Thanks</p>
+"
+"compiling caffe on Yosemite","<p>I'm trying to install caffe on Yosemite, and my C is not the strongest. Here is my error:</p>
+
+<pre><code>Alis-MacBook-Pro:caffe ali$ make all
+NVCC src/caffe/layers/absval_layer.cu
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(27): error: expected a "";""
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(29): error: inline specifier allowed on function declarations only
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(29): error: incomplete type is not allowed
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(29): error: identifier ""atomic_int_least32_t"" is undefined
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(29): error: identifier ""pw"" is undefined
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(30): error: expected a "";""
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(90): error: invalid specifier outside a class declaration
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(92): error: ""this"" may only be used inside a nonstatic member function
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(95): error: invalid specifier outside a class declaration
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(95): error: function ""boost::detail::get_deleter"" may not be initialized
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(96): error: invalid specifier outside a class declaration
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(96): error: function ""boost::detail::get_untyped_deleter"" may not be initialized
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(100): error: identifier ""use_count_"" is undefined
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(105): error: identifier ""use_count_"" is undefined
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(105): error: identifier ""atomic_conditional_increment"" is undefined
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(110): error: identifier ""use_count_"" is undefined
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(110): error: identifier ""atomic_decrement"" is undefined
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(112): error: identifier ""dispose"" is undefined
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(113): error: identifier ""weak_release"" is undefined
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(119): error: identifier ""weak_count_"" is undefined
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(124): error: identifier ""weak_count_"" is undefined
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(124): error: identifier ""atomic_decrement"" is undefined
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(130): error: a type qualifier is not allowed on a nonmember function
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(132): error: ""atomic_int_least32_t"" is not a type name
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(132): error: identifier ""use_count_"" is undefined
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(132): error: the first argument of this c11 atomic builtin must be a pointer to the _Atomic type
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(132): error: expected a "";""
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_base_clang.hpp(138): error: expected a declaration
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_impl.hpp(127): error: not a class or struct name
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_impl.hpp(156): error: identifier ""sp_typeinfo"" is undefined
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_impl.hpp(195): error: not a class or struct name
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_impl.hpp(252): error: identifier ""sp_typeinfo"" is undefined
+
+/usr/local/include/boost/smart_ptr/detail/sp_counted_impl.hpp(267): error: expected a declaration
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(543): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(543): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(568): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(568): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(593): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(593): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(618): error: unary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(618): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(643): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(643): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(668): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(668): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(693): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(693): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(720): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(720): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(745): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(745): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(770): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(770): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(795): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(795): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(820): error: unary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(820): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(845): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(845): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(870): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(870): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(895): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(895): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(937): error: unary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(937): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(956): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(956): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(978): error: unary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(978): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1004): error: unary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1004): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1030): error: unary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1030): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1048): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1048): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1065): error: unary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1065): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1076): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1076): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1099): error: unary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1099): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1110): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1110): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1133): error: unary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1133): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1144): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1144): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1167): error: unary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1167): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1179): error: binary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional(1179): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__functional_03(22): error: __weak_result_type is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__functional_03(22): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__functional_03(35): error: __invoke_return is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__functional_03(42): error: __invoke_return0 is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__functional_03(49): error: __invoke_return1 is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__functional_03(56): error: __invoke_return2 is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__functional_03(202): error: not a class or struct name
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__functional_03(218): error: unary_function is not a template
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__functional_03(218): error: not a class or struct name
+
+Error limit reached.
+100 errors detected in the compilation of ""/var/folders/6q/pzmrbk9d2_j0307lfmgbtf4r0000gn/T//tmpxft_00007c25_00000000-16_absval_layer.compute_50.cpp1.ii"".
+Compilation terminated.
+make: *** [.build_release/cuda/src/caffe/layers/absval_layer.o] Error 1
+</code></pre>
+
+<p>I'm guessing that the problem is with the compiler, so I installed gcc from brew and tried running it using</p>
+
+<pre><code>make all CC=/usr/local/bin/gcc-5.2
+</code></pre>
+
+<p>which still did not help.</p>
+
+<p>Any suggestions?</p>
+"
+"Python real time image classification problems with Neural Networks","<p>I'm attempting use caffe and python to do real-time image classification. I'm using OpenCV to stream from my webcam in one process, and in a separate process, using caffe to perform image classification on the frames pulled from the webcam. Then I'm passing the result of the classification back to the main thread to caption the webcam stream.</p>
+
+<p>The problem is that even though I have an NVIDIA GPU and am performing the caffe predictions on the GPU, the main thread gets slown down. Normally without doing any predictions, my webcam stream runs at 30 fps; however, with the predictions, my webcam stream gets at best 15 fps. </p>
+
+<p>I've verified that caffe is indeed using the GPU when performing the predictions, and that my GPU or GPU memory is not maxing out. I've also verified that my CPU cores are not getting maxed out at any point during the program. I'm wondering if I am doing something wrong or if there is no way to keep these 2 processes truly separate. Any advice is appreciated. Here is my code for reference</p>
+
+<pre><code>class Consumer(multiprocessing.Process):
+
+    def __init__(self, task_queue, result_queue):
+        multiprocessing.Process.__init__(self)
+        self.task_queue = task_queue
+        self.result_queue = result_queue
+        #other initialization stuff
+
+    def run(self):
+        caffe.set_mode_gpu()
+        caffe.set_device(0)
+        #Load caffe net -- code omitted 
+        while True:
+            image = self.task_queue.get()
+            #crop image -- code omitted
+            text = net.predict(image)
+            self.result_queue.put(text)
+
+        return
+
+import cv2
+import caffe
+import multiprocessing
+import Queue 
+
+tasks = multiprocessing.Queue()
+results = multiprocessing.Queue()
+consumer = Consumer(tasks,results)
+consumer.start()
+
+#Creating window and starting video capturer from camera
+cv2.namedWindow(""preview"")
+vc = cv2.VideoCapture(0)
+#Try to get the first frame
+if vc.isOpened():
+    rval, frame = vc.read()
+else:
+    rval = False
+frame_copy[:] = frame
+task_empty = True
+while rval:
+    if task_empty:
+       tasks.put(frame_copy)
+       task_empty = False
+    if not results.empty():
+       text = results.get()
+       #Add text to frame
+       cv2.putText(frame,text)
+       task_empty = True
+
+    #Showing the frame with all the applied modifications
+    cv2.imshow(""preview"", frame)
+
+    #Getting next frame from camera
+    rval, frame = vc.read()
+    frame_copy[:] = frame
+    #Getting keyboard input 
+    key = cv2.waitKey(1)
+    #exit on ESC
+    if key == 27:
+        break
+</code></pre>
+
+<p>I am pretty sure it is the caffe prediction slowing everything down, because when I comment out the prediction and pass dummy text back and forth between the processes, I get 30 fps again.</p>
+
+<pre><code>class Consumer(multiprocessing.Process):
+
+    def __init__(self, task_queue, result_queue):
+        multiprocessing.Process.__init__(self)
+        self.task_queue = task_queue
+        self.result_queue = result_queue
+        #other initialization stuff
+
+    def run(self):
+        caffe.set_mode_gpu()
+        caffe.set_device(0)
+        #Load caffe net -- code omitted
+        while True:
+            image = self.task_queue.get()
+            #crop image -- code omitted
+            #text = net.predict(image)
+            text = ""dummy text""
+            self.result_queue.put(text)
+
+        return
+
+import cv2
+import caffe
+import multiprocessing
+import Queue 
+
+tasks = multiprocessing.Queue()
+results = multiprocessing.Queue()
+consumer = Consumer(tasks,results)
+consumer.start()
+
+#Creating window and starting video capturer from camera
+cv2.namedWindow(""preview"")
+vc = cv2.VideoCapture(0)
+#Try to get the first frame
+if vc.isOpened():
+    rval, frame = vc.read()
+else:
+    rval = False
+frame_copy[:] = frame
+task_empty = True
+while rval:
+    if task_empty:
+       tasks.put(frame_copy)
+       task_empty = False
+    if not results.empty():
+       text = results.get()
+       #Add text to frame
+       cv2.putText(frame,text)
+       task_empty = True
+
+    #Showing the frame with all the applied modifications
+    cv2.imshow(""preview"", frame)
+
+    #Getting next frame from camera
+    rval, frame = vc.read()
+    frame_copy[:] = frame
+    #Getting keyboard input 
+    key = cv2.waitKey(1)
+    #exit on ESC
+    if key == 27:
+        break
+</code></pre>
+"
+"Caffe: Reading LMDB from Python","<p>I've extracted features using caffe, which generates a .mdb file.
+Then I'm trying to read it using Python and display it as a readable number.</p>
+
+<pre><code>import lmdb
+
+lmdb_env = lmdb.open('caffefeat')
+lmdb_txn = lmdb_env.begin()
+lmdb_cursor = lmdb_txn.cursor()
+
+for key, value in lmdb_cursor:
+    print str(value)
+</code></pre>
+
+<p>This prints out a very long line of unreadable, broken characters.</p>
+
+<p>Then I tried printing int(value), which returns the following:</p>
+
+<pre><code>ValueError: invalid literal for int() with base 10: '\x08\x80 \x10\x01\x18\x015\x8d\x80\xad?5'
+</code></pre>
+
+<p>float(value) gives the following:</p>
+
+<pre><code>ValueError: could not convert string to float:? 5????5
+</code></pre>
+
+<p>Is this a problem with the lmdb file itself, or does it have to do with conversion of data type?</p>
+"
+"caffe data layer example step by step","<p>I want to find a caffe python data layer example to learn.
+I know that Fast-RCNN has a python data layer, but it's rather complicated since I
+am not familiar with object detection.<br>
+So my question is, is there a python data layer example where I can learn how to define my own data preparation procedure?<br>
+For example, how to do define a python data layer do much more data augmentation
+(such as translation, rotation etc.) than caffe <code>""ImageDataLayer""</code>.</p>
+
+<p>Thank you very much</p>
+"
+"What is batch size in Caffe or convnets","<p>I thought that batch size is only for performance. The bigger the batch, more images are computed at the same time to train my net. But I realized, if I change my batch size, my net accuracy gets better. So I did not understand what batch size is. Can someone explain me what is batch size?  </p>
+"
+"Common causes of nans during training","<p>I've noticed that a frequent occurrence during training is <code>NAN</code>s being introduced.</p>
+
+<p>Often times it seems to be introduced by weights in inner-product/fully-connected or convolution layers blowing up.</p>
+
+<p>Is this occurring because the gradient computation is blowing up? Or is it because of weight initialization (if so, why does weight initialization have this effect)? Or is it likely caused by the nature of the input data?</p>
+
+<p>The overarching question here is simply: <strong>What is the most common reason for NANs to occurring during training?</strong> And secondly, what are some methods for combatting this (and why do they work)?</p>
+"
+"Caffe: What can I do if only a small batch fits into memory?","<p>I am trying to train a very large model. Therefore, I can only fit a very small batch size into GPU memory. Working with small batch sizes results with very <a href=""https://stackoverflow.com/a/33717093/1714410"">noisy gradient estimations</a>.<br>
+What can I do to avoid this problem?</p>
+"
+"Multi label regression in Caffe","<p>i am extracting 30 facial keypoints (x,y) from an input image as per kaggle facialkeypoints competition.</p>
+
+<p>How do i setup caffe to run a regression and produce 30 dimensional output??. </p>
+
+<pre><code>Input: 96x96 image
+Output: 30 - (30 dimensions).
+</code></pre>
+
+<p>How do i setup caffe accordingly?. I am using EUCLIDEAN_LOSS (sum of squares) to get the regressed output. Here is a simple logistic regressor model using caffe but it is not working. Looks accuracy layer cannot handle multi-label output.</p>
+
+<pre><code>I0120 17:51:27.039113  4113 net.cpp:394] accuracy &lt;- label_fkp_1_split_1
+I0120 17:51:27.039135  4113 net.cpp:356] accuracy -&gt; accuracy
+I0120 17:51:27.039158  4113 net.cpp:96] Setting up accuracy
+F0120 17:51:27.039201  4113 accuracy_layer.cpp:26] Check failed: bottom[1]-&gt;channels() == 1 (30 vs. 1) 
+*** Check failure stack trace: ***
+    @     0x7f7c2711bdaa  (unknown)
+    @     0x7f7c2711bce4  (unknown)
+    @     0x7f7c2711b6e6  (unknown)
+</code></pre>
+
+<p>Here is the layer file:</p>
+
+<pre><code>name: ""LogReg""
+layers {
+  name: ""fkp""
+  top: ""data""
+  top: ""label""
+  type: HDF5_DATA
+  hdf5_data_param {
+   source: ""train.txt""
+   batch_size: 100
+  }
+    include: { phase: TRAIN }
+
+}
+
+layers {
+  name: ""fkp""
+  type: HDF5_DATA
+  top: ""data""
+  top: ""label""
+  hdf5_data_param {
+    source: ""test.txt""
+    batch_size: 100
+  }
+
+  include: { phase: TEST }
+}
+
+layers {
+  name: ""ip""
+  type: INNER_PRODUCT
+  bottom: ""data""
+  top: ""ip""
+  inner_product_param {
+    num_output: 30
+  }
+}
+layers {
+  name: ""loss""
+  type: EUCLIDEAN_LOSS
+  bottom: ""ip""
+  bottom: ""label""
+  top: ""loss""
+}
+
+layers {
+  name: ""accuracy""
+  type: ACCURACY
+  bottom: ""ip""
+  bottom: ""label""
+  top: ""accuracy""
+  include: { phase: TEST }
+}
+</code></pre>
+"
+"Import caffe error","<p>i compiled caffe successfully in my ubuntu machine but cannot import in python.</p>
+
+<p>Caffe is installed /home/pbu/Desktop/caffe</p>
+
+<p>i tried adding the /home/pbu/caffe/python path  to sys.path.append, still not working</p>
+
+<p>i am trying to import caffe</p>
+
+<pre><code>root@pbu-OptiPlex-740-Enhanced:/home/pbu/Desktop# python ./caffe/output.py
+Traceback (most recent call last):
+  File ""./caffe/output.py"", line 13, in &lt;module&gt;
+    import caffe
+  File ""/home/pbu/Desktop/caffe/python/caffe/__init__.py"", line 1, in &lt;module&gt;
+    from .pycaffe import Net, SGDSolver
+  File ""/home/pbu/Desktop/caffe/python/caffe/pycaffe.py"", line 10, in &lt;module&gt;
+    from ._caffe import Net, SGDSolver
+ImportError: No module named _caffe
+</code></pre>
+"
+"Caffe Multiple Input Images","<p>I'm looking at implementing a Caffe CNN which accepts two input images and a label (later perhaps other data) and was wondering if anyone was aware of the correct syntax in the prototxt file for doing this? Is it simply an IMAGE_DATA layer with additional tops? Or should I use separate IMAGE_DATA layers for each?</p>
+
+<p>Thanks,
+James</p>
+"
+"What is the simplest way to make object detector on C++ with Fast/Faster-RCNN?","<p>What is the simplest way to make object detector on C++ with Fast/Faster-RCNN and Caffe?</p>
+
+<p>As known, we can use follow RCNN (Region-based Convolutional Neural Networks) with Caffe:</p>
+
+<ul>
+<li><p><strong>RCNN</strong>: <a href=""https://github.com/BVLC/caffe/blob/be163be0ea5befada208dbf0db29e6fa5811dc86/python/caffe/detector.py#L174"">https://github.com/BVLC/caffe/blob/be163be0ea5befada208dbf0db29e6fa5811dc86/python/caffe/detector.py#L174</a></p></li>
+<li><p><strong>Fast RCNN</strong>: <a href=""https://github.com/rbgirshick/fast-rcnn/blob/master/tools/demo.py#L89"">https://github.com/rbgirshick/fast-rcnn/blob/master/tools/demo.py#L89</a></p></li>
+</ul>
+
+<p><code>scores, boxes = im_detect(net, im, obj_proposals)</code>  which calls to <a href=""https://github.com/rbgirshick/fast-rcnn/blob/90e75082f087596f28173546cba615d41f0d38fe/lib/fast_rcnn/test.py#L154""><code>def im_detect(net, im, boxes):</code></a></p>
+
+<p>for this used <a href=""https://github.com/rbgirshick/caffe-fast-rcnn/tree/bcd9b4eadc7d8fbc433aeefd564e82ec63aaf69c"">rbgirshick/caffe-fast-rcnn</a>, ROIPooling-layers and output <a href=""https://github.com/rbgirshick/fast-rcnn/blob/master/models/VGG16/test.prototxt#L488"">bbox_pred</a></p>
+
+<ul>
+<li><strong>Faster RCNN</strong>: <a href=""https://github.com/rbgirshick/py-faster-rcnn/blob/master/tools/demo.py#L82"">https://github.com/rbgirshick/py-faster-rcnn/blob/master/tools/demo.py#L82</a></li>
+</ul>
+
+<p><code>scores, boxes = im_detect(net, im)</code>  which calls to <a href=""https://github.com/rbgirshick/py-faster-rcnn/blob/96dc9f1dea3087474d6da5a98879072901ee9bf9/lib/fast_rcnn/test.py#L108""><code>def im_detect(net, im, boxes=None):</code></a></p>
+
+<p>for this used <a href=""https://github.com/rbgirshick/caffe-fast-rcnn/tree/bcd9b4eadc7d8fbc433aeefd564e82ec63aaf69c"">rbgirshick/caffe-fast-rcnn</a>, ROIPooling-layers and output <a href=""https://github.com/rbgirshick/py-faster-rcnn/blob/master/models/coco/VGG16/faster_rcnn_end2end/test.prototxt#L561"">bbox_pred</a></p>
+
+<p>All of these use Python and Caffe, but how to do it on C++ and Caffe?</p>
+
+<p>There is only C++ example for classification (to say what on image), but there is not for detecton (to say what and where on image): <a href=""https://github.com/BVLC/caffe/tree/master/examples/cpp_classification"">https://github.com/BVLC/caffe/tree/master/examples/cpp_classification</a></p>
+
+<p>Is it enough to simply clone <a href=""https://github.com/rbgirshick/py-faster-rcnn"">rbgirshick/py-faster-rcnn</a> repository with 
+<a href=""https://github.com/rbgirshick/caffe-fast-rcnn"">rbgirshick/caffe-fast-rcnn</a>, download the pre-tained model <code>./data/scripts/fetch_faster_rcnn_models.sh</code>, use this <a href=""https://github.com/rbgirshick/py-faster-rcnn/blob/master/models/coco/VGG16/faster_rcnn_end2end/test.prototxt"">coco/VGG16/faster_rcnn_end2end/test.prototxt</a> and done a small change in <a href=""https://github.com/rbgirshick/caffe-fast-rcnn/blob/0dcd397b29507b8314e252e850518c5695efbb83/examples/cpp_classification/classification.cpp#L164"">CaffeNet C++ Classification example</a>?</p>
+
+<p>And how can I get output data from two layers <a href=""https://github.com/rbgirshick/py-faster-rcnn/blob/master/models/coco/VGG16/faster_rcnn_end2end/test.prototxt#L561"">bbox_pred</a> and <a href=""https://github.com/rbgirshick/py-faster-rcnn/blob/master/models/coco/VGG16/faster_rcnn_end2end/test.prototxt#L536"">cls_score</a> ?</p>
+
+<p>Will I have all (bbox_pred &amp; cls_score) in one array:</p>
+
+<pre><code>const vector&lt;Blob&lt;float&gt;*&gt;&amp; output_blobs = net_-&gt;ForwardPrefilled();
+Blob&lt;float&gt;* output_layer = output_blobs[0];
+  const float* begin = output_layer-&gt;cpu_data();
+  const float* end = begin + output_layer-&gt;channels();
+  std::vector&lt;float&gt; bbox_and_score_array(begin, end);
+</code></pre>
+
+<p>Or in two arrays?</p>
+
+<pre><code>const vector&lt;Blob&lt;float&gt;*&gt;&amp; output_blobs = net_-&gt;ForwardPrefilled();
+
+Blob&lt;float&gt;* bbox_output_layer = output_blobs[0];
+  const float* begin_b = bbox_output_layer -&gt;cpu_data();
+  const float* end_b = begin_b + bbox_output_layer -&gt;channels();
+  std::vector&lt;float&gt; bbox_array(begin_b, end_b);
+
+Blob&lt;float&gt;* score_output_layer = output_blobs[1];
+  const float* begin_c = score_output_layer -&gt;cpu_data();
+  const float* end_c = begin_c + score_output_layer -&gt;channels();
+  std::vector&lt;float&gt; score_array(begin_c, end_c);
+</code></pre>
+"
+"Prediction in Caffe - Exception: Input blob arguments do not match net inputs","<p>I'm using Caffe for classifying non-image data using a quite simple CNN structure. I've had no problems training my network on my HDF5-data with dimensions n x 1 x 156 x 12. However, I'm having difficulties classifying new data.</p>
+
+<p>How do I do a simple forward pass without any preprocessing? My data has been normalized and have correct dimensions for Caffe (it's already been used to train the net). Below is my code and the CNN structure.</p>
+
+<p><strong>EDIT:</strong> I've isolated the problem to the function '_Net_forward' in pycaffe.py and found that the issue arises as the self.input dict is empty. Can anyone explain why that is? The set is supposed to be equal to the set coming from the new test data:</p>
+
+<pre><code>if set(kwargs.keys()) != set(self.inputs):
+            raise Exception('Input blob arguments do not match net inputs.')
+</code></pre>
+
+<p>My code has changed a bit as I now use the IO methods for converting the data into datum (see below). In that way I've filled the kwargs variable with the correct data.</p>
+
+<p>Even small hints would be greatly appreciated!</p>
+
+<pre><code>    import numpy as np
+    import matplotlib
+    import matplotlib.pyplot as plt
+
+    # Make sure that caffe is on the python path:
+    caffe_root = ''  # this file is expected to be run from {caffe_root}
+    import sys
+    sys.path.insert(0, caffe_root + 'python')
+
+    import caffe
+
+    import os
+    import subprocess
+    import h5py
+    import shutil
+    import tempfile
+
+    import sklearn
+    import sklearn.datasets
+    import sklearn.linear_model
+    import skimage.io
+
+
+
+    def LoadFromHDF5(dataset='test_reduced.h5', path='Bjarke/hdf5_classification/data/'):
+
+        f   = h5py.File(path + dataset, 'r')
+        dat = f['data'][:]
+        f.close()   
+
+        return dat;
+
+    def runModelPython():
+        model_file = 'Bjarke/hdf5_classification/conv_v2_simple.prototxt'
+        pretrained = 'Bjarke/hdf5_classification/data/train_iter_10000.caffemodel'
+        test_data = LoadFromHDF5()
+
+        net = caffe.Net(model_file, pretrained)
+        caffe.set_mode_cpu()
+        caffe.set_phase_test()  
+
+        user = test_data[0,:,:,:] 
+        datum = caffe.io.array_to_datum(user.astype(np.uint8))
+        user_dat = caffe.io.datum_to_array(datum)
+        user_dat = user_dat.astype(np.uint8)
+        out = net.forward_all(data=np.asarray([user_dat]))
+
+if __name__ == '__main__':
+    runModelPython()
+</code></pre>
+
+<p><strong>CNN Prototext</strong></p>
+
+<pre><code>name: ""CDR-CNN""
+layers {
+  name: ""data""
+  type: HDF5_DATA
+  top: ""data""
+  top: ""label""
+  hdf5_data_param {
+    source: ""Bjarke/hdf5_classification/data/train.txt""
+    batch_size: 10
+  }
+  include: { phase: TRAIN }
+}
+layers {
+  name: ""data""
+  type: HDF5_DATA
+  top: ""data""
+  top: ""label""
+  hdf5_data_param {
+    source: ""Bjarke/hdf5_classification/data/test.txt""
+    batch_size: 10
+  }
+  include: { phase: TEST }
+}
+
+layers {
+  name: ""feature_conv""
+  type: CONVOLUTION
+  bottom: ""data""
+  top: ""feature_conv""
+  blobs_lr: 1
+  blobs_lr: 2
+  convolution_param {
+    num_output: 10
+    kernel_w: 12
+    kernel_h: 1
+    stride_w: 1
+    stride_h: 1
+    weight_filler {
+      type: ""gaussian""
+      std: 0.01
+    }
+    bias_filler {
+      type: ""constant""
+    }
+  }
+}
+layers {
+  name: ""conv1""
+  type: CONVOLUTION
+  bottom: ""feature_conv""
+  top: ""conv1""
+  blobs_lr: 1
+  blobs_lr: 2
+  convolution_param {
+    num_output: 14
+    kernel_w: 1
+    kernel_h: 4
+    stride_w: 1
+    stride_h: 1
+    weight_filler {
+      type: ""gaussian""
+      std: 0.01
+    }
+    bias_filler {
+      type: ""constant""
+    }
+  }
+}
+layers {
+  name: ""pool1""
+  type: POOLING
+  bottom: ""conv1""
+  top: ""pool1""
+  pooling_param {
+    pool: MAX
+    kernel_w: 1
+    kernel_h: 3
+    stride_w: 1
+    stride_h: 3
+  }
+}
+layers {
+  name: ""conv2""
+  type: CONVOLUTION
+  bottom: ""pool1""
+  top: ""conv2""
+  blobs_lr: 1
+  blobs_lr: 2
+  convolution_param {
+    num_output: 120
+    kernel_w: 1
+    kernel_h: 5
+    stride_w: 1
+    stride_h: 1
+    weight_filler {
+      type: ""gaussian""
+      std: 0.01
+    }
+    bias_filler {
+      type: ""constant""
+    }
+  }
+}
+layers {
+  name: ""fc1""
+  type: INNER_PRODUCT
+  bottom: ""conv2""
+  top: ""fc1""
+  blobs_lr: 1
+  blobs_lr: 2
+  weight_decay: 1
+  weight_decay: 0
+  inner_product_param {
+    num_output: 84
+    weight_filler {
+      type: ""gaussian""
+      std: 0.01
+    }
+    bias_filler {
+      type: ""constant""
+      value: 0
+    }
+  }
+}
+layers {
+  name: ""accuracy""
+  type: ACCURACY
+  bottom: ""fc1""
+  bottom: ""label""
+  top: ""accuracy""
+  include: { phase: TEST }
+}
+layers {
+  name: ""loss""
+  type: SOFTMAX_LOSS
+  bottom: ""fc1""
+  bottom: ""label""
+  top: ""loss""
+}
+</code></pre>
+"
+"How to build Caffe framework XCode 6.2, iOS 8.3 environment","<p>I am working on build caffe framework for ios, i used the Caffe master source and make files to build the framework for iOS. </p>
+
+<p>I changed the OS target in CMake GUI config as ""/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk""</p>
+
+<p>While run Xcode to build project i got the below error messages
+/Users/Macpro_ios_v2/Caffe_iOS/src/caffe/common.cpp:1:10: 'glog/logging.h' file not found
+""boost/thread.h"" file not found
+i included usr/local/include and opt/local/include to search paths in the build phase  </p>
+
+<p>while run the same xcode project for OSX, it works fine and generates the libs perfectly.  If i change the target for iphone OS i got above error.</p>
+
+<p>Please help me to fix the above issuse. Please help how to configure  the make list in Caffe master for iphone.</p>
+
+<p>I have caffe dylip, lib-a for OSX. Is it possible to link mac osx libaries in iOS project?</p>
+"
+"What is `lr_policy` in Caffe?","<p>I just try to find out how I can use <a href=""http://caffe.berkeleyvision.org/"">Caffe</a>. To do so, I just took a look at the different <code>.prototxt</code> files in the examples folder. There is one option I don't understand:</p>
+
+<pre><code># The learning rate policy
+lr_policy: ""inv""
+</code></pre>
+
+<p>Possible values seem to be:</p>
+
+<ul>
+<li><code>""fixed""</code></li>
+<li><code>""inv""</code></li>
+<li><code>""step""</code></li>
+<li><code>""multistep""</code></li>
+<li><code>""stepearly""</code></li>
+<li><code>""poly""</code>  </li>
+</ul>
+
+<p>Could somebody please explain those options?</p>
+"
+"Caffe didn't see hdf5.h when compiling","<p>I am having trouble when installing Caffe Deep Learning Framework on Python:</p>
+
+<p>When I run <code>make</code> command at caffe directory, it says </p>
+
+<blockquote>
+  <p>hdf5.h:no such directory</p>
+</blockquote>
+
+<p>The steps I have done:</p>
+
+<ul>
+<li><p>Update and upgrade my Ubuntu Server</p></li>
+<li><p>Install Python 2.7</p></li>
+<li><p>Having all of the dependencies base on <a href=""http://caffe.berkeleyvision.org/install_apt.html"" rel=""noreferrer"">http://caffe.berkeleyvision.org/install_apt.html</a></p></li>
+<li><p>Run cp cp Makefile.config.example Makefile.config</p></li>
+<li><p>Uncomment cpu_only = 1 in Makefile.config</p></li>
+</ul>
+
+<p>I will be grateful if someone can help me.</p>
+
+<p>Error message: </p>
+
+<pre><code>CXX src/caffe/util/hdf5.cpp
+in file include from src/caffe/util/hdf5.cpp:1:0:
+./include/caffe/util/hdf5.hpp:6:18: fatal error: hdf5.h: No such file or directory
+compilation terminated 
+
+Makefile:572 recipe for target '.build_release/src/caffe/util/hdf5.o'       
+failed Make:*** [.build_release/src/caffe/util/hdf5.o] Error 1
+</code></pre>
+"
+"Caffe: Understanding expected lmdb datastructure for blobs","<p>I'm trying to understand how data is interpreted in Caffe.
+For that I've taken a look at the <a href=""http://caffe.berkeleyvision.org/gathered/examples/mnist.html"">Minst Tutorial</a>
+Looking at the input data definition:</p>
+
+<pre><code>layers {
+  name: ""mnist""
+  type: DATA
+  data_param {
+    source: ""mnist_train_lmdb""
+    backend: LMDB
+    batch_size: 64
+    scale: 0.00390625
+  }
+  top: ""data""
+  top: ""label""
+}
+</code></pre>
+
+<p>I've now looked at the mnist_train_lmdb and taken one of the entries (shown in hex):</p>
+
+<pre><code>0801101C181C229006
+00000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000
+00000000000054B99F973C2400000000000000000000000000000000
+000000000000DEFEFEFEFEF1C6C6C6C6C6C6C6C6AA34000000000000
+00000000000043724872A3E3FEE1FEFEFEFAE5FEFE8C000000000000
+000000000000000000000011420E4343433B15ECFE6A000000000000
+00000000000000000000000000000000000053FDD112000000000000
+000000000000000000000000000000000016E9FF5300000000000000
+000000000000000000000000000000000081FEEE2C00000000000000
+000000000000000000000000000000003BF9FE3E0000000000000000
+0000000000000000000000000000000085FEBB050000000000000000
+00000000000000000000000000000009CDF83A000000000000000000
+0000000000000000000000000000007EFEB600000000000000000000
+00000000000000000000000000004BFBF03900000000000000000000
+0000000000000000000000000013DDFEA60000000000000000000000
+00000000000000000000000003CBFEDB230000000000000000000000
+00000000000000000000000026FEFE4D000000000000000000000000
+00000000000000000000001FE0FE7301000000000000000000000000
+000000000000000000000085FEFE3400000000000000000000000000
+000000000000000000003DF2FEFE3400000000000000000000000000
+0000000000000000000079FEFEDB2800000000000000000000000000
+0000000000000000000079FECF120000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000
+2807
+</code></pre>
+
+<p>(I've added the line breaks here to be able to see the '7' digit.)</p>
+
+<p>Now my question is, <strong>where this format is described?</strong> Or put differently where is defined that the first 36 bytes are some sort of header and the last 8 bytes have some label correspondence?</p>
+
+<p><strong>How would I go about constructing my own data?</strong>
+Neither <a href=""http://caffe.berkeleyvision.org/tutorial/net_layer_blob.html"">Blob Tutorial</a> nor <a href=""http://caffe.berkeleyvision.org/tutorial/layers.html"">Layers Definition</a> give much away about required formats. <em>My intention is not to use image data, but time series</em></p>
+
+<p>Thanks!</p>
+"
+"Faster RCNN for TensorFlow","<p>Has anyone implement the FRCNN for TensorFlow version?
+I found some related repos as following:</p>
+
+<ol>
+<li><a href=""https://github.com/yuxng/tensorflow"">Implement roi pool layer</a></li>
+<li><a href=""https://github.com/ExonRen/tf-fast-rcnn"">Implement fast RCNN based on py-faster-rcnn repo</a></li>
+</ol>
+
+<p>but for 1: assume the roi pooling layer works (I haven't tried), and there are something need to be implemented as following:</p>
+
+<ul>
+<li>ROI data layer e.g. <a href=""https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/roi_data_layer/roidb.py"">roidb</a>.</li>
+<li>Linear Regression e.g. <a href=""https://github.com/rbgirshick/caffe-fast-rcnn/blob/0dcd397b29507b8314e252e850518c5695efbb83/src/caffe/layers/smooth_L1_loss_layer.cu"">SmoothL1Loss</a></li>
+<li>ROI pool layer post-processing for end-to-end training which should convert the ROI pooling layer's results to feed into CNN for classifier.</li>
+</ul>
+
+<p>For 2: em...., it seems based on py-faster-rcnn which based on Caffe to prepared pre-processing (e.g. roidb) and feed data into Tensorflow to train the model, it seems weird, so I may not tried it.</p>
+
+<p>So what I want to know is that, will <a href=""https://github.com/tensorflow/tensorflow/issues/739"">Tensorflow support Faster RCNN in the future</a>?. If not, do I have any mis-understand which mentioned above? or has any repo or someone support that?</p>
+"
+"Tackling Class Imbalance: scaling contribution to loss and sgd","<p><strong>(An update to this question has been added.)</strong></p>
+
+<p>I am a graduate student at the university of Ghent, Belgium; my research is about emotion recognition with deep convolutional neural networks. I'm using the <a href=""http://caffe.berkeleyvision.org/"" rel=""noreferrer"">Caffe</a> framework to implement the CNNs.</p>
+
+<p>Recently I've run into a problem concerning class imbalance. I'm using 9216 training samples, approx. 5% are labeled positively (1), the remaining samples are labeled negatively (0).</p>
+
+<p>I'm using the <a href=""http://caffe.berkeleyvision.org/doxygen/classcaffe_1_1SigmoidCrossEntropyLossLayer.html"" rel=""noreferrer"">SigmoidCrossEntropyLoss</a> layer to calculate the loss. When training, the loss decreases and the accuracy is extremely high after even a few epochs. This is due to the imbalance: the network simply always predicts negative (0). <em>(Precision and recall are both zero, backing this claim)</em></p>
+
+<p>To solve this problem, I would like to <strong>scale the contribution to the loss depending on the prediction-truth combination</strong> (punish false negatives severely). My mentor/coach has also advised me to <strong>use a scale factor when backpropagating</strong> through stochastic gradient descent (sgd): the factor would be correlated to the imbalance in the batch. A batch containing only negative samples would not update the weights at all.</p>
+
+<p><em>I have only added one custom-made layer to Caffe: to report other metrics such as precision and recall. My experience with Caffe code is limited but I have a lot of expertise writing C++ code.</em></p>
+
+<hr>
+
+<p><strong>Could anyone help me or point me in the right direction on how to adjust the <a href=""http://caffe.berkeleyvision.org/doxygen/classcaffe_1_1SigmoidCrossEntropyLossLayer.html"" rel=""noreferrer"">SigmoidCrossEntropyLoss</a> and <a href=""http://caffe.berkeleyvision.org/doxygen/classcaffe_1_1SigmoidLayer.html"" rel=""noreferrer"">Sigmoid</a> layers to accomodate the following changes:</strong></p>
+
+<ol>
+<li>adjust the contribution of a sample to the total loss depending on the prediction-truth combination (true positive, false positive, true negative, false negative).</li>
+<li>scale the weight update performed by stochastic gradient descent depending on the imbalance in the batch (negatives vs. positives).</li>
+</ol>
+
+<p>Thanks in advance!</p>
+
+<hr>
+
+<h2>Update</h2>
+
+<p>I have incorporated the <strong><a href=""http://caffe.berkeleyvision.org/doxygen/classcaffe_1_1InfogainLossLayer.html#details"" rel=""noreferrer"">InfogainLossLayer</a> as suggested by <a href=""https://stackoverflow.com/a/30497907/1714410"">Shai</a></strong>. I've also added another custom layer that builds the infogain matrix <code>H</code> based on the imbalance in the current batch.</p>
+
+<p>Currently, the matrix is configured as follows:</p>
+
+<pre><code>H(i, j) = 0          if i != j
+H(i, j) = 1 - f(i)   if i == j (with f(i) = the frequency of class i in the batch)
+</code></pre>
+
+<p><em>I'm planning on experimenting with different configurations for the matrix in the future.</em></p>
+
+<p>I have tested this on a 10:1 imbalance. The results have shown that the network is learning useful things now: <em>(results after 30 epochs)</em></p>
+
+<ul>
+<li>Accuracy is approx. ~70% (down from ~97%);</li>
+<li>Precision is approx. ~20% (up from 0%);</li>
+<li>Recall is approx. ~60% (up from 0%).</li>
+</ul>
+
+<p>These numbers were reached at around 20 epochs and didn't change significantly after that.</p>
+
+<p><em>!! The results stated above are merely a proof of concept, they were obtained by training a simple network on a 10:1 imbalanced dataset. !!</em></p>
+"
+"Custom padding for convolutions in TensorFlow","<p>In tensorflow function <a href=""https://www.tensorflow.org/versions/r0.9/api_docs/python/nn.html#conv2d"" rel=""noreferrer"">tf.nn.conv2d</a>, the padding option just has 'SAME' and 'VALID'. </p>
+
+<p>But in the conv layer of Caffe, there is <a href=""http://caffe.berkeleyvision.org/tutorial/layers.html"" rel=""noreferrer"">pad option</a> can define the number of pixels to (implicitly) add to each side of the input.</p>
+
+<p>How to achieve that in Tensorflow?</p>
+
+<p>Thank you very much.</p>
+"
+"Scale layer in Caffe","<p>I am looking through the <a href=""https://github.com/KaimingHe/deep-residual-networks/blob/master/prototxt/ResNet-50-deploy.prototxt"">Caffe prototxt for deep residual networks</a> and have noticed the appearance of a <code>""Scale""</code> layer.</p>
+
+<pre><code>layer {
+    bottom: ""res2b_branch2b""
+    top: ""res2b_branch2b""
+    name: ""scale2b_branch2b""
+    type: ""Scale""
+    scale_param {
+        bias_term: true
+    }
+}
+</code></pre>
+
+<p>However, this layer is not available in the <a href=""http://caffe.berkeleyvision.org/tutorial/layers.html"">Caffe layer catalogue</a>. Can someone explain the functionality of this layer and the meaning of the parameters or point to a an up-to-date documentation for Caffe?</p>
+"
+"Setting GLOG_minloglevel=1 to prevent output in shell from Caffe","<p>I'm using Caffe, which is printing a lot of output to the shell when loading the neural net.<br>
+I'd like to suppress that output, which supposedly can be done by setting <code>GLOG_minloglevel=1</code> when running the Python script. I've tried doing that using the following code, but I still get all the output from loading the net. How do I suppress the output correctly?</p>
+
+<pre><code>os.environ[""GLOG_minloglevel""] = ""1""
+net = caffe.Net(model_file, pretrained, caffe.TEST)
+os.environ[""GLOG_minloglevel""] = ""0""
+</code></pre>
+"
+"How to design deep convolutional neural networks?","<p>As I understand it, all CNNs are quite similar. They all have a convolutional layers followed by pooling and relu layers. Some have specialised layers like FlowNet and Segnet. My doubt is how should we decide how many layers to use and how do we set the kernel size for each layer in the network. I have searched for an answer to this question but I couldn't find a concrete answer. Is the network designed using trial and error or are some specific rules that I am not aware of? If you could please clarify this, I would be very grateful to you.</p>
+"
+"Sharing contiguous numpy arrays between processes in python","<p>While I have found numerous answers to questions similar to mine, I don't believe it has been directly addressed here--and I have several additional questions. The motivation for sharing contiguous numpy arrays is as follows:</p>
+
+<ul>
+<li>I'm using a convolutional neural network run on Caffe to perform a regression on images to a series of continuous-value labels. </li>
+<li>The images require specific preprocessing and data augmentation.</li>
+<li>The constraints of (1) the continuous nature of the labels (they're floats) and (2) the data augmentation means that I'm preprocessing the data in python and then serving it up as contiguous numpy arrays using the in-memory data layer in Caffe.</li>
+<li>Loading the training data into memory is comparatively slow. I'd like to parallelize it such that:</li>
+</ul>
+
+<p>(1) The python I'm writing creates a ""data handler"" class which instantiates two contiguous numpy arrays. 
+(2) A worker process alternates between those numpy arrays, loading the data from the disk, performing preprocessing, and inserting the data into the numpy array. 
+(3) Meanwhile, the python Caffe wrappers send data from the <em>other</em> array to the GPU to be run through the net. </p>
+
+<p>I have a few questions:</p>
+
+<ol>
+<li><p>Is it possible to allocate memory in a contiguous numpy array then wrap it in a shared memory object (I'm not sure if 'object' is the correct term here) using something like the Array class from python's multiprocessing? </p></li>
+<li><p>Numpy arrays have a .ctypes attribute, I presume this is useful for the instantiation of shared memory arrays from Array(), but can't seem to determine precisely how to use them. </p></li>
+<li><p>If the shared memory is instantiated <em>without</em> the numpy array, does it remain contiguous? If not, is there a way to ensure it does remain contiguous? </p></li>
+</ol>
+
+<p>Is it possible to do something like:</p>
+
+<pre><code>import numpy as np
+from multiprocessing import Array
+contArr = np.ascontiguousarray(np.zeros((n_images, n_channels, img_height, img_width)), dtype=np.float32)
+sm_contArr = Array(contArr.ctypes.?, contArr?)
+</code></pre>
+
+<p>Then instantiate the worker with</p>
+
+<pre><code>p.append(Process(target=some_worker_function, args=(data_to_load, sm_contArr)))
+p.start()
+</code></pre>
+
+<p>Thanks!</p>
+
+<p>Edit: I'm aware there are a number of libraries that have similar functions in varying states of maintenance. I would prefer to restrict this to pure python and numpy, but if that's not possible I would of course be willing to use one. </p>
+"
+"When to use in-place layers in Caffe?","<p>By setting the bottom and the top blob to be the same we can tell Caffe to do ""in-place"" computation to preserve memory consumption.</p>
+
+<p>Currently I know I can safely use in-place <code>""BatchNorm""</code>, <code>""Scale""</code> and <code>""ReLU""</code> layers (please let me know if I'm wrong). While it seems to have some issues for other layers (<a href=""https://github.com/BVLC/caffe/issues/2015"">this issue</a> seems to be an example).</p>
+
+<p>When to use in-place layers in Caffe?<br>
+How does it work with back-propagation?</p>
+"
+"Conda command fails silently","<p>My anaconda is behaving oddly. </p>
+
+<p><code>conda list</code>, <code>conda debug</code>, <code>conda install</code>, all return <strong>nothing</strong>.</p>
+
+<p>I have already reinstalled <code>anaconda2</code>, checked my path on <code>.profile</code>, and it's all there.</p>
+
+<p><strong>1. <code>which -a conda</code></strong></p>
+
+<pre><code>/Users/me/anaconda2/bin/conda
+</code></pre>
+
+<p><strong>2. <code>echo $PATH</code></strong></p>
+
+<pre><code>/Users/me/anaconda2/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/usr/local/MacGPG2/bin
+</code></pre>
+
+<p><strong>3. <code>~/.profile</code>:</strong></p>
+
+<pre><code># added by Anaconda2 5.0.1 installer
+export PATH=""/Users/me/anaconda2/bin:$PATH""
+</code></pre>
+
+<p><strong>4. <code>brew doctor</code>:</strong></p>
+
+<pre><code>Warning: ""config"" scripts exist outside your system or Homebrew directories.
+`./configure` scripts often look for *-config scripts to determine if
+software packages are installed, and what additional flags to use when
+compiling and linking.
+
+Having additional scripts in your path can confuse software installed via
+Homebrew if the config script overrides a system or Homebrew provided
+script of the same name. We found the following ""config"" scripts:
+  /Users/me/anaconda2/bin/curl-config
+  /Users/me/anaconda2/bin/freetype-config
+  /Users/me/anaconda2/bin/icu-config
+  /Users/me/anaconda2/bin/libpng-config
+  /Users/me/anaconda2/bin/libpng16-config
+  /Users/me/anaconda2/bin/ncursesw6-config
+  /Users/me/anaconda2/bin/pcre-config
+  /Users/me/anaconda2/bin/python-config
+  /Users/me/anaconda2/bin/python2-config
+  /Users/me/anaconda2/bin/python2.7-config
+  /Users/me/anaconda2/bin/xml2-config
+  /Users/me/anaconda2/bin/xslt-config
+</code></pre>
+
+<p><strong>EDIT</strong></p>
+
+<p>so far I have been able to reuse anaconda installing it via <code>brew cask install anaconda</code>, because I was trying to get rid of eventual (and suspected) incompatibilities between <code>homebrew</code> and <code>anaconda</code>.</p>
+
+<p>for that purpose I had to reset my path to:</p>
+
+<pre><code>export PATH=/usr/local/anaconda3/bin:""$PATH""
+</code></pre>
+
+<p>and now anaconda works. </p>
+
+<p>however, my canonical anaconda path at <code>export PATH=""/Users/me/anaconda2/bin:$PATH""</code> remains broken up to this point.</p>
+
+<p><strong>EDIT2</strong> Contents of <code>/Users/me/anaconda2/bin</code>:</p>
+
+<pre><code>total 488472
+drwxr-xr-x  390 me  staff      13260 Nov  3 00:58 .
+drwxr-xr-x   25 me  staff        850 Oct 31 04:07 ..
+-rw-r--r--@   1 me  staff       6148 Nov  3 00:57 .DS_Store
+-rwxrwxr-x    2 me  staff        536 Oct 18 15:30 .anaconda-navigator-post-link.sh
+-rwxrwxr-x    2 me  staff        142 Oct 18 15:30 .anaconda-navigator-pre-unlink.sh
+-rwxrwxr-x    2 me  staff        661 Sep 13 09:09 .dbus-post-link.sh
+-rwxrwxr-x    2 me  staff        139 Sep 12 07:07 .python.app-post-link.sh
+-rwxrwxr-x    2 me  staff         38 Sep 12 07:07 .python.app-pre-unlink.sh
+-rwxrwxr-x    2 me  staff        276 Sep 21 19:01 .qt-post-link.sh
+-rwxrwxr-x    2 me  staff        114 Sep 21 19:01 .qt-pre-unlink.sh
+-rwxrwxr-x    1 me  staff        118 Oct 31 03:41 2to3
+drwxr-xr-x    3 me  staff        102 Oct 31 03:42 Assistant.app
+drwxr-xr-x    3 me  staff        102 Oct 31 03:42 Designer.app
+drwxr-xr-x    3 me  staff        102 Oct 31 03:42 Linguist.app
+-rwxrwxr-x    2 me  staff       3802 Oct 17 16:29 activate
+-rwxrwxr-x    1 me  staff        254 Oct 31 03:44 anaconda
+-rwxrwxr-x    1 me  staff        255 Oct 31 03:44 anaconda-navigator
+-rwxrwxr-x    1 me  staff        248 Oct 31 03:44 anaconda-project
+-rwxrwxr-x    1 me  staff      12011 Oct 31 03:42 asadmin
+-rwxrwxr-x    1 me  staff      26617 Oct 31 03:41 autopoint
+-rwxrwxr-x    1 me  staff        431 Oct 31 03:44 binstar
+-rwxrwxr-x    1 me  staff        249 Oct 31 03:44 blaze-server
+-rwxrwxr-x    1 me  staff        242 Oct 31 03:43 bokeh
+-rwxrwxr-x    1 me  staff       1577 Oct 31 03:42 bundle_image
+-rwxrwxr-x    2 me  staff     115756 Sep 20 09:05 bunzip2
+-rwxrwxr-x    2 me  staff     115756 Sep 20 09:05 bzcat
+lrwxr-xr-x    1 me  staff          6 Oct 31 03:41 bzcmp -&gt; bzdiff
+-rwxrwxr-x    2 me  staff       2128 Sep 20 09:05 bzdiff
+lrwxr-xr-x    1 me  staff          6 Oct 31 03:41 bzegrep -&gt; bzgrep
+lrwxr-xr-x    1 me  staff          6 Oct 31 03:41 bzfgrep -&gt; bzgrep
+-rwxrwxr-x    2 me  staff       1677 Sep 20 09:05 bzgrep
+-rwxrwxr-x    2 me  staff     115756 Sep 20 09:05 bzip2
+-rwxrwxr-x    2 me  staff      18792 Sep 20 09:05 bzip2recover
+lrwxr-xr-x    1 me  staff          6 Oct 31 03:41 bzless -&gt; bzmore
+-rwxrwxr-x    2 me  staff       1259 Sep 20 09:05 bzmore
+-rwxrwxr-x    1 me  staff       5166 Oct 31 03:41 c_rehash
+lrwxr-xr-x    1 me  staff          3 Oct 31 03:41 captoinfo -&gt; tic
+-rwxrwxr-x    1 me  staff       3467 Oct 31 03:42 cfadmin
+-rwxrwxr-x    1 me  staff        250 Oct 31 03:42 chardetect
+-rwxrwxr-x    2 me  staff      32756 Sep 13 17:16 cjpeg
+-rwxrwxr-x    2 me  staff       8700 Sep 11 20:39 clear
+-rwxrwxr-x    1 me  staff        237 Oct 31 03:44 conda
+-rwxrwxr-x    1 me  staff        254 Oct 31 03:44 conda-build
+-rwxrwxr-x    1 me  staff        256 Oct 31 03:44 conda-convert
+-rwxrwxr-x    1 me  staff        256 Oct 31 03:44 conda-develop
+-rwxrwxr-x    1 me  staff        246 Oct 31 03:44 conda-env
+-rwxrwxr-x    1 me  staff        254 Oct 31 03:44 conda-index
+-rwxrwxr-x    1 me  staff        256 Oct 31 03:44 conda-inspect
+-rwxrwxr-x    1 me  staff        260 Oct 31 03:44 conda-metapackage
+-rwxrwxr-x    1 me  staff        255 Oct 31 03:44 conda-render
+-rwxrwxr-x    1 me  staff        441 Oct 31 03:44 conda-server
+-rwxrwxr-x    1 me  staff        257 Oct 31 03:44 conda-skeleton
+-rwxrwxr-x    1 me  staff        245 Oct 31 03:42 conda-verify
+-rwxrwxr-x    1 me  staff       3076 Oct 31 03:42 cq
+-rwxrwxr-x    1 me  staff        567 Oct 31 03:43 createfontdatachunk.py
+-rwxrwxr-x    2 me  staff     209708 Sep 20 10:57 curl
+-rwxrwxr-x    1 me  staff       5647 Oct 31 03:41 curl-config
+-rwxrwxr-x    1 me  staff       5068 Oct 31 03:42 cwutil
+-rwxrwxr-x    1 me  staff        249 Oct 31 03:43 cygdb
+-rwxrwxr-x    1 me  staff        270 Oct 31 03:43 cython
+-rwxrwxr-x    1 me  staff        250 Oct 31 03:43 cythonize
+-rwxrwxr-x    1 me  staff        248 Oct 31 03:43 dask-mpi
+-rwxrwxr-x    1 me  staff        251 Oct 31 03:43 dask-remote
+-rwxrwxr-x    1 me  staff        254 Oct 31 03:43 dask-scheduler
+-rwxrwxr-x    1 me  staff        248 Oct 31 03:43 dask-ssh
+-rwxrwxr-x    1 me  staff        251 Oct 31 03:43 dask-submit
+-rwxrwxr-x    1 me  staff        251 Oct 31 03:43 dask-worker
+-rwxrwxr-x    1 me  staff      13952 Oct 31 03:42 dbus-cleanup-sockets
+-rwxrwxr-x    1 me  staff     209744 Oct 31 03:42 dbus-daemon
+-rwxrwxr-x    1 me  staff      23468 Oct 31 03:42 dbus-launch
+-rwxrwxr-x    1 me  staff      25596 Oct 31 03:42 dbus-monitor
+-rwxrwxr-x    1 me  staff      13632 Oct 31 03:42 dbus-run-session
+-rwxrwxr-x    1 me  staff      25724 Oct 31 03:42 dbus-send
+-rwxrwxr-x    1 me  staff      24692 Oct 31 03:42 dbus-test-tool
+-rwxrwxr-x    1 me  staff      14400 Oct 31 03:42 dbus-update-activation-environment
+-rwxrwxr-x    1 me  staff      13340 Oct 31 03:42 dbus-uuidgen
+-rwxrwxr-x    2 me  staff       3040 Oct 17 16:29 deactivate
+-rwxrwxr-x    1 me  staff      30828 Oct 31 03:41 derb
+-rwxrwxr-x    2 me  staff      32036 Sep 13 17:16 djpeg
+-rwxrwxr-x    2 me  staff      40036 Sep 15 00:06 dltest
+-rwxrwxr-x    1 me  staff       2156 Oct 31 03:42 dynamodb_dump
+-rwxrwxr-x    1 me  staff       3526 Oct 31 03:42 dynamodb_load
+-rwxr-xr-x    1 root           staff        259 Nov  2 00:14 easy_install
+-rwxrwxr-x    1 me  staff        259 Nov  2 00:14 easy_install-2.7
+-rwxrwxr-x    1 me  staff       9716 Oct 31 03:42 elbadmin
+-rwxrwxr-x    1 me  staff       1598 Oct 31 03:43 enhancer.py
+-rwxrwxr-x    1 me  staff      38784 Oct 31 03:41 envsubst
+-rwxrwxr-x    1 me  staff        248 Oct 31 03:43 epylint
+-rwxrwxr-x    1 me  staff       2463 Oct 31 03:43 explode.py
+-rwxrwxr-x    1 me  staff        783 Oct 31 03:42 f2py
+-rwxrwxr-x    2 me  staff      23488 Sep 13 17:17 fax2ps
+-rwxrwxr-x    2 me  staff      23464 Sep 13 17:17 fax2tiff
+-rwxrwxr-x    1 me  staff       1896 Oct 31 03:42 fetch_file
+-rwxrwxr-x    1 me  staff        269 Oct 31 03:43 fits2bitmap
+-rwxrwxr-x    1 me  staff        261 Oct 31 03:43 fitscheck
+-rwxrwxr-x    1 me  staff        260 Oct 31 03:43 fitsdiff
+-rwxrwxr-x    1 me  staff        262 Oct 31 03:43 fitsheader
+-rwxrwxr-x    1 me  staff        260 Oct 31 03:43 fitsinfo
+-rwxrwxr-x    2 me  staff       6004 Sep 21 18:59 fixqt4headers.pl
+-rwxrwxr-x    1 me  staff        237 Oct 31 03:43 flask
+-rwxrwxr-x    1 me  staff       5184 Oct 31 03:41 freetype-config
+-rwxrwxr-x    1 me  staff      63328 Oct 31 03:42 gdbus
+-rwxrwxr-x    1 me  staff       1533 Oct 31 03:42 gdbus-codegen
+-rwxrwxr-x    1 me  staff      23204 Oct 31 03:41 genbrk
+-rwxrwxr-x    1 me  staff      18312 Oct 31 03:41 gencfu
+-rwxrwxr-x    1 me  staff      31932 Oct 31 03:41 gencnval
+-rwxrwxr-x    1 me  staff      30036 Oct 31 03:41 gendict
+-rwxrwxr-x    1 me  staff     156100 Oct 31 03:41 genrb
+-rwxrwxr-x    1 me  staff      38500 Oct 31 03:41 gettext
+-rwxrwxr-x    2 me  staff       4629 Sep 16 14:33 gettext.sh
+-rwxrwxr-x    1 me  staff      43779 Oct 31 03:41 gettextize
+-rwxrwxr-x    1 me  staff     134940 Oct 31 03:41 gif2h5
+-rwxrwxr-x    1 me  staff        666 Oct 31 03:43 gifmaker.py
+-rwxrwxr-x    1 me  staff     110752 Oct 31 03:42 gio
+-rwxrwxr-x    1 me  staff      26760 Oct 31 03:42 gio-querymodules
+-rwxrwxr-x    1 me  staff       5269 Oct 31 03:42 glacier
+-rwxrwxr-x    1 me  staff      67360 Oct 31 03:42 glib-compile-resources
+-rwxrwxr-x    1 me  staff      72676 Oct 31 03:42 glib-compile-schemas
+-rwxrwxr-x    1 me  staff      40310 Oct 31 03:42 glib-genmarshal
+-rwxrwxr-x    1 me  staff       5401 Oct 31 03:42 glib-gettextize
+-rwxrwxr-x    1 me  staff      26561 Oct 31 03:42 glib-mkenums
+-rwxrwxr-x    1 me  staff      22248 Oct 31 03:42 gobject-query
+-rwxrwxr-x    1 me  staff      31932 Oct 31 03:42 gresource
+-rwxrwxr-x    1 me  staff        242 Oct 31 03:42 grin
+-rwxrwxr-x    1 me  staff        244 Oct 31 03:42 grind
+-rwxrwxr-x    1 me  staff      45868 Oct 31 03:42 gsettings
+-rwxrwxr-x    1 me  staff      36724 Oct 31 03:42 gtester
+-rwxrwxr-x    1 me  staff      18785 Oct 31 03:42 gtester-report
+-rwxrwxr-x    1 me  staff     133348 Oct 31 03:41 h52gif
+-rwxrwxr-x    1 me  staff      13404 Oct 31 03:41 h5c++
+-rwxrwxr-x    1 me  staff      13506 Oct 31 03:41 h5cc
+-rwxrwxr-x    1 me  staff     128356 Oct 31 03:41 h5clear
+-rwxrwxr-x    1 me  staff     132924 Oct 31 03:41 h5copy
+-rwxrwxr-x    1 me  staff      24548 Oct 31 03:41 h5debug
+-rwxrwxr-x    1 me  staff     220840 Oct 31 03:41 h5diff
+-rwxrwxr-x    1 me  staff     224748 Oct 31 03:41 h5dump
+-rwxrwxr-x    1 me  staff      12844 Oct 31 03:41 h5fc
+-rwxrwxr-x    1 me  staff     128596 Oct 31 03:41 h5format_convert
+-rwxrwxr-x    1 me  staff     175048 Oct 31 03:41 h5import
+-rwxrwxr-x    1 me  staff     129076 Oct 31 03:41 h5jam
+-rwxrwxr-x    1 me  staff     161248 Oct 31 03:41 h5ls
+-rwxrwxr-x    1 me  staff     128584 Oct 31 03:41 h5mkgrp
+-rwxrwxr-x    1 me  staff     160480 Oct 31 03:41 h5perf_serial
+-rwxrwxr-x    2 me  staff       5913 Sep 22 16:06 h5redeploy
+-rwxrwxr-x    1 me  staff     203876 Oct 31 03:41 h5repack
+-rwxrwxr-x    1 me  staff      18508 Oct 31 03:41 h5repart
+-rwxrwxr-x    1 me  staff     145964 Oct 31 03:41 h5stat
+-rwxrwxr-x    1 me  staff     128900 Oct 31 03:41 h5unjam
+-rwxrwxr-x    1 me  staff     137684 Oct 31 03:41 h5watch
+-rwxrwxr-x    2 me  staff      33340 Sep 12 16:42 iconv
+-rwxrwxr-x    1 me  staff      23167 Oct 31 03:41 icu-config
+-rwxrwxr-x    1 me  staff      17712 Oct 31 03:41 icuinfo
+-rwxrwxr-x    1 me  staff        116 Oct 31 03:41 idle
+-rwxrwxr-x    2 me  staff      64208 Sep 11 20:39 infocmp
+lrwxr-xr-x    1 me  staff          3 Oct 31 03:41 infotocap -&gt; tic
+-rwxrwxr-x    1 me  staff       5801 Oct 31 03:42 instance_events
+-rwxrwxr-x    1 me  staff        405 Oct 31 03:43 iptest
+-rwxrwxr-x    1 me  staff        407 Oct 31 03:43 iptest2
+-rwxrwxr-x    1 me  staff        253 Oct 31 03:43 ipython
+-rwxrwxr-x    1 me  staff        253 Oct 31 03:43 ipython2
+-rwxrwxr-x    1 me  staff        238 Oct 31 03:43 isort
+-rwxrwxr-x    2 me  staff      37504 Sep 15 00:06 isql
+-rwxrwxr-x    1 me  staff      11731 Oct 31 03:43 isympy
+-rwxrwxr-x    2 me  staff      28072 Sep 15 00:06 iusql
+-rwxrwxr-x    2 me  staff      36940 Sep 13 17:16 jpegtran
+-rwxrwxr-x    1 me  staff        422 Oct 31 03:43 jsonschema
+-rwxrwxr-x    1 me  staff        248 Oct 31 03:43 jupyter
+-rwxrwxr-x    1 me  staff        237 Oct 31 03:44 jupyter-bundlerextension
+-rwxrwxr-x    1 me  staff        247 Oct 31 03:44 jupyter-console
+-rwxrwxr-x    1 me  staff        290 Oct 31 03:43 jupyter-kernelspec
+-rwxrwxr-x    1 me  staff        256 Oct 31 03:44 jupyter-lab
+-rwxrwxr-x    1 me  staff        263 Oct 31 03:44 jupyter-labextension
+-rwxrwxr-x    1 me  staff        444 Oct 31 03:44 jupyter-labhub
+-rwxrwxr-x    1 me  staff        248 Oct 31 03:43 jupyter-migrate
+-rwxrwxr-x    1 me  staff        250 Oct 31 03:43 jupyter-nbconvert
+-rwxrwxr-x    1 me  staff        249 Oct 31 03:44 jupyter-nbextension
+-rwxrwxr-x    1 me  staff        248 Oct 31 03:44 jupyter-notebook
+-rwxrwxr-x    1 me  staff        123 Oct 31 03:44 jupyter-qtconsole
+-rwxrwxr-x    1 me  staff        249 Oct 31 03:43 jupyter-run
+-rwxrwxr-x    1 me  staff        253 Oct 31 03:44 jupyter-serverextension
+-rwxrwxr-x    1 me  staff        253 Oct 31 03:43 jupyter-troubleshoot
+-rwxrwxr-x    1 me  staff        281 Oct 31 03:43 jupyter-trust
+-rwxrwxr-x    2 me  staff         41 Sep 22 23:21 jupyter_mac.command
+-rwxrwxr-x    1 me  staff        947 Oct 31 03:42 kill_instance
+-rwxrwxr-x    1 me  staff      10628 Oct 31 03:42 launch_instance
+-rwxrwxr-x    1 me  staff     246044 Oct 31 03:42 lconvert
+-rwxrwxr-x    2 me  staff       1182 Feb 16  2017 less-watch
+lrwxr-xr-x    1 me  staff         15 Oct 31 03:41 libpng-config -&gt; libpng16-config
+-rwxrwxr-x    1 me  staff       2339 Oct 31 03:41 libpng16-config
+-rwxrwxr-x    1 me  staff       3121 Oct 31 03:42 list_instances
+-rwxrwxr-x    1 me  staff     466816 Oct 31 03:42 lrelease
+-rwxrwxr-x    1 me  staff       3467 Oct 31 03:42 lss3
+-rwxrwxr-x    1 me  staff     849860 Oct 31 03:42 lupdate
+lrwxr-xr-x    1 me  staff          2 Oct 31 03:41 lzcat -&gt; xz
+lrwxr-xr-x    1 me  staff          6 Oct 31 03:41 lzcmp -&gt; xzdiff
+lrwxr-xr-x    1 me  staff          6 Oct 31 03:41 lzdiff -&gt; xzdiff
+lrwxr-xr-x    1 me  staff          6 Oct 31 03:41 lzegrep -&gt; xzgrep
+lrwxr-xr-x    1 me  staff          6 Oct 31 03:41 lzfgrep -&gt; xzgrep
+lrwxr-xr-x    1 me  staff          6 Oct 31 03:41 lzgrep -&gt; xzgrep
+lrwxr-xr-x    1 me  staff          6 Oct 31 03:41 lzless -&gt; xzless
+lrwxr-xr-x    1 me  staff          2 Oct 31 03:41 lzma -&gt; xz
+-rwxrwxr-x    2 me  staff      13972 Sep 11 20:42 lzmadec
+-rwxrwxr-x    2 me  staff      13724 Sep 11 20:42 lzmainfo
+lrwxr-xr-x    1 me  staff          6 Oct 31 03:41 lzmore -&gt; xzmore
+-rwxrwxr-x    1 me  staff      76372 Oct 31 03:42 macchangeqt
+-rwxrwxr-x    1 me  staff     198484 Oct 31 03:42 macdeployqt
+-rwxrwxr-x    1 me  staff      63376 Oct 31 03:41 makeconv
+-rwxrwxr-x    1 me  staff     866140 Oct 31 03:42 moc
+-rwxrwxr-x    1 me  staff      28380 Oct 31 03:41 msgattrib
+-rwxrwxr-x    1 me  staff      28488 Oct 31 03:41 msgcat
+-rwxrwxr-x    1 me  staff      33412 Oct 31 03:41 msgcmp
+-rwxrwxr-x    1 me  staff      28484 Oct 31 03:41 msgcomm
+-rwxrwxr-x    1 me  staff      28028 Oct 31 03:41 msgconv
+-rwxrwxr-x    1 me  staff      28036 Oct 31 03:41 msgen
+-rwxrwxr-x    1 me  staff      23516 Oct 31 03:41 msgexec
+-rwxrwxr-x    1 me  staff      33716 Oct 31 03:41 msgfilter
+-rwxrwxr-x    1 me  staff      87992 Oct 31 03:41 msgfmt
+-rwxrwxr-x    1 me  staff     120272 Oct 31 03:41 msggrep
+-rwxrwxr-x    1 me  staff      53024 Oct 31 03:41 msginit
+-rwxrwxr-x    1 me  staff      58788 Oct 31 03:41 msgmerge
+-rwxrwxr-x    1 me  staff      42728 Oct 31 03:41 msgunfmt
+-rwxrwxr-x    1 me  staff      28300 Oct 31 03:41 msguniq
+-rwxrwxr-x    1 me  staff      19171 Oct 31 03:42 mturk
+-rwxrwxr-x    1 me  staff        265 Oct 31 03:43 navigator-updater
+-rwxrwxr-x    1 me  staff       6117 Oct 31 03:42 ncursesw6-config
+-rwxrwxr-x    1 me  staff      38516 Oct 31 03:41 ngettext
+-rwxrwxr-x    1 me  staff        240 Oct 31 03:43 nosetests
+-rwxrwxr-x    1 me  staff        155 Oct 31 03:43 numba
+-rwxrwxr-x    1 me  staff      12828 Oct 31 03:41 odbc_config
+-rwxrwxr-x    2 me  staff      28956 Sep 15 00:06 odbcinst
+-rwxrwxr-x    1 me  staff        792 Oct 31 03:43 odo
+-rwxrwxr-x    2 me  staff     573112 Sep 20 09:10 openssl
+-rwxrwxr-x    1 me  staff       2178 Oct 31 03:43 painter.py
+-rwxrwxr-x    2 me  staff      18224 Sep 13 17:17 pal2rgb
+-rwxrwxr-x    2 me  staff  117023956 Sep 11 22:01 pandoc
+-rwxrwxr-x    2 me  staff  110312276 Sep 11 22:01 pandoc-citeproc
+-rwxrwxr-x    1 me  staff       2383 Oct 31 03:42 pcre-config
+-rwxrwxr-x    2 me  staff      42512 Sep 12 23:15 pcregrep
+-rwxrwxr-x    2 me  staff      75656 Sep 12 23:15 pcretest
+-rwxrwxr-x    1 me  staff        234 Oct 31 03:42 pep8
+-rwxrwxr-x    1 me  staff       2383 Oct 31 03:43 pilconvert.py
+-rwxrwxr-x    1 me  staff      15535 Oct 31 03:43 pildriver.py
+-rwxrwxr-x    1 me  staff       2691 Oct 31 03:43 pilfile.py
+-rwxrwxr-x    1 me  staff       1052 Oct 31 03:43 pilfont.py
+-rwxrwxr-x    1 me  staff       2622 Oct 31 03:43 pilprint.py
+-rwxrwxr-x    1 me  staff        231 Oct 31 03:43 pip
+drwxr-xr-x    3 me  staff        102 Oct 31 03:42 pixeltool.app
+-rwxrwxr-x    1 me  staff      45876 Oct 31 03:41 pkgdata
+-rwxrwxr-x    1 me  staff        247 Oct 31 03:42 pkginfo
+-rwxrwxr-x    1 me  staff       2109 Oct 31 03:43 player.py
+-rwxrwxr-x    2 me  staff      12764 Sep 12 17:02 png-fix-itxt
+-rwxrwxr-x    2 me  staff      53248 Sep 12 17:02 pngfix
+-rwxrwxr-x    2 me  staff      18324 Sep 13 17:18 ppm2tiff
+-rwxrwxr-x    1 me  staff        249 Oct 31 03:43 pt2to3
+-rwxrwxr-x    1 me  staff        249 Oct 31 03:43 ptdump
+-rwxrwxr-x    1 me  staff        251 Oct 31 03:43 ptrepack
+-rwxrwxr-x    1 me  staff        249 Oct 31 03:43 pttree
+-rwxrwxr-x    1 me  staff        235 Oct 31 03:43 py.test
+-rwxrwxr-x    1 me  staff       2640 Oct 31 03:42 pyami_sendmail
+-rwxrwxr-x    1 me  staff        251 Oct 31 03:42 pybabel
+-rwxrwxr-x    1 me  staff        141 Oct 31 03:43 pycc
+-rwxrwxr-x    1 me  staff        241 Oct 31 03:42 pycodestyle
+-rwxrwxr-x    1 me  staff        101 Oct 31 03:41 pydoc
+-rwxrwxr-x    1 me  staff        412 Oct 31 03:43 pyflakes
+-rwxrwxr-x    1 me  staff        244 Oct 31 03:43 pygmentize
+-rwxrwxr-x    1 me  staff        246 Oct 31 03:43 pylint
+-rwxrwxr-x    1 me  staff        254 Oct 31 03:43 pylint-gui
+-rwxrwxr-x    1 me  staff     198000 Oct 31 03:43 pylupdate5
+-rwxrwxr-x    1 me  staff      65768 Oct 31 03:43 pyrcc5
+-rwxrwxr-x    1 me  staff        252 Oct 31 03:43 pyreverse
+-rwxrwxr-x    1 me  staff        235 Oct 31 03:43 pytest
+lrwxr-xr-x    1 me  staff          9 Oct 31 03:41 python -&gt; python2.7
+lrwxr-xr-x    1 me  staff         16 Oct 31 03:41 python-config -&gt; python2.7-config
+-rwxrwxr-x    1 me  staff        147 Oct 31 03:42 python.app
+lrwxr-xr-x    1 me  staff          9 Oct 31 03:41 python2 -&gt; python2.7
+lrwxr-xr-x    1 me  staff         16 Oct 31 03:41 python2-config -&gt; python2.7-config
+-rwxrwxr-x    1 me  staff      12560 Oct 31 03:41 python2.7
+-rwxrwxr-x    1 me  staff       1704 Oct 31 03:41 python2.7-config
+-rwxrwxr-x    1 me  staff        147 Oct 31 03:42 pythonw
+-rwxrwxr-x    2 me  staff         55 Sep 21 19:49 pyuic5
+-rwxrwxr-x    1 me  staff      69088 Oct 31 03:42 qcollectiongenerator
+-rwxrwxr-x    1 me  staff    1382504 Oct 31 03:42 qdoc
+-rwxrwxr-x    1 me  staff     168300 Oct 31 03:42 qhelpconverter
+-rwxrwxr-x    1 me  staff      35836 Oct 31 03:42 qhelpgenerator
+-rwxrwxr-x    1 me  staff     124824 Oct 31 03:42 qlalr
+-rwxrwxr-x    1 me  staff    4513784 Oct 31 03:42 qmake
+drwxr-xr-x    3 me  staff        102 Oct 31 03:42 qml.app
+-rwxrwxr-x    1 me  staff     110096 Oct 31 03:42 qmleasing
+-rwxrwxr-x    1 me  staff     225268 Oct 31 03:42 qmlimportscanner
+-rwxrwxr-x    1 me  staff     162404 Oct 31 03:42 qmllint
+-rwxrwxr-x    1 me  staff     108044 Oct 31 03:42 qmlmin
+-rwxrwxr-x    1 me  staff     160900 Oct 31 03:42 qmlplugindump
+-rwxrwxr-x    1 me  staff     179228 Oct 31 03:42 qmlprofiler
+-rwxrwxr-x    1 me  staff      64644 Oct 31 03:42 qmlscene
+-rwxrwxr-x    1 me  staff      24872 Oct 31 03:42 qmltestrunner
+-rw-rw-r--    1 me  staff        193 Oct 31 03:42 qt.conf
+-rwxrwxr-x    1 me  staff      69600 Oct 31 03:42 qtdiag
+-rwxrwxr-x    1 me  staff      34348 Oct 31 03:42 qtpaths
+-rwxrwxr-x    1 me  staff      32460 Oct 31 03:42 qtplugininfo
+-rwxrwxr-x    2 me  staff      26608 Sep 13 17:17 raw2tiff
+-rwxrwxr-x    1 me  staff     766788 Oct 31 03:42 rcc
+-rwxrwxr-x    2 me  staff      13424 Sep 13 17:16 rdjpgcom
+-rwxrwxr-x    1 me  staff      22520 Oct 31 03:41 recode-sr-latin
+lrwxr-xr-x    1 me  staff          4 Oct 31 03:41 reset -&gt; tset
+-rwxrwxr-x    1 me  staff       9057 Oct 31 03:42 route53
+-rwxrwxr-x    1 me  staff        619 Oct 31 03:42 rst2html.py
+-rwxrwxr-x    1 me  staff        739 Oct 31 03:42 rst2html4.py
+-rwxrwxr-x    1 me  staff       1164 Oct 31 03:42 rst2html5.py
+-rwxrwxr-x    1 me  staff        816 Oct 31 03:42 rst2latex.py
+-rwxrwxr-x    1 me  staff        625 Oct 31 03:42 rst2man.py
+-rwxrwxr-x    1 me  staff        789 Oct 31 03:42 rst2odt.py
+-rwxrwxr-x    1 me  staff       1723 Oct 31 03:42 rst2odt_prepstyles.py
+-rwxrwxr-x    1 me  staff        626 Oct 31 03:42 rst2pseudoxml.py
+-rwxrwxr-x    1 me  staff        662 Oct 31 03:42 rst2s5.py
+-rwxrwxr-x    1 me  staff        896 Oct 31 03:42 rst2xetex.py
+-rwxrwxr-x    1 me  staff        627 Oct 31 03:42 rst2xml.py
+-rwxrwxr-x    1 me  staff        695 Oct 31 03:42 rstpep2html.py
+-rwxrwxr-x    1 me  staff      16278 Oct 31 03:42 runxlrd.py
+-rwxrwxr-x    1 me  staff      16862 Oct 31 03:42 s3put
+-rwxrwxr-x    1 me  staff        263 Oct 31 03:43 samp_hub
+-rwxrwxr-x    1 me  staff       7018 Oct 31 03:42 sdbadmin
+-rwxrwxr-x    2 me  staff     329588 Sep 13 17:35 sip
+-rwxrwxr-x    1 me  staff        249 Oct 31 03:44 skivi
+-rwxrwxr-x    2 me  staff      13440 Sep 15 00:06 slencheck
+-rwxrwxr-x    1 me  staff      18564 Oct 31 03:41 smtpd.py
+-rwxrwxr-x    1 me  staff        416 Oct 31 03:44 sphinx-apidoc
+-rwxrwxr-x    1 me  staff        418 Oct 31 03:44 sphinx-autogen
+-rwxrwxr-x    1 me  staff        414 Oct 31 03:44 sphinx-build
+-rwxrwxr-x    1 me  staff        424 Oct 31 03:44 sphinx-quickstart
+-rwxrwxr-x    1 me  staff        255 Oct 31 03:44 spyder
+-rwxrwxr-x    2 me  staff    1341572 Sep 11 20:47 sqlite3
+-rwxrwxr-x    2 me  staff      29841 Sep 11 20:44 sqlite3_analyzer
+-rwxrwxr-x    1 me  staff        248 Oct 31 03:43 symilar
+-rwxrwxr-x    2 me  staff      47182 Sep 21 18:59 syncqt.pl
+-rwxrwxr-x    2 me  staff      18096 Sep 11 20:39 tabs
+-rwxrwxr-x    1 me  staff       3792 Oct 31 03:42 taskadmin
+lrwxr-xr-x    1 me  staff          8 Oct 31 03:41 tclsh -&gt; tclsh8.6
+-rwxrwxr-x    2 me  staff      12824 Sep 11 20:44 tclsh8.6
+-rwxrwxr-x    1 me  staff       2006 Oct 31 03:43 thresholder.py
+-rwxrwxr-x    2 me  staff      78192 Sep 11 20:39 tic
+-rwxrwxr-x    2 me  staff      22448 Sep 13 17:17 tiff2bw
+-rwxrwxr-x    2 me  staff      86060 Sep 13 17:17 tiff2pdf
+-rwxrwxr-x    2 me  staff      55276 Sep 13 17:17 tiff2ps
+-rwxrwxr-x    2 me  staff      22832 Sep 13 17:17 tiff2rgba
+-rwxrwxr-x    2 me  staff      26488 Sep 13 17:17 tiffcmp
+-rwxrwxr-x    2 me  staff      46160 Sep 13 17:18 tiffcp
+-rwxrwxr-x    2 me  staff     108592 Sep 13 17:17 tiffcrop
+-rwxrwxr-x    2 me  staff      22424 Sep 13 17:17 tiffdither
+-rwxrwxr-x    2 me  staff      23520 Sep 13 17:17 tiffdump
+-rwxrwxr-x    2 me  staff      23876 Sep 13 17:17 tiffinfo
+-rwxrwxr-x    2 me  staff      27124 Sep 13 17:17 tiffmedian
+-rwxrwxr-x    2 me  staff      18164 Sep 13 17:18 tiffset
+-rwxrwxr-x    2 me  staff      18448 Sep 13 17:18 tiffsplit
+-rwxrwxr-x    2 me  staff      19700 Sep 11 20:39 toe
+-rwxrwxr-x    2 me  staff      19308 Sep 11 20:39 tput
+-rwxrwxr-x    2 me  staff      24192 Sep 11 20:39 tset
+-rwxrwxr-x    1 me  staff     419400 Oct 31 03:42 uic
+-rwxr-xr-x    1 me  staff        242 Nov  1 23:57 unidecode
+lrwxr-xr-x    1 me  staff          2 Oct 31 03:41 unlzma -&gt; xz
+lrwxr-xr-x    1 me  staff          2 Oct 31 03:41 unxz -&gt; xz
+-rwxrwxr-x    1 me  staff       1978 Oct 31 03:42 vba_extract.py
+-rwxrwxr-x    1 me  staff       1045 Oct 31 03:43 viewer.py
+-rwxrwxr-x    1 me  staff        253 Oct 31 03:43 volint
+-rwxrwxr-x    1 me  staff        247 Oct 31 03:43 wcslint
+-rwxrwxr-x    1 me  staff        238 Oct 31 03:43 wheel
+lrwxr-xr-x    1 me  staff          7 Oct 31 03:41 wish -&gt; wish8.6
+-rwxrwxr-x    2 me  staff      21280 Sep 11 20:44 wish8.6
+-rwxrwxr-x    2 me  staff      13480 Sep 13 17:16 wrjpgcom
+-rwxrwxr-x    1 me  staff     308236 Oct 31 03:41 xgettext
+-rwxrwxr-x    1 me  staff        248 Oct 31 03:43 xlwings
+-rwxrwxr-x    1 me  staff       2288 Oct 31 03:42 xml2-config
+-rwxrwxr-x    2 me  staff      27444 Sep 12 23:37 xmlcatalog
+-rwxrwxr-x    2 me  staff      74132 Sep 12 23:37 xmllint
+-rwxrwxr-x    1 me  staff      69440 Oct 31 03:42 xmlpatterns
+-rwxrwxr-x    1 me  staff      19008 Oct 31 03:42 xmlpatternsvalidator
+-rwxrwxr-x    2 me  staff      26640 Sep 11 22:21 xmlwf
+-rwxrwxr-x    1 me  staff       2684 Oct 31 03:42 xslt-config
+-rwxrwxr-x    2 me  staff      38152 Sep 14 14:51 xsltproc
+-rwxrwxr-x    2 me  staff      74712 Sep 11 20:42 xz
+lrwxr-xr-x    1 me  staff          2 Oct 31 03:41 xzcat -&gt; xz
+lrwxr-xr-x    1 me  staff          6 Oct 31 03:41 xzcmp -&gt; xzdiff
+-rwxrwxr-x    2 me  staff      13980 Sep 11 20:42 xzdec
+-rwxrwxr-x    2 me  staff       6632 Sep 11 20:42 xzdiff
+lrwxr-xr-x    1 me  staff          6 Oct 31 03:41 xzegrep -&gt; xzgrep
+lrwxr-xr-x    1 me  staff          6 Oct 31 03:41 xzfgrep -&gt; xzgrep
+-rwxrwxr-x    2 me  staff       5628 Sep 11 20:42 xzgrep
+-rwxrwxr-x    2 me  staff       1802 Sep 11 20:42 xzless
+-rwxrwxr-x    2 me  staff       2161 Sep 11 20:42 xzmore
+-rwxr-xr-x    1 me  staff        238 Nov  2 00:18 youtube-dl
+-rwxr-xr-x    1 me  staff       5462 Nov  2 00:14 ytdl
+</code></pre>
+"
+"Test labels for regression caffe, float not allowed?","<p>I am doing regression using caffe, and my <code>test.txt</code> and <code>train.txt</code> files are like this:</p>
+
+<pre><code>/home/foo/caffe/data/finetune/flickr/3860781056.jpg 2.0  
+/home/foo/caffe/data/finetune/flickr/4559004485.jpg 3.6  
+/home/foo/caffe/data/finetune/flickr/3208038920.jpg 3.2  
+/home/foo/caffe/data/finetune/flickr/6170430622.jpg 4.0  
+/home/foo/caffe/data/finetune/flickr/7508671542.jpg 2.7272
+</code></pre>
+
+<p>My problem is it seems caffe does not allow float labels like 2.0, when I use float labels while reading, for example the <code>'test.txt'</code> file caffe only
+recognizes </p>
+
+<blockquote>
+  <p>a total of 1 images</p>
+</blockquote>
+
+<p>which is wrong.</p>
+
+<p>But when I for example change the 2.0 to 2 in the file and the following lines same, caffe now gives </p>
+
+<blockquote>
+  <p>a total of 2 images</p>
+</blockquote>
+
+<p>implying that the float labels are responsible for the problem.</p>
+
+<p>Can anyone help me here, to solve this problem, I definitely need to use float labels for regression, so does anyone know about a work around or solution for this? Thanks in advance.</p>
+
+<p><b>EDIT</b>
+For anyone facing a similar issue <a href=""https://stackoverflow.com/questions/31617486/use-caffe-to-train-lenet-with-csv-data"">use caffe to train Lenet with CSV data</a> might be of help. Thanks to @Shai.</p>
+"

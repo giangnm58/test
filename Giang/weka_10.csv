@@ -1,0 +1,557 @@
+Title,Body,Label
+WEKA Tutorials / Examples for a Newbie,"<p>In a <a href=""https://stackoverflow.com/questions/2257304/multi-column-integer-ordering/2267735#2267735"">follow-up to this answer</a> I want to ask if any of you know any good (and more importantly <em>easy to understand</em>) tutorials and / or examples of data mining with the <a href=""http://www.cs.waikato.ac.nz/ml/weka/"" rel=""nofollow noreferrer"">Weka toolkit</a>.</p>
+
+<p>I've been very interested in Data Mining ever since I've first heard of it and the things it can do, I've also have some experiments I'd like to do with some of my data and I've already bought four books and I found specially interesting the following two:</p>
+
+<p><a href=""http://rads.stackoverflow.com/amzn/click/3540430601"" rel=""nofollow noreferrer"">Intelligent Data Analysis http://ecx.images-amazon.com/images/I/41CJNXchMrL._BO2,204,203,200_PIsitb-sticker-arrow-click,TopRight,35,-76_AA240_SH20_OU01_.jpg</a>
+<a href=""http://rads.stackoverflow.com/amzn/click/0120884070"" rel=""nofollow noreferrer"">Data Mining http://ecx.images-amazon.com/images/I/61DhYb1Z6QL._BO2,204,203,200_PIsitb-sticker-arrow-click,TopRight,35,-76_AA240_SH20_OU01_.jpg</a></p>
+
+<p>The last one is written by the same authors of Weka and contains a lot of examples but still, I found it a little hard to understand the logic and specially the math. My math skills are currently very rough, I plan to go to the University this year and hopefully I'll learn and be able to better understand the math involved, but until then I want to gain some practice in Data Mining.</p>
+
+<p>Is there any step-by-step tutorial with example data I can read to get me started with the Weka toolkit?</p>
+",Related to library: Lack of knowledge
+Text mining with PHP,"<p>I'm doing a project for a college class I'm taking.</p>
+
+<p>I'm using PHP to build a simple web app that classify tweets as ""positive"" (or happy) and ""negative"" (or sad) based on a set of dictionaries. The algorithm I'm thinking of right now is Naive Bayes classifier or decision tree.</p>
+
+<p>However, I can't find any PHP library that helps me do some serious language processing. Python has NLTK (<a href=""http://www.nltk.org"" rel=""nofollow noreferrer"">http://www.nltk.org</a>). Is there anything like that for PHP?</p>
+
+<p>I'm planning to use WEKA as the back end of the web app (by calling Weka in command line from within PHP), but it doesn't seem that efficient.</p>
+
+<p>Do you have any idea what I should use for this project? Or should I just switch to Python?</p>
+
+<p>Thanks</p>
+",Related to library: Lack of knowledge
+Sentiment analysis with NLTK python for sentences using sample data or webservice?,"<p>I am embarking upon a NLP project for sentiment analysis.</p>
+
+<p>I have successfully installed NLTK for python (seems like a great piece of software for this). However,I am having trouble understanding how it can be used to accomplish my task.</p>
+
+<p>Here is my task:</p>
+
+<ol>
+<li>I start with one long piece of data (lets say several hundred tweets on the subject of the UK election from their webservice)</li>
+<li>I would like to break this up into sentences (or info no longer than 100 or so chars) (I guess i can just do this in python??)</li>
+<li>Then to search through all the sentences for specific instances within that sentence e.g. ""David Cameron""</li>
+<li>Then I would like to check for positive/negative sentiment in each sentence and count them accordingly</li>
+</ol>
+
+<p>NB: I am not really worried too much about accuracy because my data sets are large and also not worried too much about sarcasm. </p>
+
+<p>Here are the troubles I am having:</p>
+
+<ol>
+<li><p>All the data sets I can find e.g. the corpus movie review data that comes with NLTK arent in webservice format. It looks like this has had some processing done already. As far as I can see the processing (by stanford) was done with WEKA. Is it not possible for NLTK to do all this on its own? Here all the data sets have already been organised into positive/negative already e.g. polarity dataset <a href=""http://www.cs.cornell.edu/People/pabo/movie-review-data/"" rel=""noreferrer"">http://www.cs.cornell.edu/People/pabo/movie-review-data/</a> How is this done? (to organise the sentences by sentiment, is it definitely WEKA? or something else?)</p></li>
+<li><p>I am not sure I understand why WEKA and NLTK would be used together. Seems like they do much the same thing. If im processing the data with WEKA first to find sentiment why would I need NLTK? Is it possible to explain why this might be necessary?</p></li>
+</ol>
+
+<p>I have found a few scripts that get somewhat near this task, but all are using the same pre-processed data. Is it not possible to process this data myself to find sentiment in sentences rather than using the data samples given in the link?</p>
+
+<p>Any help is much appreciated and will save me much hair!</p>
+
+<p>Cheers Ke</p>
+",
+Increase heap size in java for weka,"<p>I'm trying to increase the heap size in java for weka which keeps crashing.  I used the suggested line:</p>
+
+<pre><code>&gt; java -Xmx500m -classpath
+</code></pre>
+
+<p>but I get the following error:</p>
+
+<pre><code>-classpath requires class path specification
+</code></pre>
+
+<p>I'm not sure what this means.  Any suggestions?</p>
+",Related to library: Bugs
+How to add LibSVM class to WEKA classpath on a Mac,"<p>I am running Max OS X 10.7 Lion and I want to use WEKA with LibSVM from command line.  I get this error:</p>
+
+<pre><code>Problem evaluating classifier: libsvm classes not in CLASSPATH!
+</code></pre>
+
+<p><img src=""https://i.stack.imgur.com/2t91y.png"" alt=""Error I am receiving in WEKA""></p>
+
+<p>I found the LibSVM library <a href=""http://www.csie.ntu.edu.tw/~cjlin/libsvm/#download"" rel=""nofollow noreferrer"">here</a>. I need to add it to my Java classpath so that WEKA can find it.  The download contains several files, shown below. I don't know how to add them to my classpath for Java.</p>
+
+<p><img src=""https://i.stack.imgur.com/ES3Vm.png"" alt=""Files in LibSVM download that need to be added to classpath""></p>
+
+<p>I am attempting to use the LibSVM classifier in WEKA because it is preferable for me over SMO. I am also unsure if this means the Java classpath or if it is specific to WEKA. I also don't know where to get these classes from. Any help is appreciated.</p>
+",Related to library: Installation
+"Skip feature when classifying, but show feature in output","<p>I've created a dataset which contains +/- 13000 rows with +/- 50 features. I know how to output every classification result: prediction and actual, but I would like to be able to output some sort of ID with those results. So i've added a ID column to my dataset but I don't know how disregard the ID when classifying while still being able to output the ID with every prediction result. I do know how to select features to output with every prediction.</p>
+",Prediction
+Web/browser-oriented open source machine learning projects?,"<p>Applying machine learning techniques, more specifically text mining techniques, in browser environment (mainly Javascript) or as a web application is not a very widely discussed topic.</p>
+
+<p>I want to build my own web application / browser extension that can accomplish certain level of text classification / visualization techniques. I would like to know, if there is any open source projects that apply text mining techniques in web application or even better as browser extensions? </p>
+
+<p>So far, these are the projects/discussions I gathered with days of random searching:</p>
+
+<p><strong>For text mining in web application:</strong></p>
+
+<ul>
+<li><a href=""http://text-processing.com/"" rel=""nofollow noreferrer"">http://text-processing.com/</a> with <a href=""http://text-processing.com/demo/"" rel=""nofollow noreferrer"">demo</a> (Close source, with limited api)</li>
+<li><a href=""http://www.uclassify.com/Default.aspx"" rel=""nofollow noreferrer"">uClassify</a> (close source, no info about library base)<br> </li>
+</ul>
+
+<p><strong>For machine learning in Javascript:</strong></p>
+
+<ul>
+<li><a href=""http://news.ycombinator.com/item?id=1704648"" rel=""nofollow noreferrer"">Discussion</a> on the possibility about Machine learning in
+JavaScript. (mainly about saying Node.js is going to change the landscape)</li>
+<li><a href=""http://harthur.github.com/brain/"" rel=""nofollow noreferrer"">brain - javascript supervised machine learning</a></li>
+<li>A <a href=""http://www.dusbabek.org/~garyd/bayes/"" rel=""nofollow noreferrer"">demo project</a> with Naive Bayes implemented in Javascript</li>
+</ul>
+
+<p>For web application text mining, the architect that I can think of:</p>
+
+<ul>
+<li>Python libraries (e.g. NLTK or scikit-learn) + Django</li>
+<li>Java libraries (a lot) + Play! framework</li>
+<li>Even R based + <a href=""http://rapache.net/"" rel=""nofollow noreferrer"">rApache</a></li>
+</ul>
+",Related to library: Lack of knowledge
+Convert CSV to ARFF using weka,"<p>I've been trying to get this dataset <code>http://archive.ics.uci.edu/ml/datasets/Communities+and+Crime+Unnormalized</code> into Weka and no luck at all. I converted it to CSV and then loaded it into Weka and then tried to convert it to ARFF but still giving me the error <code>""attribute names are not unique""</code>. </p>
+
+<p>Also, do I have to spread the training dataset from testing dataset or keep them together?</p>
+",Related to library: Bugs
+Cross Validation in Weka,"<p>I've always thought from what I read that cross validation is performed like this:</p>
+
+<blockquote>
+  <p>In k-fold cross-validation, the original sample is randomly
+  partitioned into k subsamples. Of the k subsamples, a single subsample
+  is retained as the validation data for testing the model, and the
+  remaining k − 1 subsamples are used as training data. The
+  cross-validation process is then repeated k times (the folds), with
+  each of the k subsamples used exactly once as the validation data. The
+  k results from the folds then can be averaged (or otherwise combined)
+  to produce a single estimation</p>
+</blockquote>
+
+<p>So k models are built and the final one is the average of those.
+In Weka guide is written that each model is always built using ALL the data set. So how does cross validation in Weka work ? Is the model built from all data and the ""cross-validation"" means that k fold are created then each fold is evaluated on it and the final output results is simply the averaged result from folds?</p>
+",Prediction
+Choose the right classification algorithm. Linear or non-linear?,"<p>I find this question a little tricky. Maybe someone knows an approach to answer this question. Imagine that you have a dataset(training data) which you don't know what it is about. Which features of training data would you look at in order to infer classification algorithm to classify this data? Can we say anything whether we should use a non-linear or linear classification algorithm?</p>
+
+<p>By the way, I am using WEKA to analyze the data.</p>
+
+<p>Any suggestions?
+Thank you.</p>
+",
+Beginner's resources/introductions to classification algorithms,"<p>everybody. I am entirely new to the topic of classification algorithms, and need a few good pointers about where to start some ""serious reading"". I am right now in the process of finding out, whether machine learning and automated classification algorithms could be a worthwhile thing to add to some application of mine.</p>
+
+<p>I already scanned through <em>""How to Solve It: Modern heuristics""</em> by Z. Michalewicz and D. Fogel (in particular, the chapters about linear classifiers using neuronal networks), and on the practical side, I am currently looking through the <a href=""http://www.cs.waikato.ac.nz/~ml/weka/"" rel=""noreferrer"">WEKA toolkit</a> source code. My next (planned) step would be to dive into the realm of Bayesian classification algorithms.</p>
+
+<p>Unfortunately, I am lacking a serious theoretical foundation in this area (let alone, having used it in any way as of yet), so any hints at where to look next would be appreciated; in particular, a good introduction of available classification algorithms would be helpful. Being more a craftsman and less a theoretician, the more practical, the better...</p>
+
+<p>Hints, anyone?</p>
+",
+Why does the C4.5 algorithm use pruning in order to reduce the decision tree and how does pruning affect the predicion accuracy?,"<p>I have searched on google about this issue and I can't find something that explains this algorithm in a simple yet detailed way.</p>
+
+<p>For instance, I know the id3 algorithm doesn't use pruning at all, so if you have a continuous characteristic, the prediction success rates will be very low.</p>
+
+<p>So the C4.5 in order to support continuous characteristics it uses pruning, but is this the only reason?</p>
+
+<p>Also I can't really understand in the WEKA application, how exactly the confidence factor affects the efficiency of the predictions. The smaller the confidence factor the more pruning the algorithm will do, however what is the correlation between pruning and the prediction's accuracy? The more you prune, the better the predictions or the worse?</p>
+
+<p>Thanks</p>
+",
+Visualizing Weka classification tree,"<p>I am using few data sets available online and trying to visualize tree. However, it does not let me visualize tree option at all. Could anyone please guide me how to get the tree diagram in weka by using data sets available online?</p>
+",
+How to interpret weka classification?,"<p>How can we interpret the classification result in weka using naive bayes?</p>
+
+<p>How is mean, std deviation, weight sum and precision calculated?</p>
+
+<p>How is kappa statistic, mean absolute error, root mean squared error etc calculated?</p>
+
+<p>What is the interpretation of the confusion matrix?</p>
+",
+weka.core.UnassignedDatasetException when creating an unlabeled instance,"<p>I trained an IBK classifier with some training data that I created manually as following:</p>
+
+<pre><code>ArrayList&lt;Attribute&gt; atts = new ArrayList&lt;Attribute&gt;();
+ArrayList&lt;String&gt; classVal = new ArrayList&lt;String&gt;();
+classVal.add(""C1"");
+classVal.add(""C2"");
+atts.add(new Attribute(""a""));
+atts.add(new Attribute(""b""));
+atts.add(new Attribute(""c""));
+atts.add(new Attribute(""d""));
+atts.add(new Attribute(""@@class@@"", classVal));
+
+Instances dataRaw = new Instances(""TestInstances"", atts, 0);
+dataRaw.setClassIndex(dataRaw.numAttributes() - 1);
+double[] instanceValue1 = new double[]{3,0,1,0,0};
+dataRaw.add(new DenseInstance(1.0, instanceValue1));
+
+double[] instanceValue2 = new double[]{2,1,1,0,0};
+dataRaw.add(new DenseInstance(1.0, instanceValue2));
+
+double[] instanceValue3 = new double[]{2,0,2,0,0};
+dataRaw.add(new DenseInstance(1.0, instanceValue3));
+
+double[] instanceValue4 = new double[]{1,3,0,0,1};
+dataRaw.add(new DenseInstance(1.0, instanceValue4));
+
+double[] instanceValue5 = new double[]{0,3,1,0,1};
+dataRaw.add(new DenseInstance(1.0, instanceValue5));
+
+double[] instanceValue6 = new double[]{0,2,1,1,1};
+dataRaw.add(new DenseInstance(1.0, instanceValue6));
+</code></pre>
+
+<p>Then I build up the classifier:</p>
+
+<pre><code>IBk ibk = new IBk();
+try {
+    ibk.buildClassifier(dataRaw);
+
+} catch (Exception e) {
+    e.printStackTrace();
+}
+</code></pre>
+
+<p>I want to create a new instance with unlabeled class and classify this instance, I tried the following with no luck.</p>
+
+<pre><code>IBk ibk = new IBk();
+try {
+    ibk.buildClassifier(dataRaw);
+    double[] values = new double[]{3,1,0,0,-1};
+    DenseInstance newInst = new DenseInstance(1.0,values);
+    double classif = ibk.classifyInstance(newInst);
+    System.out.println(classif);
+} catch (Exception e) {
+    e.printStackTrace();
+}
+</code></pre>
+
+<p>I just get the following errors</p>
+
+<pre><code>weka.core.UnassignedDatasetException: DenseInstance doesn't have access to a dataset!
+at weka.core.AbstractInstance.classAttribute(AbstractInstance.java:98)
+at weka.classifiers.AbstractClassifier.classifyInstance(AbstractClassifier.java:74)
+at TextCategorizationTest.instancesWithDoubleValues(TextCategorizationTest.java:136)
+at TextCategorizationTest.main(TextCategorizationTest.java:33)
+</code></pre>
+
+<p>Looks like I am doing something wrong while creating a new instance. How can I create an unlabeled instance exactly ?</p>
+
+<p>Thanks in Advance</p>
+",Related to library: Bugs
+How to use LibSVM with Weka in my Java code?,"<p>I want to use LibSVM classifier with Weka in my application. How can I (or where can I find good examples to) do this?</p>
+",Related to library: Installation
+How to interpret Weka Logistic Regression output?,"<p>Please help interpret results of logistic regression produced by weka.classifiers.functions.Logistic from Weka library.</p>
+
+<p>I use numeric data from Weka examples:</p>
+
+<pre><code>@relation weather
+
+@attribute outlook {sunny, overcast, rainy}
+@attribute temperature real
+@attribute humidity real
+@attribute windy {TRUE, FALSE}
+@attribute play {yes, no}
+
+@data
+sunny,85,85,FALSE,no
+sunny,80,90,TRUE,no
+overcast,83,86,FALSE,yes
+rainy,70,96,FALSE,yes
+rainy,68,80,FALSE,yes
+rainy,65,70,TRUE,no
+overcast,64,65,TRUE,yes
+sunny,72,95,FALSE,no
+sunny,69,70,FALSE,yes
+rainy,75,80,FALSE,yes
+sunny,75,70,TRUE,yes
+overcast,72,90,TRUE,yes
+overcast,81,75,FALSE,yes
+rainy,71,91,TRUE,no
+</code></pre>
+
+<p>To create logistic regression model I use command:
+    java -cp $WEKA_INS/weka.jar weka.classifiers.functions.Logistic -t $WEKA_INS/data/weather.numeric.arff -T $WEKA_INS/data/weather.numeric.arff -d ./weather.numeric.model.arff</p>
+
+<p>Here the three arguments mean:</p>
+
+<pre><code>-t &lt;name of training file&gt; : Sets training file.
+-T &lt;name of test file&gt; : Sets test file. 
+-d &lt;name of output file&gt; : Sets model output file.
+</code></pre>
+
+<p>Running the above command produce the following output: </p>
+
+<pre><code>Logistic Regression with ridge parameter of 1.0E-8
+Coefficients...
+              Class
+Variable                    yes
+===============================
+outlook=sunny           -6.4257
+outlook=overcast        13.5922
+outlook=rainy           -5.6562
+temperature             -0.0776
+humidity                -0.1556
+windy                    3.7317
+Intercept                22.234
+
+Odds Ratios...
+              Class
+Variable                    yes
+===============================
+outlook=sunny            0.0016
+outlook=overcast    799848.4264
+outlook=rainy            0.0035
+temperature              0.9254
+humidity                 0.8559
+windy                   41.7508
+
+
+Time taken to build model: 0.05 seconds
+Time taken to test model on training data: 0 seconds
+
+=== Error on training data ===
+Correctly Classified Instances          11               78.5714 %
+Incorrectly Classified Instances         3               21.4286 %
+Kappa statistic                          0.5532
+Mean absolute error                      0.2066
+Root mean squared error                  0.3273
+Relative absolute error                 44.4963 %
+Root relative squared error             68.2597 %
+Total Number of Instances               14     
+
+=== Confusion Matrix ===
+ a b   &lt;-- classified as
+ 7 2 | a = yes
+ 1 4 | b = no
+</code></pre>
+
+<p>Questions:</p>
+
+<p>1) First section of the report:</p>
+
+<pre><code>Coefficients...
+              Class
+Variable                    yes
+===============================
+outlook=sunny           -6.4257
+outlook=overcast        13.5922
+outlook=rainy           -5.6562
+temperature             -0.0776
+humidity                -0.1556
+windy                    3.7317
+Intercept                22.234
+</code></pre>
+
+<p>1.1) Do I understand right that ""Coefficients"" are in fact weights that are applied to each attribute
+before adding them together to produce the value of class attribute ""play"" equal to "" yes""?</p>
+
+<p>2) Second section of the report:</p>
+
+<pre><code>Odds Ratios...
+              Class
+Variable                    yes
+===============================
+outlook=sunny            0.0016
+outlook=overcast    799848.4264
+outlook=rainy            0.0035
+temperature              0.9254
+humidity                 0.8559
+windy                   41.7508
+</code></pre>
+
+<p>2.1) What is the meaning of ""Odds Ratios""?
+2.2) Do they all also relate to class attribute ""play"" equal to "" yes""?
+2.3) Why value of ""outlook=overcast"" is so much bigger then value of ""outlook=sunny""?</p>
+
+<p>3)</p>
+
+<pre><code>=== Confusion Matrix ===
+ a b   &lt;-- classified as
+ 7 2 | a = yes
+ 1 4 | b = no
+</code></pre>
+
+<p>3.1) What is the menaing of Confusion Matrix?</p>
+
+<p>Thanks a lot for your help!</p>
+",Related to library: Lack of knowledge
+How to read a text file with mixed encodings in Scala or Java?,"<p>I am trying to parse a CSV file, ideally using weka.core.converters.CSVLoader.
+However the file I have is not a valid UTF-8 file.
+It is mostly a UTF-8 file but some of the field values are in different encodings,
+so there is no encoding in which the whole file is valid,
+but I need to parse it anyway.
+Apart from using java libraries like Weka, I am mainly working in Scala.
+I am not even able to read the file usin scala.io.Source:
+For example</p>
+
+<pre><code>Source.
+  fromFile(filename)(""UTF-8"").
+  foreach(print);
+</code></pre>
+
+<p>throws:</p>
+
+<pre><code>    java.nio.charset.MalformedInputException: Input length = 1
+at java.nio.charset.CoderResult.throwException(CoderResult.java:277)
+at sun.nio.cs.StreamDecoder.implRead(StreamDecoder.java:337)
+at sun.nio.cs.StreamDecoder.read(StreamDecoder.java:176)
+at java.io.InputStreamReader.read(InputStreamReader.java:184)
+at java.io.BufferedReader.fill(BufferedReader.java:153)
+at java.io.BufferedReader.read(BufferedReader.java:174)
+at scala.io.BufferedSource$$anonfun$iter$1$$anonfun$apply$mcI$sp$1.apply$mcI$sp(BufferedSource.scala:38)
+at scala.io.Codec.wrap(Codec.scala:64)
+at scala.io.BufferedSource$$anonfun$iter$1.apply(BufferedSource.scala:38)
+at scala.io.BufferedSource$$anonfun$iter$1.apply(BufferedSource.scala:38)
+at scala.collection.Iterator$$anon$14.next(Iterator.scala:150)
+at scala.collection.Iterator$$anon$25.hasNext(Iterator.scala:562)
+at scala.collection.Iterator$$anon$19.hasNext(Iterator.scala:400)
+at scala.io.Source.hasNext(Source.scala:238)
+at scala.collection.Iterator$class.foreach(Iterator.scala:772)
+at scala.io.Source.foreach(Source.scala:181)
+</code></pre>
+
+<p>I am perfectly happy to throw all the invalid characters away or replace them with some dummy.
+I am going to have lots of text like this to process in various ways
+and may need to pass the data to various third party libraries.
+An ideal solution would be some kind of global setting that would
+cause all the low level java libraries to ignore invalid bytes in text,
+so that that I can call third party libraries on this data without modification.</p>
+
+<p>SOLUTION:</p>
+
+<pre><code>import java.nio.charset.CodingErrorAction
+import scala.io.Codec
+
+implicit val codec = Codec(""UTF-8"")
+codec.onMalformedInput(CodingErrorAction.REPLACE)
+codec.onUnmappableCharacter(CodingErrorAction.REPLACE)
+
+val src = Source.
+  fromFile(filename).
+  foreach(print)
+</code></pre>
+
+<p>Thanks to +Esailija for pointing me in the right direction.
+This lead me to <a href=""https://stackoverflow.com/questions/3801890/how-to-detect-illegal-utf-8-byte-sequences-to-replace-them-in-java-inputstream"">How to detect illegal UTF-8 byte sequences to replace them in java inputstream?</a>
+which provides the core java solution. In Scala I can make this the default behaviour by making the codec implicit. I think I can make it the default behaviour for the entire package by putting it the implicit codec definition in the package object.</p>
+",Related to library: Lack of knowledge
+Weka simple K-means clustering assignments,"<p>I have what feels like a simple problem, but I can't seem to find an answer. I'm pretty new to Weka, but I feel like I've done a bit of research on this (at least read through the first couple of pages of Google results) and come up dry.</p>
+
+<p>I am using Weka to run clustering using Simple K-Means. In the results list I have no problem visualizing my output (""Visualize cluster assignments"") and it is clear both from my understanding of the K-Means algorithm and the output of Weka that each of my instances is ending up as a member of a different cluster (centered around a particular centroid, if you will).</p>
+
+<p>I can see something of the cluster composition from the text output. However Weka provides me with no explicit ""mapping"" from instance number to cluster number. I would like something like:</p>
+
+<pre><code>instance 1 --&gt; cluster 0
+instance 2 --&gt; cluster 0
+instance 3 --&gt; cluster 2
+instance 4 --&gt; cluster 1
+... etc.
+</code></pre>
+
+<p>How do I obtain these results without calculating the distance from each item to each centroid on my own?</p>
+",
+Production architecture for big data real time machine learning application?,"<p>I'm starting to learn some stuff about big data with a big focus on predictive analysis and for that I have a case study I would like to implement:</p>
+
+<p>I have a dataset of servers health information that is polled every 5sec. I want to show the data that is retrieved but more importantly: I want to run a machine learning model previously built and show the results (alert about servers going to crash).</p>
+
+<p>The machine learning model will be built by a machine learning specialist so that's completely out of scope. My job would be to integrate the machine learning model in a platform that runs the model and shows the results in a nice dashboard.</p>
+
+<p>My problem is the ""big picture"" architecture of this system: I see that all the pieces already exist (cloudera+mahout) but I'm missing a simple integrated solution for all my needs and I don't believe the state of art is doing some custom software...</p>
+
+<p>So, can anyone shed some light on production systems like this (showing data with predictive analysis)? Reference architecture for this? Tutorials/documentation?</p>
+
+<hr>
+
+<p>Notes:</p>
+
+<ol>
+<li><p>I've investigated some related technologies: cloudera/hadoop, pentaho, mahout and weka. I know that Pentaho for example is able to store big data and run ad-hoc Weka analysis on that data. Using cloudera and Impala a data specialist can also run ad-hoc queries and analyse the data but that's not my goal. I want my system to run the ML model and show the results in a nice dashboard alongside the retrieved data. And I'm looking for a platform that already allows this usage instead of custom building.</p></li>
+<li><p>I'm focusing on Pentaho as it seems to have a nice integration of Machine Learning but every tutorial I read was more about ""ad-hoc"" ML analysis than real-time. Any tutorial on that subject will be welcomed.</p></li>
+<li><p>I don't mind opensource or commercial solutions (with a trial)</p></li>
+<li><p>Depending of the specifics maybe this isn't big data: more ""traditional"" solutions are also welcomed.</p></li>
+<li><p>Also real time here is a broad term: if the ML model has good performance running it every 5sec is good enough.</p></li>
+<li><p>ML model is static (isn't real-time updating or changing its behavior)</p></li>
+<li><p>I'm not looking for a customized application for my example as my focus is on the big picture: big data with predictive analysis generic platforms.</p></li>
+</ol>
+",
+What are data requirements for FP-Growth in Weka?,"<p>I'd like to use FP-Growth association rule algorithm on my dataset (model) in Weka. </p>
+
+<p>Unfortunately, this algorithm is greyed out. What are preconditions I have to meet in order to make use of it?</p>
+",Data Preparation: Lack of knowledge
+How to use weka for predict results,"<p>Im new to weka and I'm confused with the tool. What I needed to do is im having a data set about fruit price and relating attributes and im trying to predict the specific fruit price using the data set. Since I'm new to weka I couldn't figure out how to do this task. Please help me or guide me to a tutorial about how to do predictions and what is the best method or the algorithm to do this task.</p>
+
+<p>Thank You.</p>
+","Related to library: Lack of knowledge, Prediction"
+Java Weka: How to specify split percentage?,"<p>I have written the code to create the model and save it. It works fine. My understanding is data, by default, is split in 10 folds. I want data to be split into two sets (training and testing) when I create the model. On Weka UI, I can do it by using ""Percentage split"" radio button. I want to know how to do it through code. I want it to be split in two parts 80% being the training and 20% being the testing. Here is my code.</p>
+
+<pre><code>        FilteredClassifier model = new FilteredClassifier();
+        model.setFilter(new StringToWordVector());
+        model.setClassifier(new NaiveBayesMultinomial());
+        try {
+            model.buildClassifier(trainingSet);
+        } catch (Exception e1) { // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+
+        ObjectOutputStream oos = new ObjectOutputStream(
+                new FileOutputStream(
+                        ""/Users/me/models/MyModel.model""));
+        oos.writeObject(model);
+        oos.flush();
+        oos.close();
+</code></pre>
+
+<p>trainingSet here is already populated Instances object. Can someone help me with this?</p>
+
+<p>Thanks in advance!</p>
+",
+How to read the classifier confusion matrix in WEKA,"<p>Sorry, I am new to WEKA and just learning.</p>
+
+<p>In my decision tree (J48) classifier output, there is a confusion Matrix:</p>
+
+<pre><code>a    b   &lt;----- classified as
+130  8     a = functional
+15   150   b = non-functional
+</code></pre>
+
+<ul>
+<li>How do I read this matrix? What's the difference between a &amp; b?</li>
+<li>Also, can anyone explain to me what domain values are?</li>
+</ul>
+",Related to library: Lack of knowledge
+"Weka CSVLoader wrong number of values. Read 2, expected 23","<p>I am trying to convert a CSV to ARFF using Weka's CSVLoader from the GUI. In the options I set  the enclosure character for strings to be <code>""</code>, although there are no quotes in my file.
+I get the following error:</p>
+
+<pre><code>weka.core.converters.CSVLoaderfailed to lead &lt;my file&gt;
+Reason:
+wrong number of values. Read 2, expected 23, read Token[EOL], line 1763
+</code></pre>
+
+<p>Here are lines 1762-1764:</p>
+
+<pre><code>450c787001b004af69428e267c7a4ca1,I_need need_to to_go go_back back_to to_my my_live live_food food_diet diet_PPP PPP_Not Not_90% 90%_like like_before before_CCC CCC_but but_I I_bet bet_I I_could could_do do_75% 75%_without without_losing losing_too too_much much_weight weight_PPP PPP_PPP,2.30,3.50,4.50,2.85,4.50,n,y,y,n,y,AM,297,41728.8,95.58,0.03,42826,0.49,0.17,-12.5611111111,0.248945147679,0.0595238095238
+450c787001b004af69428e267c7a4ca1,It's_ugly ugly_here here_PPP PPP_But But_there there_are are_sparks sparks_PPP PPP_PPP PPP_PPPmoments PPPmoments_PPP PPP_Love Love_PPP,2.30,3.50,4.50,2.85,4.50,n,y,y,n,y,AM,297,41728.8,95.58,0.03,42826,0.49,0.17,-15.91,0.299242424242,0.1
+450c787001b004af69428e267c7a4ca1,I_guess guess_it it_all all_depends depends_on on_your your_mood mood_PPP PPP_PPP PPP_PPPwhy PPPwhy_can't can't_these these_meds meds_be be_any any_damn damn_good good_QQQ,2.30,3.50,4.50,2.85,4.50,n,y,y,n,y,AM,297,41728.8,95.58,0.03,42826,0.49,0.17,-12.9970588235,0.0,0.0344827586207
+</code></pre>
+
+<p>Any ideas? I can't seem to find the error.</p>
+
+<pre><code>EDIT---
+</code></pre>
+
+<p>Of course, right after I posted I found the ""error"" The CSVLoader does not like <strong>the % characters</strong>. So, I've changed my question: Does anyone know why this is or what other characters are not liked by it?</p>
+",Related to library: Bugs
+Learning Weka on the Command Line,"<p>I am fairly new to Weka and even more new to Weka on the command line.  I find documentation is poor and I am struggling to figure out a few things to do.  For example, want to take two .arff files, one for training, one for testing and get an output of predictions for the missing labels in the test data.</p>
+
+<p>How can I do this?</p>
+
+<p>I have this code as a starting block</p>
+
+<pre><code>java -classpath weka.jar weka.classifiers.meta.FilteredClassifier
+-t ""training_file_with_missing_values.arff""
+-T ""test_file_with_missing_values.arff""
+-F weka.filters.unsupervised.attribute.ReplaceMissingValues -- -c last
+-W weka.classifiers.functions.MultilayerPerceptron -- -L 0.3 -M 0.2 -H a
+</code></pre>
+
+<p>Running that code gives me ""Illegal option -c last"" and I am not sure why.  I am also not going to be using MLP as NN tend to be too slow when I have a few thousand features from the text data.  I know how to change it to another classifier though (like NB or libSVM so that is good).</p>
+
+<p>But I am not sure how to add multiple filters in one call as I also need to add the StringToWordVector filter (and possibly the Reorder filter to make the class the last, instead of first attribute).  </p>
+
+<p>And then how do I get it actually output me the prediction labels of each class?  And then store so those in an arff with the initial data.</p>
+",Related to library: Lack of knowledge

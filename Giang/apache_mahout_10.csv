@@ -1,0 +1,488 @@
+Title,Body
+"Recommendation Engines for Java applications","<p>I was wondering if there is any open source recommendation engine available? It should suggest something like Amazon and Netflix. I have heard of a framework called <a href=""http://mahout.apache.org/"" rel=""nofollow noreferrer"">Apache Mahout - Taste</a>. I am trying it next week. It would be great if you can share your valuable thoughts.</p>
+"
+"mahout lucene document clustering howto?","<p>I'm reading that i can create mahout vectors from a lucene index that can be used to apply the mahout clustering algorithms.
+<a href=""http://cwiki.apache.org/confluence/display/MAHOUT/Creating+Vectors+from+Text"" rel=""nofollow noreferrer"">http://cwiki.apache.org/confluence/display/MAHOUT/Creating+Vectors+from+Text</a></p>
+
+<p>I would like to apply K-means clustering algorithm in the documents in my Lucene index, but it is not clear how can i apply this algorithm (or hierarchical clustering) to extract meaningful clusters with these documents.</p>
+
+<p>In this page <a href=""http://cwiki.apache.org/confluence/display/MAHOUT/k-Means"" rel=""nofollow noreferrer"">http://cwiki.apache.org/confluence/display/MAHOUT/k-Means</a>
+says that the algorithm accepts two input directories: one for the data points and one for the initial clusters. My data points are the documents? How can i ""declare"" that these are my documents (or their vectors) , simply take them and do the clustering?</p>
+
+<p>sorry in advance for my poor grammar</p>
+
+<p>Thank you</p>
+"
+"Mahout Plugin for ruby on rails","<p>I want to use Apache Mahout in my project on Ruby on Rails for implementing recommendations and collaborative filtering. In Particular my requirements are:</p>
+
+<ol>
+<li>suggesting related tags.</li>
+<li>suggesting related articles.</li>
+<li>based on user's preferences prompt him for review of articles.</li>
+<li>based on geographical location, and other meta information of a user, suggest him similar users.</li>
+</ol>
+
+<p>I am open to using any other solution (other than mahout) if it integrates with rails easily and fulfills my requirements. </p>
+"
+"How to acquire or generate test data for a recommender system","<p>I'm currently researching recommender systems and would like to know how other researchers acquire or generate test data to evaluate the systems' performance? </p>
+"
+"What's difference between Collaborative Filtering Item-based recommendation and Content-based recommendation","<p>I am puzzled about what the item-based recommendation is in 《mahout in action》.There is the algorithm in the book:</p>
+
+<pre><code>for every item i that u has no preference for yet
+  for every item j that u has a preference for
+    compute a similarity s between i and j
+    add u's preference for j, weighted by s, to a running average
+return the top items, ranked by weighted average
+</code></pre>
+
+<p>what can I calculate the similarity between items? If using the content, isn't it content-based recommendation ? </p>
+"
+"Using machine learning to de-duplicate data","<p>I have the following problem and was thinking I could use machine learning but I'm not completely certain it will work for my use case.</p>
+
+<p>I have a data set of around a hundred million records containing customer data including names, addresses, emails, phones, etc and would like to find a way to clean this customer data and identify possible duplicates in the data set. </p>
+
+<p>Most of the data has been manually entered using an external system with no validation so a lot of our customers have ended up with more than one profile in our DB, sometimes with different data in each record. </p>
+
+<p>For Instance We might have 5 different entries for a customer John Doe, each with different contact details.</p>
+
+<p>We also have the case where multiple records that represent different customers match on key fields like email. For instance when a customer doesn't have an email address but the data entry system requires it our consultants will use a random email address, resulting in many different customer profiles using the same email address, same applies for phones, addresses etc.</p>
+
+<p>All of our data is indexed in Elasticsearch and stored in a SQL Server Database. My first thought was to use Mahout as a machine learning platform (since this is a Java shop) and maybe use H-base to store our data (just because it fits with the Hadoop Ecosystem, not sure if it will be of any real value), but the more I read about it the more confused I am as to how it would work in my case, for starters I'm not sure what kind of algorithm I could use since I'm not sure where this problem falls into, can I use a Clustering algorithm or a Classification algorithm? and of course certain rules will have to be used as to what constitutes a profile's uniqueness, i.e what fields.</p>
+
+<p>The idea is to have this deployed initially as a Customer Profile de-duplicator service of sorts that our data entry systems can use to validate and detect possible duplicates when entering a new customer profile and in the future perhaps develop this into an analytics platform to gather insight about our customers.</p>
+
+<p>Any feedback will be greatly appreciated :)</p>
+
+<p>Thanks.</p>
+"
+"Large scale machine learning - Python or Java?","<p>I am currently embarking on a project that will involve crawling and processing huge amounts of data (hundreds of gigs), and also mining them for extracting structured data, named entity recognition, deduplication, classification etc. </p>
+
+<p>I'm familiar with ML tools from both Java and the Python world: Lingpipe, Mahout, NLTK, etc. However, when it comes down to picking a platform for such a large scale problem - I lack sufficient experience to decide between Java or Python.</p>
+
+<p>I know this sounds like a vague question, and but I am looking for general advice on picking either Java or Python. The JVM offers better performance(?) over Python, but are libraries like Lingpipe etc. match up with the Python ecosystem? If I went this Python, how easy would it be scaling it and managing it across multiple machines etc.</p>
+
+<p>Which one should I go with and why?</p>
+"
+"Is it worth purchasing Mahout in Action to get up to speed with Mahout, or are there other better sources?","<p>I'm currently a very casual user of <a href=""http://mahout.apache.org/"" rel=""nofollow noreferrer"">Apache Mahout</a>, and I'm considering purchasing the book <a href=""http://www.manning.com/owen/"" rel=""nofollow noreferrer"">Mahout in Action</a>. Unfortunately, I'm having a really hard time getting an idea of how worth it this book is -- and seeing as it's a <a href=""http://www.manning.com/about/meap.html"" rel=""nofollow noreferrer"">Manning Early Access Program</a> book (and therefore only currently available as a beta-version e-book), I can't take a look myself in a bookstore.</p>
+
+<p>Can anyone recommend this as a good (or less good) guide to getting up to speed with Mahout, and/or other sources that can supplement the Mahout website?</p>
+"
+"Java's Mahout equivalent in Python","<p><strong><a href=""http://mahout.apache.org/"" rel=""nofollow"">Java based Mahout's</a></strong> goal is to build scalable machine learning libraries. Are there any equivalent libraries in Python ?</p>
+"
+"is it possible to use apache mahout without hadoop dependency?","<p>Is it possible to use Apache mahout without any dependency to Hadoop.</p>
+
+<p>I would like to use the mahout algorithm on a single computer by only including the mahout library inside my Java project but i dont want to use hadoop at all since i will be running on a single node anyway. </p>
+
+<p>Is that possible?</p>
+"
+"Classify data using Apache Mahout","<p>I am trying to solve a simple classification problem.</p>
+
+<p>The Problem:<br>
+    I have a set of text and I have to categorize them based on the content.</p>
+
+<p>Solution using Mahout:<br>
+    I understood that I have to convert the input to a sequence file to generate the model.  Yes, I was able to do this.  Now, how do I categorize my test data?  The 20News example only tests for correctness.  But,  I want to do the actual classification.<br>
+    I am not sure if I need to write code or use some existing classes available to classify the test set.?</p>
+"
+"Entity Extraction/Recognition with free tools while feeding Lucene Index","<p>I'm currently investigating the options to extract person names, locations, tech words and categories from text (a lot articles from the web) which will then feeded into a Lucene/ElasticSearch index. The additional information is then added as metadata and should increase precision of the search. </p>
+
+<p>E.g. when someone queries 'wicket' he should be able to decide whether he means the cricket sport or the Apache project. I tried to implement this on my own with minor success so far. Now I found a lot tools, but I'm not sure if they are suited for this task and which of them integrates good with Lucene or if precision of entity extraction is high enough.</p>
+
+<ul>
+<li><a href=""http://dbpedia.org/spotlight"" rel=""nofollow noreferrer"">Dbpedia Spotlight</a>, the <a href=""http://spotlight.dbpedia.org/demo/index.xhtml"" rel=""nofollow noreferrer"">demo</a> looks very promising</li>
+<li><a href=""http://incubator.apache.org/opennlp/index.html"" rel=""nofollow noreferrer"">OpenNLP</a> requires <a href=""https://stackoverflow.com/questions/6952512/how-i-train-an-named-entity-reconigzer-identifier-in-opennlp"">training</a>. Which training data to use?</li>
+<li><a href=""http://opennlp.sourceforge.net/projects.html"" rel=""nofollow noreferrer"">OpenNLP tools</a></li>
+<li><a href=""http://incubator.apache.org/stanbol/"" rel=""nofollow noreferrer"">Stanbol</a></li>
+<li><a href=""http://www.nltk.org/download"" rel=""nofollow noreferrer"">NLTK</a></li>
+<li><a href=""http://balie.sourceforge.net/"" rel=""nofollow noreferrer"">balie</a></li>
+<li><a href=""http://uima.apache.org/"" rel=""nofollow noreferrer"">UIMA</a></li>
+<li><a href=""http://gate.ac.uk/"" rel=""nofollow noreferrer"">GATE</a> -> <a href=""http://gate.ac.uk/wiki/code-repository/"" rel=""nofollow noreferrer"">example code</a></li>
+<li><a href=""http://mahout.apache.org/"" rel=""nofollow noreferrer"">Apache Mahout</a></li>
+<li><a href=""http://nlp.stanford.edu/software/CRF-NER.shtml"" rel=""nofollow noreferrer"">Stanford CRF-NER</a></li>
+<li><a href=""http://code.google.com/p/maui-indexer"" rel=""nofollow noreferrer"">maui-indexer</a></li>
+<li><a href=""http://mallet.cs.umass.edu/"" rel=""nofollow noreferrer"">Mallet</a></li>
+<li><a href=""http://cogcomp.cs.illinois.edu/page/software_view/4"" rel=""nofollow noreferrer"">Illinois Named Entity Tagger</a> Not open source but free</li>
+<li><a href=""http://code.google.com/p/wikipedianerdata/source/browse/trunk/src/main/entityExtractor/EntityExtractionManager.java?r=2"" rel=""nofollow noreferrer"">wikipedianer data</a></li>
+</ul>
+
+<p><strong>My questions:</strong></p>
+
+<ul>
+<li>Does anyone have experience with some of the listed tools above and its precision/recall? Or if there is training data required + available.</li>
+<li>Are there articles or tutorials where I can get started with entity extraction(NER) for each and every tool?</li>
+<li>How can they be integrated with Lucene?</li>
+</ul>
+
+<p>Here are some questions related to that subject:</p>
+
+<ul>
+<li><a href=""https://stackoverflow.com/questions/5544475/does-an-algorithm-exist-to-help-detect-the-primary-topic-of-an-english-sentence"">Does an algorithm exist to help detect the &quot;primary topic&quot; of an English sentence?</a></li>
+<li><a href=""https://stackoverflow.com/questions/188176/named-entity-recognition-libraries-for-java"">Named Entity Recognition Libraries for Java</a></li>
+<li><a href=""https://stackoverflow.com/questions/5571519/named-entity-recognition-with-java"">Named entity recognition with Java</a></li>
+</ul>
+"
+"Hadoop, Mahout real-time processing alternative","<p>I intended to use hadoop as ""computation cluster"" in my project. However then I read that Hadoop is not inteded for real-time systems because of overhead connected with start of a job. I'm looking for solution which could be use this way - jobs which could can be easly scaled into multiple machines but which does not require much input data. What is more I want to use machine learning jobs e.g. using created before neural network in real-time.</p>
+
+<p>What libraries/technologies I can use for this purposes? </p>
+"
+"How to start development for mahout","<p>After Installation of mahout from (http://girlincomputerscience.blogspot.com/2010/11/apache-mahout.html).How to Run mahout algo and from where i can get most popular as easy tutorial for mahout freshers....</p>
+
+<p>THanks in advance.</p>
+"
+"Recommendation Systems using Solr and Mahout","<p>I've been reading about using Solr and Mahout for developing Recommendation Systems.</p>
+
+<p>As I understood they handles two different problems.</p>
+
+<ol>
+<li>Since Solr is a search engine+classification system, it is used mostly for recommendations like ""more like this""
+in Drupal - <a href=""http://jamidwyer.com/d7/node/21"" rel=""noreferrer"">http://jamidwyer.com/d7/node/21</a> .</li>
+</ol>
+
+<p>(or ""Related"" feature in StackOverflow)</p>
+
+<ol start=""2"">
+<li>In the case of Mahout,it implements machine learning algorithms like Collaborative Filtering.It can be used to
+implement features like suggestions in Amazon based on users previous actions.(likes,bought items)</li>
+</ol>
+
+<p>My questions ,</p>
+
+<p>Are they used to address two different problems ?</p>
+
+<p>Can they be integrated ?</p>
+
+<p>I read Mahout does offline processing and scalable. Does this mean Solr cannot be scaled ? </p>
+"
+"Clustering (fkmeans) with Mahout using Clojure","<p>I am trying to write a short script to cluster my data via clojure (calling Mahout classes though). I have my input data in this format (which is an output from a <a href=""https://stackoverflow.com/questions/7075045/manipulating-data-to-matrix-like-format-in-php"">php script</a>)</p>
+
+<pre><code>format: (tag) (image) (frequency)
+tag_sit image_a 0
+tag_sit image_b 1
+tag_lorem image_a 1
+tag_lorem image_b 0
+tag_dolor image_a 0
+tag_dolor image_b 1
+tag_ipsum image_a 1
+tag_ipsum image_b 1
+tag_amit image_a 1
+tag_amit image_b 0
+... (more)
+</code></pre>
+
+<p>Then I write them into a SequenceFile using this script (clojure)</p>
+
+<pre><code>#!./bin/clj
+(ns sensei.sequence.core)
+
+(require 'clojure.string)
+(require 'clojure.java.io)
+
+(import org.apache.hadoop.conf.Configuration)
+(import org.apache.hadoop.fs.FileSystem)
+(import org.apache.hadoop.fs.Path)
+(import org.apache.hadoop.io.SequenceFile)
+(import org.apache.hadoop.io.Text)
+
+(import org.apache.mahout.math.VectorWritable)
+(import org.apache.mahout.math.SequentialAccessSparseVector)
+
+(with-open [reader (clojure.java.io/reader *in*)]
+  (let [hadoop_configuration ((fn []
+                                (let [conf (new Configuration)]
+                                  (. conf set ""fs.default.name"" ""hdfs://localhost:9000/"")
+                                  conf)))
+        hadoop_fs (FileSystem/get hadoop_configuration)]
+    (reduce
+      (fn [writer [index value]]
+        (. writer append index value)
+        writer)
+      (SequenceFile/createWriter
+        hadoop_fs
+        hadoop_configuration
+        (new Path ""test/sensei"")
+        Text
+        VectorWritable)
+      (map
+        (fn [[tag row_vector]]
+          (let [input_index (new Text tag)
+                input_vector (new VectorWritable)]
+            (. input_vector set row_vector)
+            [input_index input_vector]))
+        (map
+          (fn [[tag photo_list]]
+            (let [photo_map (apply hash-map photo_list)
+                  input_vector (new SequentialAccessSparseVector (count (vals photo_map)))]
+              (loop [frequency_list (vals photo_map)]
+                (if (zero? (count frequency_list))
+                  [tag input_vector]
+                  (when-not (zero? (count frequency_list))
+                    (. input_vector set
+                       (mod (count frequency_list) (count (vals photo_map)))
+                       (Integer/parseInt (first frequency_list)))
+                    (recur (rest frequency_list)))))))
+          (reduce
+            (fn [result next_line]
+              (let [[tag photo frequency] (clojure.string/split next_line #"" "")]
+                (update-in result [tag]
+                  #(if (nil? %)
+                     [photo frequency]
+                     (conj % photo frequency)))))
+            {}
+            (line-seq reader)))))))
+</code></pre>
+
+<p>Basically it turns the input into sequence file, in this format</p>
+
+<p>key (Text): $tag_uri
+value (VectorWritable): a vector (cardinality = number of documents) with numeric index and the respective frequency <code>&lt;0:1 1:0 2:0 3:1 4:0 ...&gt;</code></p>
+
+<p>Then I proceed to do the actual cluster with this script (by referring to this <a href=""http://dedcode.wordpress.com/2010/11/20/k-means-clustering-with-hadoop-and-mahout/"" rel=""nofollow noreferrer"">blog post</a>)</p>
+
+<pre><code>#!./bin/clj
+
+(ns sensei.clustering.fkmeans)
+
+(import org.apache.hadoop.conf.Configuration)
+(import org.apache.hadoop.fs.Path)
+
+(import org.apache.mahout.clustering.fuzzykmeans.FuzzyKMeansDriver)
+(import org.apache.mahout.common.distance.EuclideanDistanceMeasure)
+(import org.apache.mahout.clustering.kmeans.RandomSeedGenerator)
+
+(let [hadoop_configuration ((fn []
+                                (let [conf (new Configuration)]
+                                  (. conf set ""fs.default.name"" ""hdfs://127.0.0.1:9000/"")
+                                  conf)))
+      input_path (new Path ""test/sensei"")
+      output_path (new Path ""test/clusters"")
+      clusters_in_path (new Path ""test/clusters/cluster-0"")]
+  (FuzzyKMeansDriver/run
+    hadoop_configuration
+    input_path
+    (RandomSeedGenerator/buildRandom
+      hadoop_configuration
+      input_path
+      clusters_in_path
+      (int 2)
+      (new EuclideanDistanceMeasure))
+    output_path
+    (new EuclideanDistanceMeasure)
+    (double 0.5)
+    (int 10)
+    (float 5.0)
+    true
+    false
+    (double 0.0)
+    false)) '' runSequential
+</code></pre>
+
+<p>However I am getting output like this</p>
+
+<pre><code>SLF4J: Failed to load class ""org.slf4j.impl.StaticLoggerBinder"".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+11/08/25 15:20:16 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+11/08/25 15:20:16 INFO compress.CodecPool: Got brand-new compressor
+11/08/25 15:20:16 INFO compress.CodecPool: Got brand-new decompressor
+11/08/25 15:20:17 WARN mapred.JobClient: Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.
+11/08/25 15:20:17 INFO input.FileInputFormat: Total input paths to process : 1
+11/08/25 15:20:17 INFO mapred.JobClient: Running job: job_local_0001
+11/08/25 15:20:17 INFO mapred.MapTask: io.sort.mb = 100
+11/08/25 15:20:17 INFO mapred.MapTask: data buffer = 79691776/99614720
+11/08/25 15:20:17 INFO mapred.MapTask: record buffer = 262144/327680
+11/08/25 15:20:17 WARN mapred.LocalJobRunner: job_local_0001
+java.lang.IllegalStateException: No clusters found. Check your -c path.
+        at org.apache.mahout.clustering.fuzzykmeans.FuzzyKMeansMapper.setup(FuzzyKMeansMapper.java:62)
+        at org.apache.hadoop.mapreduce.Mapper.run(Mapper.java:142)
+        at org.apache.hadoop.mapred.MapTask.runNewMapper(MapTask.java:763)
+        at org.apache.hadoop.mapred.MapTask.run(MapTask.java:369)
+        at org.apache.hadoop.mapred.LocalJobRunner$Job.run(LocalJobRunner.java:210)
+11/08/25 15:20:18 INFO mapred.JobClient:  map 0% reduce 0%
+11/08/25 15:20:18 INFO mapred.JobClient: Job complete: job_local_0001
+11/08/25 15:20:18 INFO mapred.JobClient: Counters: 0
+Exception in thread ""main"" java.lang.RuntimeException: java.lang.InterruptedException: Fuzzy K-Means Iteration failed processing test/clusters/cluster-0/part-randomSeed
+        at clojure.lang.Util.runtimeException(Util.java:153)
+        at clojure.lang.Compiler.eval(Compiler.java:6417)
+        at clojure.lang.Compiler.load(Compiler.java:6843)
+        at clojure.lang.Compiler.loadFile(Compiler.java:6804)
+        at clojure.main$load_script.invoke(main.clj:282)
+        at clojure.main$script_opt.invoke(main.clj:342)
+        at clojure.main$main.doInvoke(main.clj:426)
+        at clojure.lang.RestFn.invoke(RestFn.java:436)
+        at clojure.lang.Var.invoke(Var.java:409)
+        at clojure.lang.AFn.applyToHelper(AFn.java:167)
+        at clojure.lang.Var.applyTo(Var.java:518)
+        at clojure.main.main(main.java:37)
+Caused by: java.lang.InterruptedException: Fuzzy K-Means Iteration failed processing test/clusters/cluster-0/part-randomSeed
+        at org.apache.mahout.clustering.fuzzykmeans.FuzzyKMeansDriver.runIteration(FuzzyKMeansDriver.java:252)
+        at org.apache.mahout.clustering.fuzzykmeans.FuzzyKMeansDriver.buildClustersMR(FuzzyKMeansDriver.java:421)
+        at org.apache.mahout.clustering.fuzzykmeans.FuzzyKMeansDriver.buildClusters(FuzzyKMeansDriver.java:345)
+        at org.apache.mahout.clustering.fuzzykmeans.FuzzyKMeansDriver.run(FuzzyKMeansDriver.java:295)
+        at sensei.clustering.fkmeans$eval17.invoke(fkmeans.clj:35)
+        at clojure.lang.Compiler.eval(Compiler.java:6406)
+        ... 10 more
+</code></pre>
+
+<p>When runSequential is set to true</p>
+
+<pre><code>SLF4J: Failed to load class ""org.slf4j.impl.StaticLoggerBinder"".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+11/09/07 14:32:32 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+11/09/07 14:32:32 INFO compress.CodecPool: Got brand-new compressor
+11/09/07 14:32:32 INFO compress.CodecPool: Got brand-new decompressor
+Exception in thread ""main"" java.lang.IllegalStateException: Clusters is empty!
+        at org.apache.mahout.clustering.fuzzykmeans.FuzzyKMeansDriver.buildClustersSeq(FuzzyKMeansDriver.java:361)
+        at org.apache.mahout.clustering.fuzzykmeans.FuzzyKMeansDriver.buildClusters(FuzzyKMeansDriver.java:343)
+        at org.apache.mahout.clustering.fuzzykmeans.FuzzyKMeansDriver.run(FuzzyKMeansDriver.java:295)
+        at sensei.clustering.fkmeans$eval17.invoke(fkmeans.clj:35)
+        at clojure.lang.Compiler.eval(Compiler.java:6465)
+        at clojure.lang.Compiler.load(Compiler.java:6902)
+        at clojure.lang.Compiler.loadFile(Compiler.java:6863)
+        at clojure.main$load_script.invoke(main.clj:282)
+        at clojure.main$script_opt.invoke(main.clj:342)
+        at clojure.main$main.doInvoke(main.clj:426)
+        at clojure.lang.RestFn.invoke(RestFn.java:436)
+        at clojure.lang.Var.invoke(Var.java:409)
+        at clojure.lang.AFn.applyToHelper(AFn.java:167)
+        at clojure.lang.Var.applyTo(Var.java:518)
+        at clojure.main.main(main.java:37)
+</code></pre>
+
+<p>I have also rewritten the fkmeans script to this form</p>
+
+<pre><code>#!./bin/clj
+
+(ns sensei.clustering.fkmeans)
+
+(import org.apache.hadoop.conf.Configuration)
+(import org.apache.hadoop.fs.Path)
+
+(import org.apache.mahout.clustering.fuzzykmeans.FuzzyKMeansDriver)
+(import org.apache.mahout.common.distance.EuclideanDistanceMeasure)
+(import org.apache.mahout.clustering.kmeans.RandomSeedGenerator)
+
+(let [hadoop_configuration ((fn []
+                                (let [conf (new Configuration)]
+                                  (. conf set ""fs.default.name"" ""hdfs://localhost:9000/"")
+                                  conf)))
+      driver (new FuzzyKMeansDriver)]
+  (. driver setConf hadoop_configuration)
+  (. driver
+     run
+     (into-array String [""--input"" ""test/sensei""
+                         ""--output"" ""test/clusters""
+                         ""--clusters"" ""test/clusters/clusters-0""
+                         ""--clustering""
+                         ""--overwrite""
+                         ""--emitMostLikely"" ""false""
+                         ""--numClusters"" ""3""
+                         ""--maxIter"" ""10""
+                         ""--m"" ""5""])))
+</code></pre>
+
+<p>but is still getting same error as the first initial version :/</p>
+
+<p>Command Line tool runs fine</p>
+
+<pre><code>$ bin/mahout fkmeans --input test/sensei --output test/clusters --clusters test/clusters/clusters-0 --clustering --overwrite --emitMostLikely false --numClusters 10 --maxIter 10 --m 5
+</code></pre>
+
+<p>However it would not return the points when I try clusterdumper even though --clustering option exists in the previous command and --pointsDir is defined here</p>
+
+<pre><code>$ ./bin/mahout clusterdump --seqFileDir test/clusters/clusters-1 --pointsDir test/clusters/clusteredPoints --output sensei.txt
+</code></pre>
+
+<p>Mahout version used: 0.6-snapshot, clojure 1.3.0-snapshot</p>
+
+<p>Please let me know if I miss out anything</p>
+"
+"Production architecture for big data real time machine learning application?","<p>I'm starting to learn some stuff about big data with a big focus on predictive analysis and for that I have a case study I would like to implement:</p>
+
+<p>I have a dataset of servers health information that is polled every 5sec. I want to show the data that is retrieved but more importantly: I want to run a machine learning model previously built and show the results (alert about servers going to crash).</p>
+
+<p>The machine learning model will be built by a machine learning specialist so that's completely out of scope. My job would be to integrate the machine learning model in a platform that runs the model and shows the results in a nice dashboard.</p>
+
+<p>My problem is the ""big picture"" architecture of this system: I see that all the pieces already exist (cloudera+mahout) but I'm missing a simple integrated solution for all my needs and I don't believe the state of art is doing some custom software...</p>
+
+<p>So, can anyone shed some light on production systems like this (showing data with predictive analysis)? Reference architecture for this? Tutorials/documentation?</p>
+
+<hr>
+
+<p>Notes:</p>
+
+<ol>
+<li><p>I've investigated some related technologies: cloudera/hadoop, pentaho, mahout and weka. I know that Pentaho for example is able to store big data and run ad-hoc Weka analysis on that data. Using cloudera and Impala a data specialist can also run ad-hoc queries and analyse the data but that's not my goal. I want my system to run the ML model and show the results in a nice dashboard alongside the retrieved data. And I'm looking for a platform that already allows this usage instead of custom building.</p></li>
+<li><p>I'm focusing on Pentaho as it seems to have a nice integration of Machine Learning but every tutorial I read was more about ""ad-hoc"" ML analysis than real-time. Any tutorial on that subject will be welcomed.</p></li>
+<li><p>I don't mind opensource or commercial solutions (with a trial)</p></li>
+<li><p>Depending of the specifics maybe this isn't big data: more ""traditional"" solutions are also welcomed.</p></li>
+<li><p>Also real time here is a broad term: if the ML model has good performance running it every 5sec is good enough.</p></li>
+<li><p>ML model is static (isn't real-time updating or changing its behavior)</p></li>
+<li><p>I'm not looking for a customized application for my example as my focus is on the big picture: big data with predictive analysis generic platforms.</p></li>
+</ol>
+"
+"HBase & Mahout - Using HBase as a Datastore/source for Mahout - Classification","<p>I'm working on a large text classification project and we have our text data (simple messages) stored in HBase. </p>
+
+<p>We have two problems, first we would like to use HBase as the source for Mahout classifiers namely Bayers and Random Forests. </p>
+
+<p>Second, we would like to be able to store the model generated in HBase instead of using the in memory approach (InMemoryBayesDatastore) however as our sets grow we are running into problems with memory utilization and would like to test out HBase as a viable alternative. </p>
+
+<p>There seems to be little material floating around using HBase with Mahout and if it's possible to use it as a potential datasource. I'm using Mahout 0.6 core API in Java which has the InMemory datastore. </p>
+
+<p>Doing a bit of digging I belive that there (was) a HBase Bayers Datastore component - <code>org.apache.mahout.classifier.bayes.datastore.HBaseBayesDatastore</code> See older JavaDoc here: <a href=""http://www.jarvana.com/jarvana/view/org/apache/mahout/mahout-core/0.3/mahout-core-0.3-javadoc.jar!/org/apache/mahout/classifier/bayes/datastore/HBaseBayesDatastore.html"" rel=""noreferrer"">http://www.jarvana.com/jarvana/view/org/apache/mahout/mahout-core/0.3/mahout-core-0.3-javadoc.jar!/org/apache/mahout/classifier/bayes/datastore/HBaseBayesDatastore.html</a> </p>
+
+<p>However, looking at the latest documentation it looks like this feature has disappeared..? <a href=""https://builds.apache.org/job/Mahout-Quality/javadoc/"" rel=""noreferrer"">https://builds.apache.org/job/Mahout-Quality/javadoc/</a></p>
+
+<p>I wanted to know if it was still possible to use HBase as a datastource for Bayers and RandomForests and are there any previous uses cases in this?</p>
+
+<p>Thanks!</p>
+"
+"Support Vector Machine for Java?","<p>I'd like to write a ""smart monitor"" in Java that sends out an alert any time it <em>detects</em> oncoming performance issues. My Java app is writing data in a structured format to a log file:</p>
+
+<pre><code>&lt;datetime&gt; | &lt;java-method&gt; | &lt;seconds-to-execute&gt;
+</code></pre>
+
+<p>So, for example, if I had a <code>Widget#doSomething(String)</code> method that took 812ms to execute, it would be logged as:</p>
+
+<pre><code>2013-03-24 11:39:21 | Widget#doSomething(String) | 812
+</code></pre>
+
+<p>As performance starts to degrade (such as during a major collection, during peak loads, or if the system is just slowing to a crawl), method execution timings start to slow down; so the right-most column starts to see huge numbers (sometime 20 - 40 seconds to execute a single method).</p>
+
+<p>In college - for a machine learning exercise - I wrote what my professor called a <em>linear dichotomizer</em> that took simple test data (the height, weight and gender of a person) and ""learned"" how to categorize a person as male or female based on their height/weight.  Then, once it had all its training data, we fed it new data to see how accurately it could determine gender.</p>
+
+<p>I <em>think</em> the multivariate version of a <em>linear dichotomizer</em> is something called a <a href=""http://en.wikipedia.org/wiki/Support_vector_machine""><em>support vector machine</em> (SVM)</a>. If I'm wrong, then please clarify and I'll change the title of my question to something more appropriate. <strong>Regardless</strong>, I need this app to do the following things:</p>
+
+<ul>
+<li>Run in a ""test mode"" where I feed it the structured log file from my main Java app (the one I wish to monitor) and it takes each log entry (as shown above) and uses it for <em>test data</em>
+<ul>
+<li>Only the <code>java-method</code> and <code>seconds-to-execute</code> columns are important as inputs/test data; I don't care about the datetime</li>
+</ul></li>
+<li>Run in ""monitor mode"" where it is actively reading new log data from the log file, and using similar ""machine learning"" techniques to determine if a a performance degradation is looming</li>
+</ul>
+
+<p>It's important to note that the <code>seconds-to-execute</code> column is not the only important factor here, as I've seen horrible timings for certain methods during periods of awesome performance, and really great timings for other methods at times when the server seemed like it was about to die and push daisies. So obviously <em>certain</em> methods are ""weighted""/more important to performance than others.</p>
+
+<h3>My question</h3>
+
+<ul>
+<li>Googling for ""linear dichotomizer"" or ""support vector machines"" turns up some really scary, highly-academic, ultra-cerebral white papers that I just don't have the mental energy (nor time) to consume - unless they truly are my only options; so I ask <strong>is there a laymen's introduction to this stuff, or a great site/article/tutorial for building such a system in Java</strong>?</li>
+<li>Are there any solid/stable open source Java libraries? I was only able to find <a href=""http://dev.davidsoergel.com/trac/jlibsvm/wiki""><code>jlibsvm</code></a> and <a href=""http://code.google.com/p/svmlearn/""><code>svmlearn</code></a> but the former looks to be in a pure beta state and the latter seems to only support binary decisions (like my old linear dichotomizer). I know there's <a href=""http://mahout.apache.org/""><strong>Mahout</strong></a> but that sits on top of Hadoop, and I don't think I have enough data to warrant the time and mental energy into setting up my own Hadoop cluster.</li>
+</ul>
+
+<p>Thanks in advance!</p>
+"
+"Why vector normalization can improve the accuracy of clustering and classification?","<p>It is described in Mahout in Action that normalization can slightly improve the accuracy.
+Can anyone explain the reason, thanks!</p>
+"
+"What is the difference between Apache Mahout and Apache Spark's MLlib?","<p>Considering a MySQL <code>products</code> database with 10 millions products for an e-commerce website. </p>
+
+<p>I'm trying to set up a classification module to categorize products. I'm using Apache Sqoop to import data from MySQL to Hadoop.</p>
+
+<p>I wanted to use Mahout over it as a Machine Learning framework to use one of it's <a href=""https://mahout.apache.org/users/basics/algorithms.html"">Classification algorithms</a>, and then I ran into Spark which is provided with <a href=""http://spark.apache.org/mllib/"">MLlib</a></p>
+
+<ul>
+<li>So what is the difference between the two frameworks?</li>
+<li>Mainly, what are the advantages,down-points and limitations of each?</li>
+</ul>
+"
